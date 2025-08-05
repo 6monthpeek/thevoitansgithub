@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&family=Cinzel:wght@600;700;800&display=swap');
+@import "tailwindcss";
+@import "../styles/tokens.css";
+/* NOTE: @import rules must come first to satisfy PostCSS/Tailwind parser */
+
+/* Base theme + Obsidian Royal tokens */
+:root {
+  /* Bridge CSS custom props to tokens.css for global usage */
+  --background: var(--bg-0);
+  --foreground: var(--fg);
+
+  /* Brand palette mapping to tokens */
+  --obsidian: var(--bg-0);
+  --royal: var(--accent-pink);
+  --royal-2: color-mix(in oklab, var(--accent-pink) 68%, #7c3aed 32%);
+  --cyber: var(--accent-cyan);
+  --glow: var(--accent-pink);
+
+  /* Surfaces from tokens */
+  --panel: var(--panel);
+  --hairline: var(--hairline);
+  --blur: var(--blur);
+
+  /* Accents as CSS vars used by components */
+  --accent-1: var(--accent-cyan);
+  --accent-2: var(--accent-pink);
+  --accent-3: var(--accent-lime);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Typography system */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --font-display: Cinzel, "Trajan Pro", "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* Update display font to Cinzel (from next/font, className is injected on body) */
+  --font-display: Cinzel, "Times New Roman", serif;
+}
+
+/* Global base */
+html, body {
+  height: 100%;
+}
+
+body {
+  /* Global typeface set to Members section font */
+  font-family: var(--font-sans);
+  /* Dark fantasy deep background */
+  background: #0A0B0D;
+  color: color-mix(in oklab, var(--fg) 90%, #cbd5e1 10%); /* daha yumuşak metin */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: auto; /* Native pointer */
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* Removed global noise layer to prevent top-half visual mismatch */
+body::before {}
+
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
+/* Mystic bottom glow (softer) */
+/* Removed bottom glow to keep background fully uniform */
+body::after {}
+
+/* Ensure native cursor is visible on interactive elements */
+a, button, [role="button"], input, select, textarea {
+  cursor: pointer;
+}
+
+/* Headings use display font (Cinzel via body class) + stronger glow */
+h1,h2,h3,.display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  text-shadow:
+    0 0 18px color-mix(in oklab, var(--accent-cyan) 12%, transparent),
+    0 0 6px color-mix(in oklab, var(--accent-lime) 10%, transparent);
+}
+
+/* Micro interactions – enhanced */
+a, button {
+  transition:
+    background-color .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+  will-change: transform, box-shadow;
+}
+a:hover, button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.32),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+/* Ornament lines for epic sections */
+.hr-ornament {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+}
+.hr-ornament::before,
+.hr-ornament::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10px; height: 10px;
+  border: 1px solid rgba(255,255,255,.22);
+  transform: translateY(-50%) rotate(45deg);
+  background: color-mix(in oklab, var(--accent-lime) 12%, transparent);
+}
+.hr-ornament::before { left: 16px; }
+.hr-ornament::after  { right: 16px; }
+
+/* Panels with inner/outer glow */
+.panel {
+  background: color-mix(in oklab, var(--panel) 92%, #0b0d12 8%);
+  backdrop-filter: blur(5px) saturate(120%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 16px 48px rgba(0,0,0,.35),
+    0 0 0 0.5px color-mix(in oklab, var(--royal) 18%, transparent);
+  border-radius: 16px;
+}
+
+/* Fancy buttons */
+.btn-epic {
+  position: relative;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  color: #0a0b0d;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: .65rem 1.1rem;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.35),
+    0 0 0 0.5px color-mix(in oklab, var(--accent-lime) 40%, transparent);
+}
+.btn-epic:hover {
+  border-color: rgba(255,255,255,.22);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.42),
+    0 0 0 0.5px color-mix(in oklab, var(--accent-lime) 55%, transparent),
+    0 0 26px color-mix(in oklab, var(--accent-cyan) 22%, transparent);
+}
+
+/* Header polish */
+.site-header {
+  background: color-mix(in oklab, var(--obsidian) 86%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+/* Animated grid backdrop */
+.bg-grid {
+  /* Animated sky / battlefield horizon */
+  background:
+    radial-gradient(1200px 600px at 50% 100%, rgba(53,180,255,0.08), transparent 60%),
+    radial-gradient(1000px 520px at 20% 20%, rgba(139,240,203,0.06), transparent 65%),
+    radial-gradient(900px 480px at 80% 30%, rgba(255,209,68,0.05), transparent 62%),
+    linear-gradient(#0A0B0D, #0A0B0D);
+  background-size: auto;
+  background-position: 0 0;
+  animation: bgFloat 12s ease-in-out infinite;
+}
+@keyframes bgFloat {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+  50% { background-position: 0 -8px, 0 -5px, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+}
+
+/* Tabs container and readable text blocks */
+.tablist {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 72rem;
+  padding-left: .25rem;
+  padding-right: .25rem;
+}
+.prose, .panel, p, li {
+  line-height: 1.7;
+}
+p, li {
+  color: color-mix(in oklab, var(--fg) 92%, #cbd5e1 8%);
+}
+ul { padding-left: 1.1rem; }
+section .text-zinc-300 { color: color-mix(in oklab, #d1d5db 90%, #cbd5e1 10%); }

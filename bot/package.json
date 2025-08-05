@@ -1,0 +1,18 @@
+{
+  "name": "voitans-bot",
+  "version": "1.0.0",
+  "description": "Discord.js v14 ile yapılmış modern bir bot altyapısı",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Ömer",
+  "license": "MIT",
+  "dependencies": {
+    "@discordjs/rest": "^2.5.1",
+    "discord-api-types": "^0.38.17",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^3.3.2"
+  }
+}

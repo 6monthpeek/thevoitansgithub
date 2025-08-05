@@ -1,0 +1,900 @@
+{
+  "channel": "1161659153606000660",
+  "count": 42,
+  "messages": [
+    {
+      "id": "1266714585042518119",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-07-27T11:11:31.493000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1262148611039563796/1266713524571209802 güncellendi.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1255272003762524261",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-06-25T21:22:47.523000+00:00",
+      "edited_timestamp": "2024-06-25T21:40:48.273000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "* https://discord.com/channels/1140361736470409316/1255256270404063276/1255269315955921076 eklendi.\n* https://discord.com/channels/1140361736470409316/1255258675900317788 eklendi.\n* <:silver:1255276302467072050> emojisi eklendi. `:silver:`",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1252977854753538129",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-06-19T13:26:39.776000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "`!friend`\n`!pvp`\n`!docs`\n\nkomutları eklendi.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1251880624055386246",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-06-16T12:46:39.592000+00:00",
+      "edited_timestamp": "2024-06-16T12:47:10.058000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1239716350390304810 rehbere yeni güncelleme eklendi.\n- 291 AP | 353 DP \n * ile ortalama 6-8 saniye aralığında gyfindeki mob ölüyor. \n * Bu dp'ye rağmen lahn için özel bir güncelleme yayınladık.\n\n- Düşük DP için\n * Yeni beceri eklentisi eklendi.\n * Kombo güncellendi.\n\n- Kullanılan Eser: Arkanı Kolla [Ort Fiyat: 1B]",
+      "attachments": [
+        {
+          "id": "1251880623866515527",
+          "filename": "image.png",
+          "size": 108410,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1251880623866515527/image.png?ex=688f5a2f&is=688e08af&hm=6e7648d960804d5b97642aee728e4dae4fd95c9bcd5f1504e74d800c68f1a882&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1251880623866515527/image.png?ex=688f5a2f&is=688e08af&hm=6e7648d960804d5b97642aee728e4dae4fd95c9bcd5f1504e74d800c68f1a882&",
+          "content_type": "image/png",
+          "width": 399,
+          "height": 603
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1250921490392809472",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-06-13T21:15:24.307000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "<@&1140381309500412008> https://discord.com/channels/1140361736470409316/1233747790744518789/1249904609175277620\nCadı dökümanındaki addons güncellendi. Son addon yanlıştı düzeltildi. Bunu ping atarak paylaşıyorum çünkü çoğu kişi yaptı. Anlayışınız için teşekkür ederim.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": [
+          "1140381309500412008"
+        ]
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1249913550911176705",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-06-11T02:30:12.808000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Arkadaşlar cadı dökümanında bulunan beceri eklentisi ve komboda güncelleme yapılmıştır.\n\n## Detaylar\n* 274 AP / 329 DP'lik bir gearscore ile test edilmiş olup tet şimşeği ve zehir atılması unutulmasına rağmen saatlik ortalaması 27K çıktı.\n* Bu gear'dan özellikle AP bakımından daha yukarıdaysanız min 30k çöp almanız gerekiyor.\n* Yapılan teste örnek resim aşağıda mevcut. Test yaparken kolye düşmüştü kolyeyi de ekledik. Zaten bu kadar çöp kasıldığı zaman mobu daha hızlı kesiyorsunuz demek bu da aksesuar düşürme ihtimalinizi arttırıyor.\n* Paramız biraz vardı bizde kristalleri es geçmişiz. Bir önceki duyuruyu sildim garmoth.com'daki veri yanlış kalmış.\n * İşin daha da komik yanı bu kadar boktan bir kristal buildi ile birlikte bu kadar fazla para kazandık.\n\n### Giderilen Hatalar\n* Kombo akıcılığı\n * Kombo istediğimiz akıcılıkta değildi ve bu yüzden gereksiz beceriler kaldırıldı.\n * Beceri sayısı azalsa da ilk üç beceri hemen yenilendiği için rahatlıkla spam atmamızı sağlıyor. (Hasarları çok yüksek, anormal)\n* Beceri eklentisi\n * Beceri eklentilerindeki en büyük sorunlardan birisi DP kırmaydı. Bir beceriye eklediğimiz eklenti sayesinde bir kez DP kırıp, 2-3 beceri sonrasında ise attığımız becerinin kendisi DP kırıyordu. Bunu düzelttik ve artık tek beceride iki kez DP(Savunma) kırılabiliyor.\n * Kritik ve arkadan vurulan %5 hasarın daha fazla üzerimizde kalması için kombonun gidişatına göre eklemeler yapıldı.\n* Kristal buildleri\n * Kristaller biraz daha pahalıydı ve Kuvvet kristalini bulmak zordu. Bizde başta JIN Addis ve JIN Carmae olmak üzere onları kullandık. Hem fiyat bakımından kuvvetten ucuz hem de AP bakımından aynı özellikleri veriyordu. Tedariği daha kolay ve ucuz olan kristalleri tercih ederek fiyat/performans arttırıldı.\n * Early ve Mid Game kristal buildlerinde Macalod sayısı azaltılarak fiyat/performansa uygun kristaller tercih edilerek buildlerden alınan AP arttırıldı.\n\n### [Başlamak için tıkla](https://discord.com/channels/1140361736470409316/1233747790744518789/1249904580079386697)",
+      "attachments": [
+        {
+          "id": "1249913550718107753",
+          "filename": "image.png",
+          "size": 289608,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1249913550718107753/image.png?ex=688f7274&is=688e20f4&hm=a758a7e14d9b00b1a343df1de4cdfa468fa0eb74747fb06bfdd75b1456ccf109&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1249913550718107753/image.png?ex=688f7274&is=688e20f4&hm=a758a7e14d9b00b1a343df1de4cdfa468fa0eb74747fb06bfdd75b1456ccf109&",
+          "content_type": "image/png",
+          "width": 720,
+          "height": 944
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1243420713252032632",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-24T04:29:59.679000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1238256790848802836 güncellendi",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1241872344759402657",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-19T21:57:19.863000+00:00",
+      "edited_timestamp": "2024-05-19T22:05:36.369000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "```js\n        if (matchMember == null) {\n          oldState.channel.setName(`「🌀」 ⌐ Lobi ${oldState.channel.members.random().displayName}`);\n```\n* Lobi sistemindeki logo hatası giderildi\n* CPU, Disk ve RAM kullanımı azaltıldı.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1241561418466332744",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-19T01:21:49.258000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "`!katıl` komutu eklenmiştir.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1239717649475309609",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-13T23:15:20.475000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "- https://discord.com/channels/1140361736470409316/1239716350390304810\n- https://discord.com/channels/1140361736470409316/1239690372674752543\neklendi.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1238314348179619902",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-10T02:19:07.374000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1205769546015707157 güncellendi.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1238260948394053722",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-09T22:46:55.873000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1238259068523778058 yayınlandı.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1238248880706162911",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-09T21:58:58.712000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "https://discord.com/channels/1140361736470409316/1238246452426178713 yayınlandı.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1236765778297094305",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-05-05T19:45:39.543000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# Cadı için gerekli kombo ve beceri eklentisi güncellemeleri yapılmıştır. @everyone \nhttps://discord.com/channels/1140361736470409316/1233747790744518789/1236764272902799430",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1234926612655378432",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-04-30T17:57:28.284000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Merhaba,\nOda durumunu güncelleyememizle alakalı bir sorun vardı. Discord güncelleme getirmiş artık odaya sağ tıklayarak odanın durumunu güncelleyebiliyoruz. İyi akşamlar dilerim @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1234926448960213063",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-04-30T17:56:49.256000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "",
+      "attachments": [
+        {
+          "id": "1234926448746299413",
+          "filename": "image.png",
+          "size": 47782,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1234926448746299413/image.png?ex=688fa2e1&is=688e5161&hm=d15614b6e87efaeba40d754403f66744d091f448c32d99494c0d18c9f27470b4&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1234926448746299413/image.png?ex=688fa2e1&is=688e5161&hm=d15614b6e87efaeba40d754403f66744d091f448c32d99494c0d18c9f27470b4&",
+          "content_type": "image/png",
+          "width": 280,
+          "height": 487
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1234926360385032264",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-04-30T17:56:28.138000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "",
+      "attachments": [
+        {
+          "id": "1234926360225386598",
+          "filename": "image.png",
+          "size": 4609,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1234926360225386598/image.png?ex=688fa2cc&is=688e514c&hm=5bff0c061d4cf63971126af75fb24db88f7277a074150ccd7eb7333c56834545&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1234926360225386598/image.png?ex=688fa2cc&is=688e514c&hm=5bff0c061d4cf63971126af75fb24db88f7277a074150ccd7eb7333c56834545&",
+          "content_type": "image/png",
+          "width": 211,
+          "height": 64
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1233748427074961489",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-04-27T11:55:46.952000+00:00",
+      "edited_timestamp": "2024-04-30T11:55:27.202000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# Eklenenler @everyone\n* https://discord.com/channels/1140361736470409316/1232313109226455111\n* https://discord.com/channels/1140361736470409316/1232395765335199885\n* https://discord.com/channels/1140361736470409316/1232313109226455111\n\n# Cadı ve Gyfin\n* Herkesin gerçekten merakla ve inanmayarak beklediği içerik, iyi seyirler.\nhttps://www.youtube.com/watch?v=V7uGbXHaFiE&ab_channel=EuvanZone\n\n*video yeni combo ile güncellenecek! Aktarım haliyle pro combo yüklenecek*",
+      "attachments": [],
+      "embeds": [
+        {
+          "type": "video",
+          "title": "Gyfin ve Cadı",
+          "url": "https://www.youtube.com/watch?v=V7uGbXHaFiE"
+        }
+      ],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1228487822437126245",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-04-12T23:32:01.069000+00:00",
+      "edited_timestamp": "2024-04-13T13:15:19.322000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# Büyüme ve Gelişme Çapında Eklediklerimiz @everyone\n* https://discord.com/channels/1140361736470409316/1205423807679045694 kanalına bir çok bilgi eklenmeye başladı.\n * https://discord.com/channels/1140361736470409316/1227644734437195897\n * https://discord.com/channels/1140361736470409316/1227337172529709107\n * https://discord.com/channels/1140361736470409316/1227274250851713045\n * https://discord.com/channels/1140361736470409316/1227246918791462933\n * https://discord.com/channels/1140361736470409316/1227242465736790096\n * https://discord.com/channels/1140361736470409316/1222269271569338469\n * https://discord.com/channels/1140361736470409316/1212395650931626067\n * https://discord.com/channels/1140361736470409316/1219011725593153656\n * https://discord.com/channels/1140361736470409316/1217844126683500554\n * https://discord.com/channels/1140361736470409316/1216365589161836634\n * https://discord.com/channels/1140361736470409316/1216019102561472562\n * https://discord.com/channels/1140361736470409316/1215922632135016499\n * https://discord.com/channels/1140361736470409316/1215923083286810755\n * https://discord.com/channels/1140361736470409316/1212689612091428884\n * https://discord.com/channels/1140361736470409316/1212447576750563400\n * https://discord.com/channels/1140361736470409316/1212446010521944134\n * https://discord.com/channels/1140361736470409316/1211609081543004230\n * https://discord.com/channels/1140361736470409316/1211598816130768946\n * https://discord.com/channels/1140361736470409316/1211102202152615966\n * https://discord.com/channels/1140361736470409316/1205799400522260530\n * https://discord.com/channels/1140361736470409316/1205760641231622215\n * https://discord.com/channels/1140361736470409316/1214874569525956658\n*Sizlerin de rehber konusunda detaylı desteklerinizi bekliyoruz. Discord Markdown kullanılmayan rehberler yakında silinecektir.*\n\n## META Kategorisi\n* 6mp-peek Guide'e yeni trickler eklendi.\n* <#1227281355163963585> ses kanalı türkçe yapıldı.\n * Lobi oluştura tıklayarak odayı oluşturan kişi, odadaki kullanıcı limitini güncelleyebiliyor.\n * İlerleyen dönemlerde izinleri de aktifleştirmeyi planlıyoruz fakat bu yetkiyi kötüye kullanmak isteyenlerin de önüne geçmek istiyoruz. Şükür ki bizim loncamızda bu tarz insanlar yok yakında aktifleşecek 🙂\n\nMerhaba,\nAşağıya eklemiş olduğum videoda tüm detayları bizzat kendim anlattım, iyi seyirler.\nhttps://www.youtube.com/watch?v=uHuUGtAmh6o&ab_channel=EuvanZone",
+      "attachments": [],
+      "embeds": [
+        {
+          "type": "video",
+          "title": "9 Dakikada Gyfin Rhasia Tapınağı",
+          "url": "https://www.youtube.com/watch?v=uHuUGtAmh6o"
+        }
+      ],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1209824197027569664",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-21T11:29:26.018000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# Discord sunucumuzun boostu ve sunucu linki\n* Sunucumuz üçüncü seviye olmakla beraber discord.gg/thevoitans davet linkimiz etkinleştirilmiştir.\n * 2k 60fps yayın\n * Banner\n * Özel davet linki",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1209194239251189822",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-19T17:46:12.380000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "### Black Desert'a yeni gelecek olan karakterin erkek olduğu doğrulandı. \n* Tahminler gunner olması yönünde fakat net bir bilgi henüz yok.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1209185396626296892",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-19T17:11:04.134000+00:00",
+      "edited_timestamp": "2024-02-19T17:11:37.868000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "* Klan sunucularımız; Serendia-1 ve Serendia-2 olmak üzere güncellenmiştir.\n * Serendia sunucuları arasında bekleme süresi olmadan geçiş yapabilirsiniz.\n * +RNG test.\n* Sunucumuzun bannerı güncellendi.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1209087553970507806",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-19T10:42:16.627000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "* New World tek kategori haline getirildi.\n * Black Desert META kategorisine eklendi.\n * Sunucu Rehberi, Kanal ve Rol Seçimi güncellenecek.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1209041041915772928",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-19T07:37:27.289000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "* Sunucudaki banner güncellendi.\n * Vell'e kadar bize eşlik ettiğiniz için hepinize teşekkür ederiz.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1205467318424043540",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-02-09T10:56:45.212000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "* Voitans için pvp grupları metin kanallarını kaldırdık.\n* Pvp-genel kanalı kaldırıldı. \n * <#1198924012559028264>  kanalından voitans'a özel metin akışı devam edecek.\n* Black Desert için yeni kategori oluşturuldu şimdilik kapalı beta sürecinde olduğu için sadece ilgi duyanlara erişimi açtık.\n* Sea Of Thieves için istenilen asgari miktar karşılanır ise kategori açılacak.\n* New World için asgari miktar karşılanır ise savaşlar devam edecek.\n * Sayın Tankımız Erkut eşliğinde her akşam zindanlar devam ediyor.\n* Yapay zeka hakkında çalışmalar sürüyor, deep learning mantığıyla ilerlemek için yeni çalışmalar yapıyoruz.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1202099469600948254",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-01-31T03:54:07.481000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## Buradaki soruları cevaplayınız.",
+      "attachments": [
+        {
+          "id": "1202099469420855296",
+          "filename": "image.png",
+          "size": 27762,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1202099469420855296/image.png?ex=688f861f&is=688e349f&hm=e60afad8d6b97c469a4f956b25d34b6af82bf212e1dd7ebf5048c8482fd690f0&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1202099469420855296/image.png?ex=688f861f&is=688e349f&hm=e60afad8d6b97c469a4f956b25d34b6af82bf212e1dd7ebf5048c8482fd690f0&",
+          "content_type": "image/png",
+          "width": 1221,
+          "height": 338
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1202099352110112798",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-01-31T03:53:39.469000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## Artık sunucun sağ üstünde bulunan ''Kanallar ve Roller'' bölümünden direkt seçim yapabilirsiniz. (birden fazla seçim vardır)",
+      "attachments": [
+        {
+          "id": "1202099351921639424",
+          "filename": "voitans.png",
+          "size": 69725,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1202099351921639424/voitans.png?ex=688f8603&is=688e3483&hm=8165228a95c5f646927d91f0b6e3784bf99ee46c407f204c2f12ce803b77f6a3&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1202099351921639424/voitans.png?ex=688f8603&is=688e3483&hm=8165228a95c5f646927d91f0b6e3784bf99ee46c407f204c2f12ce803b77f6a3&",
+          "content_type": "image/png",
+          "width": 225,
+          "height": 246
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1202099240118263829",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-01-31T03:53:12.768000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## Sınıf ve Silah seçme kategorisi daha düzenli bir sunucu için silindi. (düzenlendi)\n||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [
+        {
+          "id": "1202099239845638144",
+          "filename": "image.png",
+          "size": 18370,
+          "url": "https://cdn.discordapp.com/attachments/1161659153606000660/1202099239845638144/image.png?ex=688f85e8&is=688e3468&hm=05fc8f2b2d4d014fa2ba79e4c07cbefb1ea37f8434eb1dfd96f7dd0890675251&",
+          "proxy_url": "https://media.discordapp.net/attachments/1161659153606000660/1202099239845638144/image.png?ex=688f85e8&is=688e3468&hm=05fc8f2b2d4d014fa2ba79e4c07cbefb1ea37f8434eb1dfd96f7dd0890675251&",
+          "content_type": "image/png",
+          "width": 243,
+          "height": 104
+        }
+      ],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1199492416911196211",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-01-23T23:14:37.683000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Pvp builds kanalına ek bilgiler eklendi. Daha fazlası gelecek.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1192383618912354305",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2024-01-04T08:26:48.165000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "<#1192355254411460668> knowledge forum kategorisinden çıkartılıp mutasyon ve lobi kurma kısmında ana kanal olarak eklenmiştir.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1188767861141950484",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-25T08:59:04.335000+00:00",
+      "edited_timestamp": "2023-12-25T09:06:27.473000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Yakında yeni bildirimler yayınlayacağız fakat bunlardan önce hayattaki sorumluluklarımı yerine getirmem gerekiyor. Dönüş yapacağız",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1188166614986797056",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-23T17:09:56.081000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# <#1186253388762075186> eklendi @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1186973085220474901",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-20T10:07:16.410000+00:00",
+      "edited_timestamp": "2023-12-20T10:08:36.545000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Savaş için <#1186953950373629992> eklenmiştir, analiz amaçlı oluşturulmuştur.\n* <#1140379021549518858> kanalına Flail yakında eklenecek.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1186253268205179016",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-18T10:26:58.660000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "Verified kanalı silinmiştir.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1183767894199369768",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-11T13:50:59.321000+00:00",
+      "edited_timestamp": "2023-12-11T13:51:16.767000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "## Sezon 4 Hakkında\n* Sezon 4 için bir giriş yazısı yazdık. Okuyup sezon 4 hakkında bilgi edinebilirsiniz. @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1182853305525882950",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-09T01:16:44.389000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## Silah Leveli Kasma\n- <#1182852715504734249> Sadece OKU !!!\n||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1181341132802752522",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-12-04T21:07:54.317000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## New World Buddy\n- Yeni bir rehber yayınlandı <#1181340018598486166> gayet yararlı bi rehber bakmanızı öneririm.\n||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1179564401246867467",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-11-29T23:27:48.504000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "## Bugün Yayınlanan Bilgiler\n\n- <#1179540019107598508> ---> Neden Gear Set almalısınız ve kullanmalısınız ?\n- <#1179562690646122516> ---> Ne kadar çok ağırlık taşıyabilirim veya depolayabilirim ?\n||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1178811088188477571",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-11-27T21:34:24.675000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "574489991212695552",
+        "username": "tekkol",
+        "global_name": "Tekkol"
+      },
+      "content": "# Oyun İçi Kostümün Yok Mu ?\n\n\n### Transmog Token hakkında yeni bir rehber hazırladık.\n\n<#1178809112549675090>\n||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1177555613211955230",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-11-24T10:25:36.115000+00:00",
+      "edited_timestamp": "2023-11-24T10:27:58.181000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "# <@972569323258413106> güncellenmiştir! @everyone\n* Belirli aralıklarla çevrimiçi olduğu vakit sizlere komutların varlığını hatırlatmak amacıyla <#1140379269705502821> kanalına bilgilendirme yapacak.\n* Artık her ay mesaj ve ses süresi sıfırlaması yapacağız. \n * İlk sıfırlama tarihi 01.12.2023\n * Aylık aktivite takibi yapılabilecek.\n* En önemli sorunlardan birisi olan <#1140649165991465112> kanalına tıklayıp oda oluşturduğumuzda, odayı oluşturan kişiye **odayı yönetme** yetkisi verilmeme sorunu giderildi.\n* Logta bir takım güncellemeler yapıldı.\n* <#1161655818786181180> odasındaki bir takım sorunlar giderildi.\n* <#1176916997481697382> otomatik olacak şekilde güncellenecek.\n* <#1176871404910678046> Gypsum craftlayabileceğiniz ideal item listesi eklendi.\n* <#1140381955083468921> marketplace pingi için yeni bir güncelleme gelecek.\n* <#1140379397065543795> kanalına sadece fotoğraf ve oyuncu nicki sebebi yazılacak şekilde bir komut güncellemesi gelecek.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [
+          {
+            "id": "972569323258413106",
+            "username": "THE VOITANS Manager"
+          }
+        ],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1172843078848102400",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-11-11T10:19:40.368000+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "## Dark  Ascent Rünü Hakkında \n> [Combat Ability Disabled] Due to an issue, the effects of \"Heartrune of Dark Ascent\" have been temporarily disabled. Although the heartrune can still be slotted, its activation is currently not possible. The ability will be re-enabled once the problem is addressed in a future patch. We apologize for any inconvenience this may cause.\n\n> [Savaş Yeteneği Devre Dışı] Bir sorun nedeniyle, \"Dark Ascent \"rününün etkileri geçici olarak devre dışı bırakıldı. Heartrune hâlâ yuvalanabilir olsa da, etkinleştirilmesi şu anda mümkün değil. Gelecekteki bir yamada sorun çözüldüğünde yetenek yeniden etkinleştirilecektir. Bu durumun yol açabileceği her türlü rahatsızlık için özür dileriz.",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    },
+    {
+      "id": "1161659606574039141",
+      "channel_id": "1161659153606000660",
+      "timestamp": "2023-10-11T13:40:32.799000+00:00",
+      "edited_timestamp": "2023-10-11T13:57:09.763000+00:00",
+      "author": {
+        "id": "285154906766180362",
+        "username": "6monthpeek",
+        "global_name": "6monthpeek"
+      },
+      "content": "## AFK Odası Hakkında\n* Yoğun gelen **talepler** ardından <#1161655818786181180> kanalını etkinleştirdik. Hem size özel oda oluşturuyoruz hem de AFK kalarak da sunucudaki **aktifliği koruyoruz.** ||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|||||||||||| @everyone",
+      "attachments": [],
+      "embeds": [],
+      "mentions": {
+        "users": [],
+        "roles": []
+      },
+      "referenced_message_id": null
+    }
+  ]
+}

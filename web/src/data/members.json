@@ -1,0 +1,16 @@
+[
+  { "id": "285154906766180362", "role": "Healer", "class": "Bard" },
+  { "id": "395283215251800093", "role": "DPS", "class": "Fighter" },
+  { "id": "303285579062181888", "role": "Tank", "class": "Tank" },
+  { "id": "140578474074177536", "role": "DPS", "class": "Mage" },
+  { "id": "269595686230556673", "role": "DPS", "class": "Fighter" },
+  { "id": "294441277699915776", "role": "DPS", "class": "Mage" },
+  { "id": "1200454448883965974", "role": "DPS", "class": "Fighter" },
+  { "id": "419471279511568384", "role": "Tank", "class": "Tank" },
+  { "id": "298904157165715457", "role": "DPS", "class": "Fighter" },
+  { "id": "413879154707267595", "role": "DPS", "class": "Rogue" },
+  { "id": "938834321228308480", "role": "Healer", "class": "Cleric" },
+  { "id": "704485360264151091", "role": "DPS", "class": "Mage" },
+  { "id": "596067126679175228", "role": "Tank", "class": "Tank" },
+  { "id": "381885271681138688", "role": "DPS", "class": "Mage" }
+]

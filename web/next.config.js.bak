@@ -1,0 +1,7 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  // i18n ayarları App Router ile uyumlu değil, kaldırıldı
+};
+
+module.exports = nextConfig;
