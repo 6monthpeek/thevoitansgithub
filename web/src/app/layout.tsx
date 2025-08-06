@@ -77,8 +77,9 @@ export const metadata: Metadata = {
 
 import React from "react";
 import dynamic from "next/dynamic";
-// Client-only bileşenleri server layout'ta dinamik yükle
-const ClientShell = dynamic(() => import("../components/LayoutClientShell"), { ssr: false });
+// Server Component içinde ssr:false kullanılamaz; bu nedenle sadece dynamic import kullanıp
+// ssr bayrağını kaldırıyoruz. LayoutClientShell zaten "use client" içerir.
+const ClientShell = dynamic(() => import("../components/LayoutClientShell"));
 
 export default function RootLayout({
   children,
