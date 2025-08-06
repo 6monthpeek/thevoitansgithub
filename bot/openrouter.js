@@ -234,6 +234,16 @@ async function callOpenRouter(messages, opts = {}) {
           }
         }
 
+        // Moderation modunda çıktı yalnızca tek JSON olmalı; post-filter uygula
+        if (intentHint === "moderation") {
+          const onlyJson = extractFirstJsonObject(text);
+          if (!onlyJson) {
+            console.warn("[openrouter][moderation] JSON parse failed, raw:", (text||"").slice(0,200));
+            throw new Error("Moderation output is not valid JSON");
+          }
+          return JSON.stringify(onlyJson);
+        }
+
         return text;
       } catch (e) {
         clearTimeout(t);
