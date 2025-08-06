@@ -750,8 +750,13 @@ function MembersSection() {
 export default function Home() {
   const { data: session } = useSession() as any;
   const roles: Array<{ id: string; name: string }> =
-    (session?.user?.guildMember?.roles as any[])?.map((r) => ({ id: r.id, name: r.name })) ?? [];
-  const isSeniorOfficer = roles.some((r) => r.name?.toLowerCase() === "senior officer");
+    (session?.user?.guildMember?.roles as any[])?.map((r) => ({ id: String(r.id), name: r.name })) ?? [];
+
+  // ID bazlı kontrol (isim bağımsız)
+  const SENIOR_OFFICER_ROLE_ID =
+    (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SENIOR_OFFICER_ROLE_ID || process.env.SENIOR_OFFICER_ROLE_ID)) ||
+    "1249512318929342505";
+  const isSeniorOfficer = roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID));
 
   const [tab, setTab] = useState<
     "home" | "about" | "adventures" | "members" | "announcements" | "streams" | "schedule" | "join" | "officer"
@@ -800,7 +805,34 @@ export default function Home() {
         }}
       >
         {/* Header */}
-{/* Header kaldırıldı: üst bar (logo/discord/x) footer mevcut olduğundan gereksiz */}
+{/* Header: üst bar (logo • menü • auth) */}
+<header className="site-header sticky top-0 z-40 border-b border-white/5 backdrop-blur">
+  <div className="mx-auto max-w-6xl px-4 py-2 flex items-center justify-between">
+    {/* Sol: Logo */}
+    <a href="/" className="inline-flex items-center gap-2">
+      <img src="/voitans-logo.svg" alt="Voitans" className="h-6 w-6" />
+      <span className="text-sm text-zinc-200">Voitans</span>
+    </a>
+
+    {/* Orta: Menü */}
+    <nav className="hidden md:flex items-center gap-4 text-sm text-zinc-300">
+      <a href="#home" className="hover:text-white/90">Ana Sayfa</a>
+      <a href="#about" className="hover:text-white/90">Hakkımızda</a>
+      <a href="#adventures" className="hover:text-white/90">Maceralarımız</a>
+      <a href="#members" className="hover:text-white/90">Üyeler</a>
+      {/* Officer: navbar’da buton (rol kontrolü ile) */}
+      {/* Not: UI görünürlüğü için client tarafında session gerekir; SSR hydration çakışmaması adına basit bir client hook kullanalım */}
+      {/* Bu sayfa server component; Officer linkini güvenli şekilde client’ta enjekte edeceğiz */}
+      <span id="officer-nav-anchor" />
+    </nav>
+
+    {/* Sağ: Auth */}
+    <div className="flex items-center gap-2">
+      {/* Client AuthButton bileşeni navbar içinde gösterilebilir */}
+      {/* Eğer ayrı bir AuthButton kullanıyorsan import edip buraya koyabilirsin */}
+    </div>
+  </div>
+</header>
 
         {/* Tabs */}
         <div className="px-6 sm:px-10 pb-16">
@@ -1585,9 +1617,3 @@ function OfficerPanel(): React.JSX.Element {
     </div>
   );
 }
-
-
-
-
-
-
