@@ -20,10 +20,30 @@ module.exports = {
   once: false,
   async execute(message, client) {
     try {
+      // DEBUG: akış tetikleniyor mu?
+      try {
+        console.log("[bot][messageCreate] incoming", {
+          guildId: message.guild?.id,
+          channelId: message.channel?.id,
+          target: String(TARGET_CHANNEL_ID),
+          authorId: message.author?.id,
+          isBot: !!message.author?.bot,
+          len: String(message.content || "").length,
+        });
+      } catch {}
+
       // 1) Filtreler
       if (!message || !message.channel || !message.author) return;
       if (message.author.bot) return; // bot mesajları yok
-      if (String(message.channel.id) !== String(TARGET_CHANNEL_ID)) return; // sadece hedef kanal
+      if (String(message.channel.id) !== String(TARGET_CHANNEL_ID)) {
+        try {
+          console.log("[bot][messageCreate] skip:not-target", {
+            here: String(message.channel.id),
+            target: String(TARGET_CHANNEL_ID),
+          });
+        } catch {}
+        return; // sadece hedef kanal
+      }
 
       const apiKey = process.env.OPENROUTER_API_KEY;
       if (!apiKey) {
