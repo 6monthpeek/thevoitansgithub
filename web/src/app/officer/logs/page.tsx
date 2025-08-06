@@ -35,8 +35,6 @@ type ApiPayload = {
 };
 
 type Filters = {
-  start: string; // ISO date input
-  end: string;   // ISO date input
   types: string[]; // çoklu event seçimi
   user: string;
   channel: string;
@@ -53,6 +51,58 @@ function useDebounced<T>(value: T, delay = 300) {
     return () => clearTimeout(t);
   }, [value, delay]);
   return debounced;
+}
+
+// SSE auto-reconnect with exponential backoff
+function useSSE(urlBuilder: () => string, onMessage: (data: any) => void) {
+  const backoffRef = useRef(1000);
+  const esRef = useRef<EventSource | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+
+    const connect = () => {
+      if (cancelled) return;
+      try {
+        const url = urlBuilder();
+        const es = new EventSource(url, { withCredentials: true });
+        esRef.current = es;
+
+        es.onmessage = (ev) => {
+          try {
+            const payload = JSON.parse(ev.data);
+            onMessage(payload);
+          } catch {
+            // ignore
+          }
+        };
+        es.onerror = () => {
+          // close and schedule reconnect
+          try { es.close(); } catch {}
+          esRef.current = null;
+          const delay = backoffRef.current;
+          backoffRef.current = Math.min(delay * 2, 30000);
+          setTimeout(connect, delay);
+        };
+        es.onopen = () => {
+          backoffRef.current = 1000; // reset backoff on open
+        };
+      } catch {
+        const delay = backoffRef.current;
+        backoffRef.current = Math.min(delay * 2, 30000);
+        setTimeout(connect, delay);
+      }
+    };
+
+    connect();
+    return () => {
+      cancelled = true;
+      if (esRef.current) {
+        try { esRef.current.close(); } catch {}
+        esRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlBuilder]);
 }
 
 // Event seçenekleri: pratikte botta üretilen başlıca eventler
@@ -100,30 +150,11 @@ function FilterPanel({
   useEffect(() => {
     onChange(local);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [local.start, local.end, local.user, local.channel, local.q, local.types.join("|")]);
+  }, [local.user, local.channel, local.q, local.types.join("|")]);
 
   return (
     <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-3 md:p-4 space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">Başlangıç</label>
-          <input
-            type="datetime-local"
-            value={local.start}
-            onChange={(e) => setLocal((s) => ({ ...s, start: e.target.value }))}
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-2.5 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">Bitiş</label>
-          <input
-            type="datetime-local"
-            value={local.end}
-            onChange={(e) => setLocal((s) => ({ ...s, end: e.target.value }))}
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-2.5 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
-          />
-        </div>
-      </div>
+      {/* Tarih alanları kaldırıldı: canlı akış + sayfalama modeli */}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
@@ -248,8 +279,6 @@ export default function OfficerLogsPage() {
 
   // Filtre state
   const [filters, setFilters] = useState<Filters>({
-    start: "",
-    end: "",
     types: [],
     user: "",
     channel: "",
@@ -273,8 +302,6 @@ export default function OfficerLogsPage() {
   // Query string builder
   const query = useMemo(() => {
     const p = new URLSearchParams();
-    if (debounced.start) p.set("start", new Date(debounced.start).toISOString());
-    if (debounced.end) p.set("end", new Date(debounced.end).toISOString());
     for (const t of debounced.types) p.append("type", t);
     if (debounced.user) p.set("user", debounced.user.trim());
     if (debounced.channel) p.set("channel", debounced.channel.trim());
@@ -320,6 +347,24 @@ export default function OfficerLogsPage() {
     };
   }, [query]);
 
+  // Live SSE: always-on, adds newest items on top (if they match client filters)
+  useSSE(
+    () => {
+      const p = new URLSearchParams();
+      for (const t of debounced.types) p.append("type", t);
+      if (debounced.user) p.set("user", debounced.user.trim());
+      if (debounced.channel) p.set("channel", debounced.channel.trim());
+      if (debounced.q) p.set("q", debounced.q.trim());
+      return `/api/officer/logs/stream?${p.toString()}`;
+    },
+    (payload) => {
+      if (!payload || payload.ok !== true) return;
+      if (!payload.item) return; // hello/ready ping’lerini atla
+      setItems((prev) => [payload.item as LogEntry, ...prev].slice(0, 1000)); // UI koruması: en fazla 1000 kayıt
+      setTotal((t) => t + 1);
+    }
+  );
+
   const totalPages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
 
   // UI
@@ -364,7 +409,7 @@ export default function OfficerLogsPage() {
           setPage(1); // filtre değişince sayfayı sıfırla
         }}
         onClear={() => {
-          setFilters({ start: "", end: "", types: [], user: "", channel: "", q: "" });
+          setFilters({ types: [], user: "", channel: "", q: "" });
           setPage(1);
         }}
       />
