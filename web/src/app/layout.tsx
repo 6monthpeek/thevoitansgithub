@@ -93,7 +93,26 @@ export default function RootLayout({
 
   return (
     <html lang="tr" suppressHydrationWarning>
-      <body className={bodyClass}>
+      {/* body'de 3P uzantıların enjekte ettiği beklenmeyen attribute'ları tolere et */}
+      <body className={bodyClass} suppressHydrationWarning>
+        {/* First paint'te body üzerindeki bilinmeyen attribute'ları temizle */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+  try {
+    var b = document.body;
+    if(!b) return;
+    var allowed = new Set(["class","style"]); // sadece class ve style'a izin
+    // cz-shortcut-listen gibi beklenmeyen attr'ları kaldır
+    Array.from(b.attributes).forEach(function(attr){
+      if(!allowed.has(attr.name)) {
+        try { b.removeAttribute(attr.name); } catch(e){}
+      }
+    });
+  } catch(e){}
+})();`
+          }}
+        />
         {/* RSC uyarısını gidermek için provider'ı ayrı bir client bileşenine taşıyoruz */}
         <AuthSessionProvider>
           {/* Basit global auth butonu (geçici) */}
