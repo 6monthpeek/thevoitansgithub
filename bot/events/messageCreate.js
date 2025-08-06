@@ -117,8 +117,10 @@ module.exports = {
             { role: "user", content: userText }
           ];
           const parsedText = await callOpenRouter(parseMessages, { temperature: 0, max_tokens: 60 });
+          console.log("[delete][parse][raw]", parsedText);
           let parsed;
           try { parsed = JSON.parse(parsedText); } catch { parsed = null; }
+          console.log("[delete][parse][json]", parsed);
 
           if (parsed && parsed.action === "delete") {
             // Silinecek mesajları belirle
@@ -143,7 +145,10 @@ module.exports = {
               // Komut mesajından önce olanları tercih et
               const beforeCmd = arr.filter(m => m.createdTimestamp <= message.createdTimestamp);
               toDelete = (beforeCmd.length ? beforeCmd : arr).slice(0, 100);
-            }
+            } else {
+            // JSON yorumlayıcı delete aksiyonu üretmediyse, kullanıcıya netleştirme mesajı
+            await message.reply("Silme için ne kadar mesaj veya hangi saate kadar olduğunu belirtir misin? Örn: 'son 5 mesaj' ya da '05:20’ye kadar'").catch(() => {});
+          }
 
             if (toDelete.length > 0) {
               // Discord kuralı: 14 günden eski mesajlar bulkDelete ile silinemez
