@@ -83,6 +83,103 @@ try {
   console.warn("⚠️ _wireAll yüklenemedi:", e?.message || e);
 }
 
+// Basit HTTP keep-alive sunucusu (Replit/Uptime ping için)
+try {
+  const http = require("http");
+  const KEEPALIVE_PORT = process.env.KEEPALIVE_PORT || process.env.PORT || 8080; // Replit bazen PORT verir
+  const server = http.createServer((req, res) => {
+    if (req.url === "/keepalive" || req.url === "/" ) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({
+        ok: true,
+        ts: new Date().toISOString(),
+        bot: {
+          ready: !!client?.user,
+          user: client?.user?.tag || null
+        }
+      }));
+      return;
+    }
+    res.writeHead(404);
+    res.end("not found");
+  });
+  server.listen(KEEPALIVE_PORT, () => {
+    console.log(`🌐 Keep-alive HTTP listening on :${KEEPALIVE_PORT}`);
+  });
+
+  // Ek: Guards yönetimi için hafif HTTP API
+  const SHARED_SECRET = process.env.GUARDS_SHARED_SECRET || process.env.SHARED_SECRET;
+  const API_PORT = process.env.GUARDS_API_PORT || 8787;
+
+  function readBody(req) {
+    return new Promise((resolve) => {
+      let data = "";
+      req.on("data", (c) => (data += c));
+      req.on("end", () => {
+        try { resolve(data ? JSON.parse(data) : {}); } catch { resolve({}); }
+      });
+    });
+  }
+  function send(res, code, obj) {
+    res.writeHead(code, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(obj));
+  }
+
+  const { loadConfig, saveConfig } = require("./guards");
+
+  const api = http.createServer(async (req, res) => {
+    if (req.method === "GET" && req.url === "/health") {
+      return send(res, 200, { ok: true, user: client?.user?.tag || null });
+    }
+    const secret = req.headers["x-guards-secret"];
+    if (!SHARED_SECRET || secret !== SHARED_SECRET) {
+      return send(res, 401, { ok: false, error: "unauthorized" });
+    }
+
+    if (req.method === "GET" && req.url === "/guards/status") {
+      const cfg = loadConfig();
+      return send(res, 200, { ok: true, config: cfg });
+    }
+
+    if (req.method === "POST" && (req.url === "/guards/enable" || req.url === "/guards/disable")) {
+      const body = await readBody(req);
+      const guard = String(body.guard || "");
+      if (!guard) return send(res, 400, { ok: false, error: "guard required" });
+      const cfg = loadConfig();
+      cfg.guards = cfg.guards || {};
+      cfg.guards[guard] = cfg.guards[guard] || {};
+      cfg.guards[guard].enabled = req.url.endsWith("/enable");
+      const ok = saveConfig(cfg);
+      return send(res, ok ? 200 : 500, { ok });
+    }
+
+    if (req.method === "POST" && req.url === "/guards/config-set") {
+      const body = await readBody(req);
+      const pathStr = String(body.path || "");
+      if (!pathStr) return send(res, 400, { ok: false, error: "path required" });
+      const cfg = loadConfig();
+      const parts = pathStr.split(".");
+      let cur = cfg;
+      while (parts.length > 1) {
+        const p = parts.shift();
+        if (!cur[p]) cur[p] = {};
+        cur = cur[p];
+      }
+      cur[parts[0]] = body.value;
+      const ok = saveConfig(cfg);
+      return send(res, ok ? 200 : 500, { ok });
+    }
+
+    return send(res, 404, { ok: false, error: "not found" });
+  });
+
+  api.listen(API_PORT, () => {
+    console.log(`🛡️ Guards HTTP API listening on :${API_PORT}`);
+  });
+} catch (e) {
+  console.warn("HTTP keep-alive server başlatılamadı:", e?.message || e);
+}
+
 // Koruma altyapısını bağla (varsayılan: tüm guard'lar kapalı).
 try {
   attachGuards(client);
