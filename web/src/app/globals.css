@@ -47,8 +47,8 @@ html, body {
 body {
   /* Global typeface set to Members section font */
   font-family: var(--font-sans);
-  /* Dark fantasy deep background */
-  background: #0A0B0D;
+  /* Dark fantasy deep background with GIF */
+  background: rgba(10, 11, 13, 0.5) url('/thevoitanspurple-saturation100.gif') center / contain no-repeat fixed;
   color: color-mix(in oklab, var(--fg) 90%, #cbd5e1 10%); /* daha yumuşak metin */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
