@@ -9,7 +9,11 @@ const THINKING_EMOJI = "💭";
 const rawSenior = process.env.SENIOR_OFFICER_ROLE_ID || "";
 const SENIOR_ROLE_ID = String(rawSenior).trim();
 
-// Ek yetkili rol (örn. 302812332915032064)
+/**
+ * Ek yetkili rol
+ * ID: 302812332915032064
+ * Name: Field Officer
+ */
 const EXTRA_OFFICER_ROLE_ID = "302812332915032064";
 
 /**
@@ -156,6 +160,7 @@ module.exports = {
         console.log("[moderation][debug] senior_check", {
           SENIOR_ROLE_ID: SENIOR_ROLE_ID,
           EXTRA_OFFICER_ROLE_ID: EXTRA_OFFICER_ROLE_ID,
+          EXTRA_OFFICER_ROLE_NAME: "Field Officer",
           user: { id: message.author.id, tag: message.author.tag },
           guild: { id: message.guild?.id, name: message.guild?.name },
           memberRoleIds: roleIds,
