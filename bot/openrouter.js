@@ -46,6 +46,7 @@ function listApiKeys() {
       const fsSync = require("fs");
       const path = require("path");
       const p = path.join(__dirname, "config", "openrouter-keys.md");
+      console.log("[openrouter][config] reading keys from", p);
       if (fsSync.existsSync(p)) {
         const raw = fsSync.readFileSync(p, "utf8");
         for (const line of raw.split(/\r?\n/)) {
@@ -53,8 +54,12 @@ function listApiKeys() {
           if (!s || s.startsWith("#")) continue;
           keys.push(s);
         }
+      } else {
+        console.log("[openrouter][config] keys file not found");
       }
-    } catch {}
+    } catch (e) {
+      console.log("[openrouter][config] keys read error", e?.message || e);
+    }
   }
 
   // 2) Also collect from ENV (primary + OPENROUTER_API_KEY1..N)
@@ -95,6 +100,7 @@ async function callOpenRouter(messages, opts = {}) {
       const fsSync = require("fs");
       const path = require("path");
       const p = path.join(__dirname, "config", "models.md");
+      console.log("[openrouter][config] reading models from", p);
       if (fsSync.existsSync(p)) {
         const raw = fsSync.readFileSync(p, "utf8");
         for (const line of raw.split(/\r?\n/)) {
@@ -102,14 +108,23 @@ async function callOpenRouter(messages, opts = {}) {
           if (!s || s.startsWith("#")) continue;
           modelList.push(s);
         }
+      } else {
+        console.log("[openrouter][config] models file not found");
       }
-    } catch {}
+    } catch (e) {
+      console.log("[openrouter][config] models read error", e?.message || e);
+    }
   }
   if (!modelList.length) {
     modelList = [String(opts.model || DEFAULT_MODEL)];
   }
 
   const keys = listApiKeys();
+  console.log("[openrouter][config] flags", {
+    USE_MODEL_LIST: String(process.env.USE_MODEL_LIST || ""),
+    USE_KEY_LIST: String(process.env.USE_KEY_LIST || ""),
+  });
+  console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length });
   if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) or key list in bot/config/openrouter-keys.md");
 
   const payload = {
