@@ -57,6 +57,74 @@ module.exports = {
       const userText = String(message.content || "").trim();
       if (!userText) return;
 
+      // Lokal "son N mesajı oku/özetle" akışı (model çağrısı yok)
+      // Örnek tetikler: "son 50 mesajı oku", "son 30 mesajı okur musun", "son 100 mesajın özetini ver"
+      const readMatch = userText
+        .toLowerCase()
+        .match(/\bson\s+(\d{1,3})\s*mesaj[ıi]?\s*(oku|okur musun|özet(le|ini ver)|göster)/);
+      if (readMatch) {
+        const n = Math.min(Math.max(parseInt(readMatch[1], 10) || 50, 1), 100);
+        try {
+          const fetched = await message.channel.messages.fetch({ limit: Math.min(100, n) });
+          const arr = Array.from(fetched.values())
+            .sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+          const stats = {
+            total: arr.length,
+            authors: new Set(arr.map(m => m.author?.id)).size,
+            mentionsUsers: 0,
+            mentionsRoles: 0,
+            mentionsChannels: 0,
+            attachments: 0,
+            embeds: 0,
+          };
+
+          const preview = (m) => {
+            const t = String(m.content || "").replace(/\s+/g, " ").trim();
+            return t.length > 120 ? t.slice(0, 117) + "..." : t;
+          };
+
+          const samples = {
+            head: arr.slice(0, Math.min(3, arr.length)),
+            mid: arr.slice(Math.max(0, Math.floor(arr.length / 2) - 1), Math.max(0, Math.floor(arr.length / 2) - 1) + Math.min(3, arr.length)),
+            tail: arr.slice(Math.max(0, arr.length - 3), arr.length),
+          };
+
+          for (const m of arr) {
+            const mu = m.mentions?.users?.size || 0;
+            const mr = m.mentions?.roles?.size || 0;
+            const mc = m.mentions?.channels?.size || 0;
+            stats.mentionsUsers += mu;
+            stats.mentionsRoles += mr;
+            stats.mentionsChannels += mc;
+            stats.attachments += m.attachments?.size || 0;
+            stats.embeds += (m.embeds?.length || 0);
+          }
+
+          const formatBlock = (label, list) => {
+            if (!list.length) return `${label}: -`;
+            return `${label}:\n` + list.map(m => `• ${m.author?.bot ? "[BOT] " : ""}${m.author?.username || "user"}: ${preview(m)}`).join("\n");
+          };
+
+          const replyText =
+            `Son ${n} mesaj özeti\n` +
+            `• Toplam: ${stats.total} | Benzersiz yazar: ${stats.authors}\n` +
+            `• Mentions: kullanıcı ${stats.mentionsUsers}, rol ${stats.mentionsRoles}, kanal ${stats.mentionsChannels}\n` +
+            `• Ekler: attachments ${stats.attachments}, embeds ${stats.embeds}\n` +
+            `\n` +
+            formatBlock("İlk 3", samples.head) + `\n\n` +
+            formatBlock("Orta 3", samples.mid) + `\n\n` +
+            formatBlock("Son 3", samples.tail);
+
+          await message.reply(replyText.slice(0, MAX_DISCORD_REPLY_LEN)).catch(() => {});
+          return;
+        } catch (e) {
+          console.error("[local-read][error]", e?.message || e);
+          await message.reply("Son mesajları okurken bir sorun oluştu.").catch(() => {});
+          return;
+        }
+      }
+
       // Senior Officer kontrolü (AI moderasyon/silme komutları için şart)
       const member = await message.guild?.members.fetch(message.author.id).catch(() => null);
 
