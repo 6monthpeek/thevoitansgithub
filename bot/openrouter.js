@@ -31,40 +31,26 @@ async function readPrompt() {
  */
 /**
  * Rotating API keys on 429:
- * - Primary: OPENROUTER_API_KEY
- * - Secondary: OPENROUTER_API_KEY1, OPENROUTER_API_KEY2, ...
+ * - Source ONLY from ENV to avoid leaking keys via repo.
+ * - Priority: OPENROUTER_API_KEYS (comma-separated) -> OPENROUTER_API_KEY -> OPENROUTER_API_KEY1..N
  * When 429 received, we retry once per additional key with small backoff.
  * NOTE: Prefer official pooling (Integrations) for production. This is a best-effort fallback.
  */
 function listApiKeys() {
   const keys = [];
 
-  // 1) If USE_KEY_LIST=1, read keys from bot/config/openrouter-keys.md (one per line, ignoring comments)
-  const useKeyList = String(process.env.USE_KEY_LIST || "").trim() === "1";
-  if (useKeyList) {
-    try {
-      const fsSync = require("fs");
-      const path = require("path");
-      const p = path.join(__dirname, "config", "openrouter-keys.md");
-      console.log("[openrouter][config] reading keys from", p);
-      if (fsSync.existsSync(p)) {
-        const raw = fsSync.readFileSync(p, "utf8");
-        for (const line of raw.split(/\r?\n/)) {
-          const s = String(line || "").trim();
-          if (!s || s.startsWith("#")) continue;
-          keys.push(s);
-        }
-      } else {
-        console.log("[openrouter][config] keys file not found");
-      }
-    } catch (e) {
-      console.log("[openrouter][config] keys read error", e?.message || e);
-    }
+  // 1) Comma-separated list
+  const listEnv = process.env.OPENROUTER_API_KEYS;
+  if (listEnv && typeof listEnv === "string") {
+    for (const part of listEnv.split(","))
+      if (part && String(part).trim()) keys.push(String(part).trim());
   }
 
-  // 2) Also collect from ENV (primary + OPENROUTER_API_KEY1..N)
+  // 2) Primary single key
   const primary = process.env.OPENROUTER_API_KEY ? String(process.env.OPENROUTER_API_KEY).trim() : "";
   if (primary) keys.push(primary);
+
+  // 3) Numbered keys OPENROUTER_API_KEY1..N
   let i = 1;
   while (true) {
     const k = process.env[`OPENROUTER_API_KEY${i}`];
@@ -96,10 +82,18 @@ const rateLimitedUntil = new Map();
 async function callOpenRouter(messages, opts = {}) {
   const baseURL = DEFAULT_BASE;
 
-  // Build model list from file or env
+  // Build model list from ENV or file (ENV preferred)
   let modelList = [];
-  const useModelList = String(process.env.USE_MODEL_LIST || "").trim() === "1";
-  if (useModelList) {
+
+  // 1) ENV: OPENROUTER_MODEL_LIST (comma or newline separated)
+  const envModelList = process.env.OPENROUTER_MODEL_LIST;
+  if (envModelList && typeof envModelList === "string") {
+    const parts = envModelList.split(/\r?\n|,/).map(s => String(s || "").trim()).filter(Boolean).filter(s => !s.startsWith("#"));
+    if (parts.length) modelList.push(...parts);
+  }
+
+  // 2) File: models.md if USE_MODEL_LIST=1 (kept for compatibility)
+  if (!modelList.length && String(process.env.USE_MODEL_LIST || "").trim() === "1") {
     try {
       const fsSync = require("fs");
       const path = require("path");
@@ -119,6 +113,8 @@ async function callOpenRouter(messages, opts = {}) {
       console.log("[openrouter][config] models read error", e?.message || e);
     }
   }
+
+  // 3) Fallback: opts.model or DEFAULT_MODEL
   if (!modelList.length) {
     modelList = [String(opts.model || DEFAULT_MODEL)];
   }
@@ -134,7 +130,7 @@ async function callOpenRouter(messages, opts = {}) {
 
   console.log("[openrouter][config] flags", {
     USE_MODEL_LIST: String(process.env.USE_MODEL_LIST || ""),
-    USE_KEY_LIST: String(process.env.USE_KEY_LIST || ""),
+    KEY_SOURCE: "ENV_ONLY", // harden: keys read only from ENV
   });
   console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length, skippedKeys: keysRaw.length - keys.length });
   if (!keys.length) throw new Error("No usable OpenRouter keys (all cooling down or missing)");
