@@ -1,1 +1,1 @@
-nousresearch/deephermes-3-llama-3-8b-preview:free
+meta-llama/llama-3.2-3b-instruct:free
