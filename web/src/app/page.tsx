@@ -1244,22 +1244,8 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Hızlı Eylem */}
-      <div className="flex items-center gap-3">
-        <a
-          href="https://discord.gg/thevoitans"
-          className="inline-flex items-center justify-center gap-2 rounded-full h-10 px-4 text-sm font-semibold text-white transition-all"
-          style={{ backgroundColor: "#5865F2" }}
-        >
-          Discord’a Katıl
-        </a>
-        <a
-          href="#panel-adventures"
-          className="inline-flex items-center justify-center rounded-full h-10 px-4 text-sm border border-white/10 text-zinc-200 hover:border-white/20"
-        >
-          Maceralarımız
-        </a>
-      </div>
+      {/* Hızlı Eylem butonları kaldırıldı: NavBar üzerinde zaten mevcut */}
+      {/* (istem üzerine boş bırakıldı) */}
     </div>
   </section>
 )}
