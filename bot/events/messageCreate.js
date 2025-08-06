@@ -63,26 +63,14 @@ module.exports = {
         return;
       }
 
-      // Kanal filtresi (opsiyonel): AI_ONLY_ENABLED_CHANNELS=1 ise whitelist uygula, aksi halde tüm metin kanalları serbest
-      const ENABLED_CHANNELS = (process.env.AI_ENABLED_CHANNELS || String(TARGET_CHANNEL_ID)).split(",").map(s => s.trim()).filter(Boolean);
-      if (AI_ONLY_ENABLED_CHANNELS) {
-        if (!ENABLED_CHANNELS.includes(String(message.channel.id))) {
-          try {
-            console.log("[bot][messageCreate] skip:not-allowed-channel(whitelist-on)", {
-              here: String(message.channel.id),
-              allowed: ENABLED_CHANNELS
-            });
-          } catch {}
-          return;
-        }
-      } else {
-        try {
-          console.log("[bot][messageCreate] channel-whitelist:OFF (AI_ONLY_ENABLED_CHANNELS=0)", {
-            here: String(message.channel.id),
-            guild: message.guild?.id,
-          });
-        } catch {}
-      }
+      // Kanal filtresi tamamen KAPALI: bot mention/prefix gördüğü her metin kanalında çalışır
+      // (AI_ONLY_ENABLED_CHANNELS ve ENABLED_CHANNELS kontrolü devre dışı)
+      try {
+        console.log("[bot][messageCreate] channel-whitelist:DISABLED (respond anywhere on mention/prefix)", {
+          here: String(message.channel.id),
+          guild: message.guild?.id,
+        });
+      } catch {}
 
       const prefixes = (process.env.AI_PREFIXES || "!ai,!ask,/ai").split(",").map(s => s.trim()).filter(Boolean);
       const contentRaw = String(message.content || "");
@@ -128,16 +116,7 @@ module.exports = {
         }, 5 * 60 * 1000);
       } catch {}
 
-      // Eski tek-kanal kısıtı kaldırıldı: whitelist kapalıyken tüm kanallarda çalış
-      if (AI_ONLY_ENABLED_CHANNELS && String(message.channel.id) !== String(TARGET_CHANNEL_ID) && !ENABLED_CHANNELS.includes(String(message.channel.id))) {
-        try {
-          console.log("[bot][messageCreate] skip:not-target(whitelist-on)", {
-            here: String(message.channel.id),
-            target: String(TARGET_CHANNEL_ID),
-          });
-        } catch {}
-        return;
-      }
+      // Eski tek-kanal kısıtı tamamen kaldırıldı (her yerde çalış)
 
       const apiKey = process.env.OPENROUTER_API_KEY;
       if (!apiKey) {
