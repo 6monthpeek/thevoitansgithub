@@ -48,9 +48,19 @@ const eventFiles = fs.existsSync(eventsPath)
   ? fs.readdirSync(eventsPath).filter(file => file.endsWith(".js") && !file.startsWith("_"))
   : [];
 
+/**
+ * ÖNEMLİ: messageCreate için ÇİFT TETİKLEMENİN önüne geçmek adına,
+ * merkezi _wireAll da kendi messageCreate dinleyicisini kuruyor (log amaçlı).
+ * Bu nedenle legacy loader ile messageCreate'i bind ETME.
+ */
 for (const file of eventFiles) {
   const event = require(path.join(eventsPath, file));
   if (event && typeof event === "object" && ("name" in event) && ("execute" in event)) {
+    // messageCreate dosyasını legacy loader üzerinden tekrar bind etmeyelim.
+    if (String(event.name) === "messageCreate") {
+      // Sadece LOG amaçlı _wireAll üzerinden tek bağlama yapılacak.
+      continue;
+    }
     if (event.once) {
       client.once(event.name, (...args) => event.execute(...args, client));
     } else {
@@ -60,6 +70,11 @@ for (const file of eventFiles) {
 }
 
 // Merkezi wiring: tüm önemli eventleri ingest'e yollar
+/**
+ * Merkezi wiring: tüm önemli eventleri ingest'e yollar.
+ * Not: messageCreate yanıtlayıcıyı legacy loader üzerinden devre dışı bıraktık,
+ * böylece aynı mesaj için iki farklı handler tetiklenmeyecek.
+ */
 try {
   require(path.join(__dirname, "events", "_wireAll"))(client);
   console.log("✅ Merkezi event wiring aktif (_wireAll).");
