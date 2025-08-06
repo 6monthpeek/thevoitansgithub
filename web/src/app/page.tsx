@@ -1297,7 +1297,7 @@ export default function Home() {
 {/* Lazy Twitch Player */}<LazyTwitch
   channel="skipperofleague"
   title="Twitch Player"
- parents={["voitans.gg","voitans.vercel.app"]} />
+ parents={["thevoitansgithub.vercel.app"]} />
                       </div>
                     </div>
                     <div className="rounded-xl border border-white/10 bg-black/40 overflow-hidden">
@@ -1308,7 +1308,7 @@ export default function Home() {
 {/* Lazy Twitch Chat */}
                         <LazyTwitch type="chat" channel="skipperofleague"
                           title="Twitch Chat"
-                         parents={["voitans.gg","voitans.vercel.app"]} />
+ parents={["thevoitansgithub.vercel.app"]} />
                       </div>
                     </div>
                   </div>
