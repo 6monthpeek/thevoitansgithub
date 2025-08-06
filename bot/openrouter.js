@@ -127,8 +127,7 @@ async function callOpenRouter(messages, opts = {}) {
   console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length });
   if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) or key list in bot/config/openrouter-keys.md");
 
-  const payload = {
-    model,
+  const payloadBase = {
     messages,
     temperature: opts.temperature ?? 0.7,
     top_p: opts.top_p ?? 0.9,
@@ -157,7 +156,7 @@ async function callOpenRouter(messages, opts = {}) {
             "HTTP-Referer": process.env.SITE_URL || "https://thevoitansgithub.vercel.app",
             "X-Title": "VOITANS Discord Bot",
           },
-          body: JSON.stringify({ ...payload, model: modelTry }),
+          body: JSON.stringify({ ...payloadBase, model: modelTry }),
           signal: abort.signal,
         });
 
