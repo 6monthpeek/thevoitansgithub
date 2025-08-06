@@ -1,1 +1,1 @@
-deepseek/deepseek-r1-0528:free
+qwen/qwen2.5-14b-instruct:free
