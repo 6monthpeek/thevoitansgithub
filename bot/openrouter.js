@@ -204,16 +204,34 @@ async function callOpenRouter(messages, opts = {}) {
 
         const json = await res.json();
         dbg("response usage/choices", { usage: json?.usage, choicesLen: Array.isArray(json?.choices) ? json.choices.length : 0 });
-        const text = json?.choices?.[0]?.message?.content?.trim?.();
+        let text = json?.choices?.[0]?.message?.content?.trim?.();
 
+        // Fallback (R1/Reasoning modelleri için): content boş ise reasoning/tool_outputs'tan özet çıkar
         if (!text) {
-          console.error("[openrouter][empty-response]", {
-            model: modelTry,
-            usage: json?.usage,
-            choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
-          });
-          dbg("empty message.content", { model: modelTry });
-          throw new Error("OpenRouter returned empty response");
+          const msg0 = json?.choices?.[0]?.message || {};
+          const reasoning = typeof msg0.reasoning === "string" ? msg0.reasoning : Array.isArray(msg0.reasoning) ? msg0.reasoning.join("\n") : "";
+          const toolOut = Array.isArray(msg0.tool_outputs) ? msg0.tool_outputs.map(t => t?.output || t?.content || "").join("\n") : "";
+          const anyAlt = `${reasoning}\n${toolOut}`.trim();
+
+          if (anyAlt) {
+            // Basit çıkarım: son 3 satırdan bir özet oluştur
+            const lines = anyAlt.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            const tail = lines.slice(-6); // biraz daha fazla bağlam
+            // Çok uzun ise kısalt
+            const merged = tail.join(" ").replace(/\s+/g, " ").trim();
+            text = merged.slice(0, 800) || null;
+            dbg("fallback-from-reasoning", { usedReasoning: !!reasoning, usedToolOutputs: !!toolOut, extractedLen: text ? text.length : 0 });
+          }
+
+          if (!text) {
+            console.error("[openrouter][empty-response]", {
+              model: modelTry,
+              usage: json?.usage,
+              choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
+            });
+            dbg("empty message.content", { model: modelTry });
+            throw new Error("OpenRouter returned empty response");
+          }
         }
 
         return text;
