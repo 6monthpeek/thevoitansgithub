@@ -1,1 +1,1 @@
-meta-llama/llama-3.2-3b-instruct:free
+deepseek/deepseek-r1-0528:free
