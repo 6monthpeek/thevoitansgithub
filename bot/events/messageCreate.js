@@ -1,5 +1,9 @@
 const { buildMessagesForUser, callOpenRouter } = require("../openrouter");
 
+// Idempotency guard: aynı mesajı birden fazla kez işlemeyi önle
+const __processedMessageIds = global.__processedMessageIds || new Set();
+global.__processedMessageIds = __processedMessageIds;
+
 const TARGET_CHANNEL_ID = process.env.OPENROUTER_CHANNEL_ID || "1140379269705502821";
 const MAX_DISCORD_REPLY_LEN = 1800; // 2000 limitine güvenli tampon
 const HISTORY_LIMIT = Number(process.env.OPENROUTER_HISTORY_LIMIT || 30); // Son 30 mesaj
@@ -42,6 +46,19 @@ module.exports = {
       // 1) Filtreler
       if (!message || !message.channel || !message.author) return;
       if (message.author.bot) return; // bot mesajları yok
+
+      // Idempotent koruma: aynı message.id için tek kez çalış
+      try {
+        if (__processedMessageIds.has(message.id)) {
+          return;
+        }
+        __processedMessageIds.add(message.id);
+        // 5 dk sonra otomatik temizle
+        setTimeout(() => {
+          try { __processedMessageIds.delete(message.id); } catch {}
+        }, 5 * 60 * 1000);
+      } catch {}
+
       if (String(message.channel.id) !== String(TARGET_CHANNEL_ID)) {
         try {
           console.log("[bot][messageCreate] skip:not-target", {
@@ -208,6 +225,7 @@ module.exports = {
 
       // 4) AI komutu: silme isteği olabilir mi? OpenRouter ile JSON-yorumlama
       let handledDelete = false;
+      let handledResponse = false; // herhangi bir yanıt gönderildiyse normal akışı atlamak için
       if (isSeniorOfficer) {
         try {
           const interpreterSystem = [
@@ -253,9 +271,10 @@ module.exports = {
               const beforeCmd = arr.filter(m => m.createdTimestamp <= message.createdTimestamp);
               toDelete = (beforeCmd.length ? beforeCmd : arr).slice(0, 100);
             } else {
-            // JSON yorumlayıcı delete aksiyonu üretmediyse, kullanıcıya netleştirme mesajı
-            await message.reply("Silme için ne kadar mesaj veya hangi saate kadar olduğunu belirtir misin? Örn: 'son 5 mesaj' ya da '05:20’ye kadar'").catch(() => {});
-          }
+              // JSON yorumlayıcı delete aksiyonu üretmediyse, kullanıcıya netleştirme mesajı
+              await message.reply("Silme için ne kadar mesaj veya hangi saate kadar olduğunu belirtir misin? Örn: 'son 5 mesaj' ya da '05:20’ye kadar'").catch(() => {});
+              handledResponse = true;
+            }
 
             if (toDelete.length > 0) {
               // Discord kuralı: 14 günden eski mesajlar bulkDelete ile silinemez
@@ -296,16 +315,24 @@ module.exports = {
 
               handledDelete = true;
               await message.reply(`Silme tamamlandı. Kaldırılan mesaj sayısı: ${deleted}.`).catch(() => {});
+              handledResponse = true;
             } else {
               // Silinecek mesaj bulunamadı
               handledDelete = true;
               await message.reply("Silinecek uygun mesaj bulunamadı veya ölçütler çok dar.").catch(() => {});
+              handledResponse = true;
             }
           }
         } catch (e) {
           console.error("[openrouter][delete-parse-error]", e?.message || e);
           // devam edip normal yanıt üretelim
         }
+      }
+
+      // Eğer delete/yardımcı akışta yanıt verildiyse, normal yanıt akışını atla
+      if (handledResponse) {
+        clearInterval(typingTimer);
+        return;
       }
 
       if (!handledDelete) {
@@ -320,7 +347,8 @@ module.exports = {
             // model: process.env.OPENROUTER_MODEL, // env ile override edilebilir
             temperature: 0.7,
             top_p: 0.9,
-            max_tokens: 400,
+            // Daha stabil yanıtlar için biraz daha düşük token sınırı
+            max_tokens: 256,
           });
         } catch (err) {
           console.error("[openrouter][error]", err?.message || err);
