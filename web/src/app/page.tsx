@@ -1183,134 +1183,86 @@ export default function Home() {
                 </section>
               )}
 
-              {tab === "about" && (
-                <section
-                  id="panel-about"
-                  role="tabpanel"
-                  aria-labelledby="tab-about"
-                  className="max-w-6xl mx-auto rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-6"
-                >
-                  <h2 className="text-xl font-semibold mb-2">Hakkımızda</h2>
+{tab === "about" && (
+  <section
+    id="panel-about"
+    role="tabpanel"
+    aria-labelledby="tab-about"
+    className="max-w-6xl mx-auto rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-6"
+  >
+    <h2 className="text-xl font-semibold mb-2">Hakkımızda</h2>
 
-                  <div className="grid md:grid-cols-2 gap-6 text-[15px] leading-7 text-zinc-300">
-                    {/* Sol sütun */}
-                    <div className="space-y-4">
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">Lonca nedir?</h3>
-                        <p>
-                          Bir lonca, ortak hedefler doğrultusunda hareket eden insanların bir araya geldiği bir topluluktur.
-                          Bu topluluklar genellikle birbirlerine destek olur, üyelerinin gelişimini sağlar ve karşılıklı
-                          dayanışma içinde bulunur. Loncalar, üyelerin bireysel yeteneklerini geliştirmenin yanı sıra,
-                          ekip olarak hareket etmeyi ve birlikte büyük hedeflere ulaşmayı amaçlar.
-                        </p>
-                      </section>
+    {/* Anlatısal ve duygusal akış */}
+    <div className="space-y-6 text-[15px] leading-7 text-zinc-300">
+      {/* Giriş Hikâyesi */}
+      <section className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <p>
+          Bazen bir “günaydın” ile başlar, bazen tek bir cümle bütün günü toparlar:{" "}
+          <strong className="text-zinc-100">“Akşam 19:30 Discord.”</strong> Kimi gün drop kovalarken
+          build’ler tartışılır; kimi gün birimizin sevincine ortak olur, kaybında omuz veririz. VOITANS’ta
+          bir isimden fazlası vardır: <span className="text-zinc-100">emek, söz ve çağrıya cevap</span>.
+        </p>
+      </section>
 
-                      {/* keep only a single parchment divider; extra ones removed */}
+      {/* Kültür */}
+      <section>
+        <h3 className="text-base font-semibold text-zinc-100 mb-1">Kültür</h3>
+        <p>
+          “Hoş geldin” bizde bir buton değil, <span className="text-zinc-100">bir ritüel</span>.
+          Yeni katılanın adı anılır, saatler süren emek görünür kılınır, “geliyorum” denildiyse gelinir.
+          Denk gelindiğinde yayın açılır, paylaşılır. <em className="not-italic text-zinc-200">Kimi gün tartışır, kimi gün yalnızca “iyi geceler” yazarız;</em>{" "}
+          ama ertesi gün yine aynı çağrıda buluşuruz.
+        </p>
+      </section>
 
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">THE VOITANS</h3>
-                        <p>
-                          Biz, THE VOITANS olarak MMORPG oyun dünyasında belirgin, net ve kararlı ilkelerle yolumuza devam eden
-                          bir loncayız. Türkiye'yi temsil etmek, loncamızdaki herkesin mutlu olduğu ve gurur duyduğu bir ortam
-                          oluşturmak en büyük hedefimizdir.
-                        </p>
-                      </section>
+      {/* İlkeler */}
+      <section>
+        <h3 className="text-base font-semibold text-zinc-100 mb-1">İlkeler</h3>
+        <ul className="list-disc ml-5 space-y-2">
+          <li><strong className="text-zinc-100">Saygı</strong>: Söze, emeğe ve zamana saygı.</li>
+          <li><strong className="text-zinc-100">Disiplin</strong>: Hazırlık bir alışkanlıktır; plan duvara kazınır.</li>
+          <li><strong className="text-zinc-100">Birlik</strong>: Kibir değil yardımla büyürüz; zaferler paylaşılır.</li>
+        </ul>
+      </section>
 
-                      {/* removed duplicate divider to keep rhythm clean */}
+      {/* Aradığımız Oyuncu */}
+      <section>
+        <h3 className="text-base font-semibold text-zinc-100 mb-1">Aradığımız Oyuncu</h3>
+        <p>
+          Rozet değil, <span className="text-zinc-100">yol arkadaşlığı</span> arayan;
+          safını sözle değil <em className="not-italic text-zinc-200">tutumla</em> belli eden oyuncular.
+          Hazırlığı nefes almak kadar isteyen; eksik kaldığında söyleyip birlikte tamamlayan insanlar.
+        </p>
+      </section>
 
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">Neden THE VOITANS?</h3>
-                        <ul className="list-disc ml-5 space-y-2">
-                          <li>
-                            <strong className="text-zinc-100">Saygı ve anlayış</strong> bizim için vazgeçilmezdir. Toksik oyunculara,
-                            sürekli negatiflik saçanlara veya kişisel tartışmaları oyun dışına taşıyanlara burada yer yoktur.
-                          </li>
-                          <li>
-                            <strong className="text-zinc-100">Başarı paylaşılır, kibir değil.</strong> Kendi başarısını, diğerlerini
-                            aşağılamak için değil desteklemek için kullanan; arkadaşlarının moralini ve motivasyonunu yükselten kişiler
-                            bizim önceliğimizdir.
-                          </li>
-                          <li>
-                            <strong className="text-zinc-100">Sadakat ve takım ruhu.</strong> Arkadaşlarını ve loncayı satmaktansa
-                            oyundan vazgeçmeyi göze alabilen; dayanışmayı ve dostluk bağlarını koruyan oyuncularla ilerleriz.
-                          </li>
-                        </ul>
-                      </section>
-                    </div>
+      {/* Sözümüz */}
+      <section className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <p>
+          Eğer aradığın şey sadece bir etiket ya da rastgele bir kalabalık değilse; doğru yerdesin.
+          VOITANS’ta hikâye yazılırken herkesin bir satırı vardır ve belki de seninki{" "}
+          <span className="text-zinc-100">bugün burada başlar.</span>
+        </p>
+      </section>
 
-                    {/* Sağ sütun */}
-                    <div className="space-y-4">
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">Aradığımız Oyuncu Profili</h3>
-                        <ul className="list-disc ml-5 space-y-2">
-                          <li>
-                            MMORPG tecrübesi bulunan; loncasına ve arkadaşlarına bağlılığıyla tanınan, loncayı sahiplenip
-                            kolayca bırakmayacak oyuncular.
-                          </li>
-                          <li>
-                            Zorlukları kişisel gelişimi için fırsata dönüştürebilen; sürekli kendini geliştirmeye açık,
-                            eleştiri ve önerilere olumlu yaklaşan oyuncular.
-                          </li>
-                          <li>
-                            Oyunu bırakmayı düşünenler kararlarını yapıcı bir dille iletir; <strong>hesap satışı asla kabul edilmez.</strong>
-                          </li>
-                          <li>
-                            Loncayı terk eden oyuncular bizi de terk etmiş sayılır; bu nedenle çıkan kişi bir daha katılamaz.
-                            <strong> Bu karar kesindir.</strong>
-                          </li>
-                        </ul>
-                      </section>
-
-                      {/* removed extra divider */}
-
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">Lonca İçi İletişim ve Davranışlar</h3>
-                        <ul className="list-disc ml-5 space-y-2">
-                          <li>
-                            Sohbet ve etkileşimde saygı ve anlayış esastır. Küfür ve argo sınırlı tutulmalı; başkalarının moralini
-                            bozacak davranışlardan kaçınılmalıdır.
-                          </li>
-                          <li>
-                            Parti kurmak ve etkinliklere katılmak için <strong>aktif iletişim</strong> şarttır. Sessiz ve pasif kalmak,
-                            loncanın gerçek ruhunu ve potansiyelini kaçırmanıza yol açar.
-                          </li>
-                        </ul>
-                      </section>
-
-                      {/* Removed extra divider to reduce repetition and keep rhythm clean */}
-                      <div className="my-3" aria-hidden />
-
-                      <section>
-                        <h3 className="text-base font-semibold text-zinc-100 mb-1">THE VOITANS Olarak Ne Bekliyoruz?</h3>
-                        <ul className="list-disc ml-5 space-y-2">
-                          <li>
-                            Değerlerimizi benimseyip gelişimini loncayla paylaşırken, geride kalmış oyuncunun moralini zedelemeyecek üslup.
-                          </li>
-                          <li>
-                            Etkinliklere ve savaşlara <strong>aktif katılım</strong>.
-                          </li>
-                          <li>
-                            <strong>Motivasyonunu kaybetmeyen</strong> ve sürekli daha iyisini yapmak için çalışan bir tutum.
-                          </li>
-                        </ul>
-                        <p className="mt-3 text-zinc-200 font-semibold">
-                          Eğer sen de bu değerlere sahipsen, bize katılmalısın.
-                        </p>
-                      </section>
-                    </div>
-                  </div>
-
-                  {/* Kapanış vurgusu */}
-                  <div className="mt-6 panel p-5">
-                    <p className="text-[15px] leading-7 text-zinc-200">
-                      Zihnin açlıktan değil, içerikten şekillenir. Neyi izler, neyi dinler, kiminle konuşur ve hangi sözlere
-                      itimat edersen; zihnin o iklimde kök salar. Biz VOITANS’ta rastgele beslenmeyiz: Gürültüyü ayıklar,
-                      odağı disiplinle besleriz. Çünkü aklını özensizliğe bırakan, iradesini de rüzgâra terk eder. Düşünceni
-                      neyle beslersen, kaderin de ona dönüşür—bu yüzden seçtiklerimiz, olduğumuz şeydir.
-                    </p>
-                  </div>
-                </section>
-              )}
+      {/* Hızlı Eylem */}
+      <div className="flex items-center gap-3">
+        <a
+          href="https://discord.gg/thevoitans"
+          className="inline-flex items-center justify-center gap-2 rounded-full h-10 px-4 text-sm font-semibold text-white transition-all"
+          style={{ backgroundColor: "#5865F2" }}
+        >
+          Discord’a Katıl
+        </a>
+        <a
+          href="#panel-adventures"
+          className="inline-flex items-center justify-center rounded-full h-10 px-4 text-sm border border-white/10 text-zinc-200 hover:border-white/20"
+        >
+          Maceralarımız
+        </a>
+      </div>
+    </div>
+  </section>
+)}
 
               {tab === "adventures" && (
                 <section
