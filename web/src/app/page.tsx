@@ -1443,7 +1443,7 @@ const OfficerDashboardTabsDynamic = dynamic(() => Promise.resolve(OfficerDashboa
 });
 
 function OfficerDashboardTabs(): React.JSX.Element {
-  const [tab, setTab] = useState<"announce" | "logs" | "protection">("announce");
+  const [tab, setTab] = useState<"announce" | "logs">("announce");
 
   // Görünür hata/teşhis UI state'i (announce tabına özel)
   const [diag, setDiag] = useState<{ msg?: string } | null>(null);
@@ -1492,14 +1492,7 @@ function OfficerDashboardTabs(): React.JSX.Element {
         >
           Loglar
         </button>
-        <button
-          role="tab"
-          aria-selected={tab === "protection"}
-          onClick={() => setTab("protection")}
-          className={`px-3 py-1.5 text-sm rounded-full border ${tab === "protection" ? "text-white border-white/20 bg-white/5" : "text-zinc-300 border-white/10 hover:border-white/20 hover:bg-white/5"}`}
-        >
-          Protection
-        </button>
+        
       </div>
 
       {tab === "announce" && (
@@ -1522,12 +1515,7 @@ function OfficerDashboardTabs(): React.JSX.Element {
           <LogsEmbed />
         </div>
       )}
-      {tab === "protection" && (
-        <div role="tabpanel" aria-labelledby="">
-          {/* Tek URL dashboard ilkesi: Protection panelini doğrudan sekme içinde render et */}
-          <ProtectionPanelInline />
-        </div>
-      )}
+      
     </div>
   );
 }
@@ -1542,182 +1530,6 @@ function LogsEmbed(): React.JSX.Element {
 }
 
 /* Officer Panel – gerçek React bileşeni (inline) */
-/**
- * Protection Panel – tek sayfa mimarisi için inline sekme içeriği
- * Senior kontrolü server-side API üzerinde; UI tarafında sadece butonları/alanları sunar.
- */
-function ProtectionPanelInline(): React.JSX.Element {
-  const { data: session } = useSession() as any;
-  const [state, setState] = useState<{ loading: boolean; error: string | null; config: any | null }>({
-    loading: true,
-    error: null,
-    config: null
-  });
-  const [saving, setSaving] = useState(false);
-
-  async function load() {
-    setState((s) => ({ ...s, loading: true, error: null }));
-    try {
-      const r = await fetch("/api/officer/protection", { cache: "no-store" });
-      const contentType = r.headers.get("content-type") || "";
-      let data: any = null;
-      if (contentType.includes("application/json")) {
-        data = await r.json();
-      } else {
-        const t = await r.text();
-        throw new Error(`status=${r.status} ${t.slice(0, 140)}`);
-      }
-      if (!r.ok || !data?.ok) throw new Error(data?.error || "status_failed");
-      setState({ loading: false, error: null, config: data.config });
-    } catch (e: any) {
-      setState({ loading: false, error: e?.message || "fetch_error", config: null });
-    }
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  async function toggleGuard(guard: string, enable: boolean) {
-    setSaving(true);
-    try {
-      const r = await fetch("/api/officer/protection", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: enable ? "enable" : "disable", guard })
-      });
-      const ct = r.headers.get("content-type") || "";
-      const j = ct.includes("application/json") ? await r.json() : { ok: false, error: await r.text() };
-      if (!r.ok || !j.ok) throw new Error(j.error || "toggle_failed");
-      await load();
-    } catch (e: any) {
-      setState((s) => ({ ...s, error: e?.message || "toggle_error" }));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function setConfig(path: string, value: any) {
-    setSaving(true);
-    try {
-      const r = await fetch("/api/officer/protection", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "config-set", path, value })
-      });
-      const ct = r.headers.get("content-type") || "";
-      const j = ct.includes("application/json") ? await r.json() : { ok: false, error: await r.text() };
-      if (!r.ok || !j.ok) throw new Error(j.error || "config_set_failed");
-      await load();
-    } catch (e: any) {
-      setState((s) => ({ ...s, error: e?.message || "config_error" }));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  if (state.loading) {
-    return <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-4 text-sm text-zinc-400">Yükleniyor…</div>;
-  }
-  if (state.error) {
-    return (
-      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-300">
-        Hata: {state.error}
-        <div className="mt-2">
-          <button
-            onClick={load}
-            className="text-xs rounded-full px-3 py-1.5 border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5"
-          >
-            Yeniden Dene
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const cfg = state.config || {};
-  const guards = Object.entries(cfg?.guards || {});
-  const rateLimits = Object.entries(cfg?.rateLimits || {});
-
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-5 space-y-5">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-zinc-100">Protection</h3>
-        <button
-          onClick={load}
-          className="text-xs rounded-full px-3 py-1.5 border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5"
-        >
-          Yenile
-        </button>
-      </div>
-
-      <section className="space-y-2">
-        <h4 className="text-sm font-medium text-zinc-200">Guard’lar</h4>
-        <div className="grid sm:grid-cols-2 gap-2">
-          {guards.length === 0 && <div className="text-zinc-400 text-sm">Guard bulunamadı.</div>}
-          {guards.map(([key, val]) => {
-            const enabled = !!(val as any)?.enabled;
-            return (
-              <div key={key} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <div>
-                  <div className="text-sm font-medium text-zinc-100">{key}</div>
-                  <div className="text-xs text-zinc-400">{enabled ? "Açık" : "Kapalı"}</div>
-                </div>
-                <button
-                  disabled={saving}
-                  onClick={() => toggleGuard(key, !enabled)}
-                  className={`text-xs rounded-full px-3 py-1.5 border transition ${
-                    enabled
-                      ? "border-green-500/30 text-green-300 hover:bg-green-500/10"
-                      : "border-zinc-400/30 text-zinc-200 hover:bg-white/10"
-                  }`}
-                >
-                  {enabled ? "Kapat" : "Aç"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="space-y-2">
-        <h4 className="text-sm font-medium text-zinc-200">Rate Limits</h4>
-        <div className="grid sm:grid-cols-2 gap-2">
-          {rateLimits.length === 0 && <div className="text-zinc-400 text-sm">Rate limit alanı yok.</div>}
-          {rateLimits.map(([k, v]) => (
-            <div key={k} className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-sm font-medium text-zinc-100">{k}</div>
-              <div className="mt-2 flex items-center gap-2">
-                <input
-                  className="w-24 rounded-md bg-black/40 border border-white/10 px-2 py-1 text-sm text-zinc-100"
-                  defaultValue={String(v ?? "")}
-                  inputMode="numeric"
-                  onBlur={(e) => {
-                    const num = Number(e.target.value);
-                    if (!Number.isFinite(num)) return;
-                    setConfig(`rateLimits.${k}`, num);
-                  }}
-                />
-                <button
-                  disabled={saving}
-                  onClick={(e) => {
-                    const input = (e.currentTarget.previousSibling as HTMLInputElement);
-                    const num = Number((input && (input as any).value) || 0);
-                    if (!Number.isFinite(num)) return;
-                    setConfig(`rateLimits.${k}`, num);
-                  }}
-                  className="text-xs rounded-full px-3 py-1.5 border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5"
-                >
-                  Kaydet
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
 
 function OfficerPanel(): React.JSX.Element {
   const { data: session } = useSession() as any;
