@@ -17,10 +17,13 @@ export default function OfficerProtectionPage() {
   const [cfg, setCfg] = useState<GuardsConfig | null>(null);
 
   const seniorId = process.env.NEXT_PUBLIC_SENIOR_OFFICER_ROLE_ID || "1249512318929342505";
+  const [clientRoles, setClientRoles] = useState<string[] | null>(null);
   const isSenior = useMemo(() => {
     const roles = (session?.user as any)?.discordRoles as string[] | undefined;
-    return Array.isArray(roles) && roles.includes(seniorId);
-  }, [session, seniorId]);
+    const baseHas = Array.isArray(roles) && roles.includes(seniorId);
+    const clientHas = Array.isArray(clientRoles) && clientRoles.includes(seniorId);
+    return !!(baseHas || clientHas);
+  }, [session, seniorId, clientRoles]);
 
   async function fetchStatus() {
     setErr(null);
@@ -41,6 +44,23 @@ export default function OfficerProtectionPage() {
     fetchStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Roller session'da yoksa client-side fallback: /api/resolve/roles çağır
+  useEffect(() => {
+    const roles = (session?.user as any)?.discordRoles as string[] | undefined;
+    if (Array.isArray(roles)) return;
+    (async () => {
+      try {
+        const r = await fetch("/api/resolve/roles", { cache: "no-store" });
+        if (!r.ok) return;
+        const data = await r.json().catch(() => null);
+        const list: string[] =
+          (data?.roles as string[]) ||
+          (Array.isArray(data) ? data : []);
+        if (Array.isArray(list)) setClientRoles(list);
+      } catch {}
+    })();
+  }, [session]);
 
   async function toggleGuard(guard: string, next: boolean) {
     setErr(null);

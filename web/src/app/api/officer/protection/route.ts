@@ -7,20 +7,33 @@ const SENIOR_ROLE = process.env.SENIOR_OFFICER_ROLE_ID || "1249512318929342505";
 const RENDER_BASE = process.env.RENDER_GUARDS_BASE; // örn: https://thevoitansgithub.onrender.com
 const SHARED_SECRET = process.env.GUARDS_SHARED_SECRET;
 
-// Basit rol doğrulama: session.user.discordRoles içinde SENIOR_ROLE var mı?
+// Senior kontrolü: Önce session.user.discordRoles, yoksa /api/resolve/roles fallback
 async function ensureSenior(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) return { ok: false, reason: "unauthorized" };
 
-  // Session üzerinde roller var ise
   const roles = (session.user as any).discordRoles as string[] | undefined;
-
   if (Array.isArray(roles) && roles.includes(SENIOR_ROLE)) {
     return { ok: true, session };
   }
 
-  // Yoksa mevcut roles resolver API'niz varsa buradan çekebilirsiniz.
-  // Güvenlik gereği 403 dönelim; gerekirse bu kısım genişletilir.
+  // Fallback: roller session'da yoksa, mevcut resolver API'yi çağır.
+  // Beklenen: Bu endpoint oturumdaki kullanıcı için roller döndürür.
+  try {
+    const url = new URL(req.url);
+    const base = `${url.origin}`;
+    const r = await fetch(`${base}/api/resolve/roles`, { cache: "no-store", headers: { cookie: req.headers.get("cookie") || "" } });
+    if (r.ok) {
+      const data = await r.json().catch(() => null);
+      const list: string[] =
+        (data?.roles as string[]) ||
+        (Array.isArray(data) ? data : []);
+      if (Array.isArray(list) && list.includes(SENIOR_ROLE)) {
+        return { ok: true, session, roles: list };
+      }
+    }
+  } catch {}
+
   return { ok: false, reason: "forbidden" };
 }
 
