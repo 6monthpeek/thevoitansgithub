@@ -38,6 +38,26 @@ async function readPrompt() {
  */
 function listApiKeys() {
   const keys = [];
+
+  // 1) If USE_KEY_LIST=1, read keys from bot/config/openrouter-keys.md (one per line, ignoring comments)
+  const useKeyList = String(process.env.USE_KEY_LIST || "").trim() === "1";
+  if (useKeyList) {
+    try {
+      const fsSync = require("fs");
+      const path = require("path");
+      const p = path.join(__dirname, "config", "openrouter-keys.md");
+      if (fsSync.existsSync(p)) {
+        const raw = fsSync.readFileSync(p, "utf8");
+        for (const line of raw.split(/\r?\n/)) {
+          const s = String(line || "").trim();
+          if (!s || s.startsWith("#")) continue;
+          keys.push(s);
+        }
+      }
+    } catch {}
+  }
+
+  // 2) Also collect from ENV (primary + OPENROUTER_API_KEY1..N)
   const primary = process.env.OPENROUTER_API_KEY ? String(process.env.OPENROUTER_API_KEY).trim() : "";
   if (primary) keys.push(primary);
   let i = 1;
@@ -47,17 +67,50 @@ function listApiKeys() {
     const v = String(k).trim();
     if (v) keys.push(v);
     i += 1;
-    if (i > 20) break; // hard cap
+    if (i > 50) break; // extended hard cap
   }
-  return keys;
+
+  // De-duplicate while preserving order
+  const uniq = [];
+  const seen = new Set();
+  for (const k of keys) {
+    if (!seen.has(k)) {
+      uniq.push(k);
+      seen.add(k);
+    }
+  }
+  return uniq;
 }
 
 async function callOpenRouter(messages, opts = {}) {
   const baseURL = DEFAULT_BASE;
-  const model = String(opts.model || DEFAULT_MODEL);
+
+  // Build model list:
+  // - If USE_MODEL_LIST=1 and bot/config/models.md exists, read ordered list from there (ignore comments).
+  // - Else fallback to single model from opts.model or DEFAULT_MODEL.
+  let modelList = [];
+  const useModelList = String(process.env.USE_MODEL_LIST || "").trim() === "1";
+  if (useModelList) {
+    try {
+      const fsSync = require("fs");
+      const path = require("path");
+      const p = path.join(__dirname, "config", "models.md");
+      if (fsSync.existsSync(p)) {
+        const raw = fsSync.readFileSync(p, "utf8");
+        for (const line of raw.split(/\r?\n/)) {
+          const s = String(line || "").trim();
+          if (!s || s.startsWith("#")) continue;
+          modelList.push(s);
+        }
+      }
+    } catch {}
+  }
+  if (!modelList.length) {
+    modelList = [String(opts.model || DEFAULT_MODEL)];
+  }
 
   const keys = listApiKeys();
-  if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) in environment");
+  if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) or key list in bot/config/openrouter-keys.md");
 
   const payload = {
     model,
@@ -74,9 +127,9 @@ async function callOpenRouter(messages, opts = {}) {
   for (let idx = 0; idx < keys.length; idx++) {
     const apiKey = keys[idx];
 
-    // Only preferred model. No fallback to "openrouter/auto".
-    const modelTry = String(opts.model || DEFAULT_MODEL);
-    {
+    // Try models in order (from modelList). No implicit "openrouter/auto".
+    for (let mi = 0; mi < modelList.length; mi++) {
+      const modelTry = modelList[mi];
 
       const abort = new AbortController();
       const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000));
@@ -99,10 +152,15 @@ async function callOpenRouter(messages, opts = {}) {
           const errText = await res.text().catch(() => "");
           if (res.status === 429) {
             console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, model: modelTry, status: 429, body: errText?.slice?.(0, 500) || errText });
-            // On 429: backoff then rotate to next key (no model fallback)
+            // On 429: if there are other models left for this key, try next model.
+            // If all models for this key exhausted, backoff then rotate to next key.
+            const moreModelsLeft = mi < modelList.length - 1;
+            if (moreModelsLeft) {
+              continue; // try next model with same key
+            }
             const wait = backoffsMs[Math.min(idx, backoffsMs.length - 1)];
             await new Promise(r => setTimeout(r, wait));
-            break; // go to next key
+            break; // break model loop -> next key
           }
           console.error("[openrouter][http-error]", { keyIndex: idx, model: modelTry, status: res.status, body: errText?.slice?.(0, 500) || errText });
           throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
@@ -125,8 +183,12 @@ async function callOpenRouter(messages, opts = {}) {
         clearTimeout(t);
         lastErr = e;
         console.error("[openrouter][fetch-error]", { keyIndex: idx, model: modelTry, err: e?.message || e });
-        // Network/timeout: small wait then rotate to next key
-        await new Promise(r => setTimeout(r, 300));
+        // Network/timeout: try next model; if models exhausted, rotate key after small wait
+        const moreModelsLeft = mi < modelList.length - 1;
+        if (!moreModelsLeft) {
+          await new Promise(r => setTimeout(r, 300));
+        }
+        continue;
       }
     }
     // proceed to next key
