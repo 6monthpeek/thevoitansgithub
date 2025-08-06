@@ -31,9 +31,18 @@ export default function AuthButton() {
     (typeof process !== "undefined" && process.env.SENIOR_OFFICER_ROLE_ID) ||
     "1249512318929342505";
 
+  // Eldeki iki kaynak:
+  // - session.user.guildMember.roles (detaylı obje listesi)
+  // - session.user.discordRoles (sadece ID dizisi) -> auth.ts session callback'te hydrate edilir
+  const discordRoleIds: string[] =
+    (data as any)?.user?.discordRoles && Array.isArray((data as any).user.discordRoles)
+      ? ((data as any).user.discordRoles as string[])
+      : [];
+
   const isOfficer =
-    Array.isArray(user?.guildMember?.roles) &&
-    user.guildMember.roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID));
+    (Array.isArray(user?.guildMember?.roles) &&
+      user.guildMember.roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID))) ||
+    (Array.isArray(discordRoleIds) && discordRoleIds.includes(String(SENIOR_OFFICER_ROLE_ID)));
 
   // outside-click controlled popover
   const [open, setOpen] = useState(false);
@@ -194,32 +203,44 @@ export default function AuthButton() {
 
             {/* Officer kısayolu kaldırıldı — Officer erişimi yalnız sekmeler üzerinden */}
 
-            {/* Roles preview (first 3) */}
-            {user.guildMember?.roles?.length ? (
-              <div className="mt-3">
-                <div className="text-[11px] text-zinc-400 mb-1">Roller</div>
+            {/* Roles preview: guildMember.roles varsa isimleri göster; yoksa discordRoles ID’lerini kapsül olarak göster */}
+            <div className="mt-3">
+              <div className="text-[11px] text-zinc-400 mb-1">Roller</div>
+              {Array.isArray(user?.guildMember?.roles) && user.guildMember.roles.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {user.guildMember.roles.slice(0, 6).map((r) => {
-                    const hex =
-                      r.hex || `#${(r.color ?? 0).toString(16).padStart(6, "0")}`;
+                    const hex = r.hex || `#${(r.color ?? 0).toString(16).padStart(6, "0")}`;
                     return (
                       <span
                         key={r.id}
                         className="text-[10px] px-2 py-0.5 rounded-full border"
-                        style={{
-                          borderColor: `${hex}55`,
-                          background: `${hex}22`,
-                          color: "#e5e7eb",
-                        }}
-                        title={`Pozisyon: ${r.position}`}
+                        style={{ borderColor: `${hex}55`, background: `${hex}22`, color: "#e5e7eb" }}
+                        title={r.name ? `Pozisyon: ${r.position}` : r.id}
                       >
-                        {r.name}
+                        {r.name || r.id}
                       </span>
                     );
                   })}
                 </div>
-              </div>
-            ) : null}
+              ) : Array.isArray(discordRoleIds) && discordRoleIds.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {discordRoleIds.slice(0, 6).map((rid: string) => (
+                    <span
+                      key={rid}
+                      className="text-[10px] px-2 py-0.5 rounded-full border border-white/10 bg-white/5 text-zinc-200"
+                      title={rid}
+                    >
+                      #{rid}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <span className="h-4 w-16 rounded-full bg-white/5 border border-white/10 animate-pulse" />
+                  <span className="h-4 w-10 rounded-full bg-white/5 border border-white/10 animate-pulse" />
+                </div>
+              )}
+            </div>
 
             {/* Meta */}
             <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-zinc-400">
