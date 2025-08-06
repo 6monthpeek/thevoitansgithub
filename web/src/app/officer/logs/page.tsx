@@ -372,8 +372,16 @@ export default function OfficerLogsPage() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-xl font-semibold text-neutral-100">Officer / Loglar</h1>
-
+ 
         <div className="flex items-center gap-2">
+          {/* Protection butonu */}
+          <a
+            href="/officer/protection"
+            className="px-3 py-1.5 text-xs rounded-full border border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:bg-white/10"
+            title="Protection paneline git"
+          >
+            Protection
+          </a>
           <label className="text-xs text-zinc-400">Raw</label>
           <button
             onClick={() => setRaw((v) => !v)}
