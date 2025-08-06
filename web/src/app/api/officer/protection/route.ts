@@ -59,8 +59,17 @@ export async function GET(req: NextRequest) {
     const r = await fetch(`${RENDER_BASE}/guards/status`, {
       headers: { "x-guards-secret": SHARED_SECRET as string }
     });
-    const data = await r.json();
-    return NextResponse.json(data, { status: r.status });
+    const ct = r.headers.get("content-type") || "";
+    if (ct.includes("application/json")) {
+      const data = await r.json().catch(() => ({}));
+      return NextResponse.json(data, { status: r.status });
+    } else {
+      const text = await r.text().catch(() => "");
+      return NextResponse.json(
+        { ok: false, error: "upstream_non_json", status: r.status, body: text.slice(0, 200) },
+        { status: 502 }
+      );
+    }
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message || "fetch_error" }, { status: 502 });
   }
@@ -89,8 +98,17 @@ export async function PATCH(req: NextRequest) {
         },
         body: JSON.stringify({ guard: body.guard })
       });
-      const data = await r.json();
-      return NextResponse.json(data, { status: r.status });
+      const ct = r.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const data = await r.json().catch(() => ({}));
+        return NextResponse.json(data, { status: r.status });
+      } else {
+        const text = await r.text().catch(() => "");
+        return NextResponse.json(
+          { ok: false, error: "upstream_non_json", status: r.status, body: text.slice(0, 200) },
+          { status: 502 }
+        );
+      }
     }
     if (action === "config-set") {
       const r = await fetch(`${RENDER_BASE}/guards/config-set`, {
@@ -101,8 +119,17 @@ export async function PATCH(req: NextRequest) {
         },
         body: JSON.stringify({ path: body.path, value: body.value })
       });
-      const data = await r.json();
-      return NextResponse.json(data, { status: r.status });
+      const ct = r.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const data = await r.json().catch(() => ({}));
+        return NextResponse.json(data, { status: r.status });
+      } else {
+        const text = await r.text().catch(() => "");
+        return NextResponse.json(
+          { ok: false, error: "upstream_non_json", status: r.status, body: text.slice(0, 200) },
+          { status: 502 }
+        );
+      }
     }
 
     return NextResponse.json({ ok: false, error: "invalid_action" }, { status: 400 });
