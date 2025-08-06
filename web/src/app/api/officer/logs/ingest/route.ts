@@ -9,8 +9,6 @@ type LogEntry = {
   data?: any;
 };
 
-// Geçici: Prod (Vercel) ortamında kalıcı dosya yazımı yerine no-op.
-// Local geliştirmede isterseniz dosyaya yazmaya devam edebiliriz, ancak şu an için botun 500 hatasını kesmek adına tamamen no-op uygulanıyor.
 const isProd = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
 
 export async function POST(req: Request) {
@@ -84,10 +82,39 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4) NO-OP (hem prod hem şimdilik tüm ortamlarda)
-    // İleride KV/DB entegre edildiğinde buraya kalıcı yazım eklenecek.
-    const took = Date.now() - start;
-    return NextResponse.json({ ok: true, tookMs: took, mode: isProd ? "prod-noop" : "noop" }, { status: 200 });
+    // 4) Yazma hedefi:
+    // - Prod (Vercel): /tmp/site-logs.json (runtime yazılabilir)
+    // - Local/dev: web/output/site-logs.json (repo içi)
+    try {
+      const targetPath = isProd ? "/tmp/site-logs.json" : "web/output/site-logs.json";
+
+      // Mevcut içeriği oku (yoksa boş dizi)
+      let arr: any[] = [];
+      try {
+        const buf = await (await import("fs/promises")).readFile(targetPath, "utf8");
+        const json = JSON.parse(buf);
+        if (Array.isArray(json)) arr = json;
+      } catch {
+        arr = [];
+      }
+
+      // Append (boyut büyürse ileride rotasyon/KV eklenir)
+      arr.push(entry);
+
+      // Klasör oluşturmayı dener (local path için)
+      try {
+        const { dirname } = await import("path");
+        const dir = dirname(targetPath);
+        await (await import("fs/promises")).mkdir(dir, { recursive: true });
+      } catch {}
+
+      await (await import("fs/promises")).writeFile(targetPath, JSON.stringify(arr, null, 2), "utf8");
+
+      const took = Date.now() - start;
+      return NextResponse.json({ ok: true, tookMs: took, mode: isProd ? "prod-tmp" : "local-file", path: targetPath }, { status: 200 });
+    } catch (e: any) {
+      return NextResponse.json({ error: "storage error", code: "IO_ERROR", message: e?.message || "io-failed" }, { status: 500 });
+    }
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "failed", code: "UNHANDLED" }, { status: 500 });
   }
