@@ -58,12 +58,20 @@ module.exports = {
       if (!userText) return;
 
       // Lokal "son N mesajı oku/özetle" akışı (model çağrısı yok)
-      // Örnek tetikler: "son 50 mesajı oku", "son 30 mesajı okur musun", "son 100 mesajın özetini ver"
-      const readMatch = userText
-        .toLowerCase()
-        .match(/\bson\s+(\d{1,3})\s*mesaj[ıi]?\s*(oku|okur musun|özet(le|ini ver)|göster)/);
-      if (readMatch) {
-        const n = Math.min(Math.max(parseInt(readMatch[1], 10) || 50, 1), 100);
+      // Örnek tetikler: 
+      //  - "son 50 mesajı oku", "son 30 mesajı okur musun", "son 100 mesajın özetini ver"
+      //  - "geçmiş mesajları oku", "geçmişi oku", "son mesajları oku", "son 50 mesaj"
+      const lower = userText.toLowerCase();
+      const readRegexCount = /\bson\s+(\d{1,3})\s*mesaj[ıi]?\s*(oku|okur musun|okuyabilir misin|özet(le|ini ver)|göster)?/;
+      const readRegexGeneric = /\b(geçmiş( mesaj(lar[ıi])?)?|son mesaj(lar[ıi])?)\s*(oku|okuyabilir misin|okur musun|özet(le|ini ver)|göster)?\b/;
+
+      const readMatchCount = lower.match(readRegexCount);
+      const readMatchGeneric = !readMatchCount && lower.match(readRegexGeneric);
+
+      if (readMatchCount || readMatchGeneric) {
+        // N belirtilmişse kullan, yoksa varsayılan 50
+        const parsedN = readMatchCount ? parseInt(readMatchCount[1], 10) : 50;
+        const n = Math.min(Math.max(parsedN || 50, 1), 100);
         try {
           const fetched = await message.channel.messages.fetch({ limit: Math.min(100, n) });
           const arr = Array.from(fetched.values())
