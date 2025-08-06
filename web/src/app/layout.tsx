@@ -95,6 +95,49 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       {/* body'de 3P uzantıların enjekte ettiği beklenmeyen attribute'ları tolere et */}
       <body className={bodyClass} suppressHydrationWarning>
+        {/* Advanced.team benzeri iskelet: ortalanmış GIF arka plan katmanı */}
+        <div aria-hidden className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          <style jsx>{`
+            .bg-center-wrap {
+              position: absolute;
+              inset: 0;
+              display: grid;
+              place-items: center;
+            }
+            .bg-center-gif {
+              /* GIF küçük ise merkezde sabit; büyütme yok (pikselleşmeyi önle) */
+              width: min(60vmin, 560px);
+              height: auto;
+              opacity: 0.22; /* arka plan hissi */
+              image-rendering: -webkit-optimize-contrast;
+              image-rendering: crisp-edges;
+              filter: saturate(1) contrast(1.05) brightness(1.05);
+            }
+            /* Koyu degrade ile sayfa kenarlarını sakinleştir (advanced.team hissi) */
+            .bg-vignette {
+              position: absolute;
+              inset: -10%;
+              background:
+                radial-gradient(60% 60% at 50% 40%, rgba(80,80,120,0.20), transparent 65%),
+                radial-gradient(80% 80% at 50% 80%, rgba(0,0,0,0.45), transparent 60%),
+                linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.60));
+              pointer-events: none;
+              mix-blend-mode: normal;
+            }
+            @media (max-width: 640px) {
+              .bg-center-gif { width: min(70vmin, 420px); opacity: 0.26; }
+            }
+          `}</style>
+          <div className="bg-center-wrap">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/pictures/thevoitanspurple-saturation100.gif"
+              alt=""
+              className="bg-center-gif"
+            />
+          </div>
+          <div className="bg-vignette" />
+        </div>
         {/* First paint'te body üzerindeki bilinmeyen attribute'ları temizle */}
         <script
           dangerouslySetInnerHTML={{
