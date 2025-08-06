@@ -93,6 +93,40 @@ export const authOptions: NextAuthOptions = {
         session.user.id = (token as any).discordId || token.sub;
         session.user.username = (token as any).username || session.user?.name || "Discord User";
         session.user.avatar = (token as any).avatar || session.user?.image || null;
+
+        // HYDRATE: Discord guildMember.roles -> session.user.guildMember.roles
+        // Server-side çağrı; Vercel'de çalışır, client bundle'a girmez.
+        try {
+          const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+          const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
+          const userId = session.user.id as string | undefined;
+
+          if (DISCORD_BOT_TOKEN && DISCORD_GUILD_ID && userId) {
+            const gm = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/members/${userId}`, {
+              headers: { Authorization: `Bot ${DISCORD_BOT_TOKEN}` },
+              cache: "no-store",
+            });
+            if (gm.ok) {
+              const j = (await gm.json().catch(() => ({}))) as { roles?: string[]; nick?: string | null };
+              const roleIds = Array.isArray(j?.roles) ? (j.roles as string[]) : [];
+              // Minimal shape: sadece id ile UI koşulu için yeterli
+              const roles = roleIds.map((id) => ({ id, name: undefined as unknown as string | undefined }));
+              session.user.guildMember = {
+                ...(session.user.guildMember || {}),
+                nick: j?.nick ?? (session.user.guildMember?.nick ?? null),
+                roles,
+              };
+            } else {
+              // Hata durumunu logla ama sessiyonu bozma
+              console.error("[next-auth][hydrate][guildMember] failed", gm.status);
+            }
+          } else {
+            // Eksik ENV logu
+            console.error("[next-auth][hydrate][guildMember] missing DISCORD_BOT_TOKEN or DISCORD_GUILD_ID");
+          }
+        } catch (e: any) {
+          console.error("[next-auth][hydrate][guildMember] error", e?.message || e);
+        }
       }
       return session;
     },
