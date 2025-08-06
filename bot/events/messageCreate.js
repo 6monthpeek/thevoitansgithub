@@ -9,6 +9,11 @@ const MAX_DISCORD_REPLY_LEN = 1800; // 2000 limitine güvenli tampon
 const HISTORY_LIMIT = Number(process.env.OPENROUTER_HISTORY_LIMIT || 30); // Son 30 mesaj
 const THINKING_EMOJI = "💭";
 
+// Kanal beyaz listesi davranışı:
+// AI_ONLY_ENABLED_CHANNELS=1 ise yalnızca AI_ENABLED_CHANNELS içinde çalışır.
+// AI_ONLY_ENABLED_CHANNELS=0 (veya tanımsız) ise TÜM metin kanallarında mention/prefix tetiklenebilir.
+const AI_ONLY_ENABLED_CHANNELS = String(process.env.AI_ONLY_ENABLED_CHANNELS || "0") === "1";
+
 // Senior Officer rol ID (ENV)
 const rawSenior = process.env.SENIOR_OFFICER_ROLE_ID || "";
 const SENIOR_ROLE_ID = String(rawSenior).trim();
@@ -58,21 +63,47 @@ module.exports = {
         return;
       }
 
-      // Sadece izinli kanallarda ve mention/prefix ile çalış
+      // Kanal filtresi (opsiyonel): AI_ONLY_ENABLED_CHANNELS=1 ise whitelist uygula, aksi halde tüm metin kanalları serbest
       const ENABLED_CHANNELS = (process.env.AI_ENABLED_CHANNELS || String(TARGET_CHANNEL_ID)).split(",").map(s => s.trim()).filter(Boolean);
-      if (!ENABLED_CHANNELS.includes(String(message.channel.id))) {
+      if (AI_ONLY_ENABLED_CHANNELS) {
+        if (!ENABLED_CHANNELS.includes(String(message.channel.id))) {
+          try {
+            console.log("[bot][messageCreate] skip:not-allowed-channel(whitelist-on)", {
+              here: String(message.channel.id),
+              allowed: ENABLED_CHANNELS
+            });
+          } catch {}
+          return;
+        }
+      } else {
         try {
-          console.log("[bot][messageCreate] skip:not-allowed-channel", {
+          console.log("[bot][messageCreate] channel-whitelist:OFF (AI_ONLY_ENABLED_CHANNELS=0)", {
             here: String(message.channel.id),
-            allowed: ENABLED_CHANNELS
+            guild: message.guild?.id,
           });
         } catch {}
-        return;
       }
 
       const prefixes = (process.env.AI_PREFIXES || "!ai,!ask,/ai").split(",").map(s => s.trim()).filter(Boolean);
       const contentRaw = String(message.content || "");
-      const mentionsBot = message.mentions?.users?.has?.(client.user?.id);
+
+      // Mention algısını güçlendir: doğrudan mention, reply üzerinden mention ve ham içerikte <@id> match'i
+      const botId = String(client.user?.id || "");
+      const directMention = message.mentions?.users?.has?.(client.user?.id);
+      const contentHasTag = botId ? /<@!?(\d+)>/.test(contentRaw) && contentRaw.includes(botId) : false;
+      let replyMentionsBot = false;
+      try {
+        if (message.reference?.messageId && message.channel?.messages?.fetch) {
+          const ref = await message.channel.messages.fetch(message.reference.messageId).catch(() => null);
+          if (ref) {
+            const refHas = ref.mentions?.users?.has?.(client.user?.id);
+            const refContentHasTag = botId ? (typeof ref.content === "string" && ref.content.includes(botId)) : false;
+            replyMentionsBot = !!(refHas || refContentHasTag);
+          }
+        }
+      } catch {}
+
+      const mentionsBot = !!(directMention || contentHasTag || replyMentionsBot);
       const hasPrefix = prefixes.some(p => contentRaw.startsWith(p));
 
       // Çifte tetiklemeyi önlemek için: mention + prefix birlikte ise sadece BİR kez çalıştır.
@@ -83,7 +114,7 @@ module.exports = {
       }
       // Aynı mesajda mention ve prefix birlikteyse, tek akış sinyali ayarla
       const trigger = mentionsBot ? "mention" : "prefix";
-      try { console.log("[bot][messageCreate] trigger", { trigger, mentionsBot, hasPrefix }); } catch {}
+      try { console.log("[bot][messageCreate] trigger", { trigger, mentionsBot, hasPrefix, channelId: String(message.channel.id), guildId: String(message.guild?.id || "") }); } catch {}
 
       // Idempotent koruma: aynı message.id için tek kez çalış
       try {
@@ -97,14 +128,15 @@ module.exports = {
         }, 5 * 60 * 1000);
       } catch {}
 
-      if (String(message.channel.id) !== String(TARGET_CHANNEL_ID)) {
+      // Eski tek-kanal kısıtı kaldırıldı: whitelist kapalıyken tüm kanallarda çalış
+      if (AI_ONLY_ENABLED_CHANNELS && String(message.channel.id) !== String(TARGET_CHANNEL_ID) && !ENABLED_CHANNELS.includes(String(message.channel.id))) {
         try {
-          console.log("[bot][messageCreate] skip:not-target", {
+          console.log("[bot][messageCreate] skip:not-target(whitelist-on)", {
             here: String(message.channel.id),
             target: String(TARGET_CHANNEL_ID),
           });
         } catch {}
-        return; // sadece hedef kanal
+        return;
       }
 
       const apiKey = process.env.OPENROUTER_API_KEY;
