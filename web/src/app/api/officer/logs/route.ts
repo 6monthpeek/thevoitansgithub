@@ -252,8 +252,11 @@ export async function GET(req: Request) {
       });
     }
 
-    // presenceUpdate loglarını tamamen gizle
-    filtered = filtered.filter((l) => (l.event || "").toLowerCase() !== "presenceupdate");
+    // presenceUpdate loglarını tamamen gizle (çeşitli adlandırmalar dahil)
+    filtered = filtered.filter((l) => {
+      const ev = String(l.event || "").toLowerCase();
+      return ev !== "presenceupdate" && ev !== "presence_update" && ev !== "presence-update";
+    });
 
     // Varsayılan olarak en yeni en üstte görmek için tersle
     filtered = filtered.slice().reverse();

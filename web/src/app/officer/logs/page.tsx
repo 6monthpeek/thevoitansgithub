@@ -105,24 +105,24 @@ function useSSE(urlBuilder: () => string, onMessage: (data: any) => void) {
   }, [urlBuilder]);
 }
 
-// Event seçenekleri: pratikte botta üretilen başlıca eventler
-const KNOWN_EVENTS = [
-  "messageCreate",
-  "messageUpdate",
-  "messageDelete",
-  "presenceUpdate",
-  "voiceStateUpdate",
-  "guildBanAdd",
-  "guildCreate",
-  "guildDelete",
-  "guildMemberAdd",
-  "guildMemberRemove",
-  "interactionCreate",
-  "channelCreate",
-  "channelDelete",
-  "rateLimit",
-  "warn",
-  "error",
+// Event seçenekleri: pratikte botta üretilen başlıca eventler (presenceUpdate kaldırıldı)
+const KNOWN_EVENTS: Array<{ key: string; label: string }> = [
+  { key: "messageCreate", label: "Mesaj Gönderildi" },
+  { key: "messageUpdate", label: "Mesaj Düzenlendi" },
+  { key: "messageDelete", label: "Mesaj Silindi" },
+  // presenceUpdate listeden tamamen kaldırıldı
+  { key: "voiceStateUpdate", label: "Ses Kanalı Olayı" },
+  { key: "guildBanAdd", label: "Yasaklama (Ban)" },
+  { key: "guildCreate", label: "Sunucuya Katılım (Bot)" },
+  { key: "guildDelete", label: "Sunucudan Ayrılma (Bot)" },
+  { key: "guildMemberAdd", label: "Üye Katıldı" },
+  { key: "guildMemberRemove", label: "Üye Ayrıldı" },
+  { key: "interactionCreate", label: "Etkileşim (Slash/Buton)" },
+  { key: "channelCreate", label: "Kanal Oluşturuldu" },
+  { key: "channelDelete", label: "Kanal Silindi" },
+  { key: "rateLimit", label: "Rate Limit" },
+  { key: "warn", label: "Uyarı" },
+  { key: "error", label: "Hata" },
 ];
 
 function FilterPanel({
@@ -190,20 +190,20 @@ function FilterPanel({
         <div className="text-xs text-zinc-400 mb-1">Event Türleri</div>
         <div className="flex flex-wrap gap-1.5">
           {KNOWN_EVENTS.map((ev) => {
-            const selected = value.types.includes(ev);
+            const selected = value.types.includes(ev.key);
             return (
               <button
-                key={ev}
-                onClick={() => toggleType(ev)}
+                key={ev.key}
+                onClick={() => toggleType(ev.key)}
                 className={`px-2.5 py-1 rounded-full border text-xs ${
                   selected
                     ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
                     : "border-white/10 bg-white/5 text-zinc-300 hover:border-white/20"
                 }`}
-                title={ev}
+                title={ev.label}
                 type="button"
               >
-                {ev}
+                {ev.label}
               </button>
             );
           })}
