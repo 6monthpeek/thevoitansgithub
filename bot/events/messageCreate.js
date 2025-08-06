@@ -1,96 +1,73 @@
-/* eslint-disable no-undef */
-// 📁 events/messageCreate.js
-// Not: Merkezî ingest helper'ını kullan (tek noktadan diagnostic ve normalizasyon)
-const { postLog, baseUser, baseGuild, baseChannel, enrichUserData } = require("./_logIngest");
+const { buildMessagesForUser, callOpenRouter } = require("../openrouter");
 
+const TARGET_CHANNEL_ID = process.env.OPENROUTER_CHANNEL_ID || "1140379269705502821";
+const MAX_DISCORD_REPLY_LEN = 1800; // 2000 limitine güvenli tampon
+const THINKING_EMOJI = "💭";
+
+/**
+ * messageCreate
+ * - Belirlenen kanalda gelen kullanıcı mesajlarına OpenRouter ile yanıt verir.
+ * - Bot mesajlarını ve salt komut prefix'li mesajları (opsiyonel) atlar.
+ * - Uzun içerikleri kısaltır, hata durumunda kullanıcıyı nazikçe bilgilendirir.
+ */
 module.exports = {
   name: "messageCreate",
-  async execute(message) {
+  once: false,
+  async execute(message, client) {
     try {
-      if (!message || message.author?.bot) return;
+      // 1) Filtreler
+      if (!message || !message.channel || !message.author) return;
+      if (message.author.bot) return; // bot mesajları yok
+      if (String(message.channel.id) !== String(TARGET_CHANNEL_ID)) return; // sadece hedef kanal
 
-      // Kullanıcı bilgilerini zenginleştir
-      const enrichedData = message.guild && message.author ? await enrichUserData(message.author.id, message.guild.id) : {};
-
-      // 0) Her messageCreate'i temel bilgiyle ingest et (UI özetleri için gerekli)
-      await postLog({
-        event: "messageCreate",
-        ...baseGuild(message.guild),
-        ...baseChannel(message.channel),
-        ...baseUser(message.author),
-        data: {
-          content: typeof message.content === "string" ? message.content : undefined,
-          messageId: message.id,
-          attachments: Array.from(message.attachments?.values?.() || []).map((a) => ({
-            id: a.id,
-            name: a.name,
-            size: a.size,
-            contentType: a.contentType || a.content_type,
-            url: a.url,
-          })),
-          hasEmbeds: Boolean(message.embeds?.length),
-          hasComponents: Boolean(message.components?.length),
-          isReply: Boolean(message.reference?.messageId),
-          referencedMessageId: message.reference?.messageId,
-          ...enrichedData, // Zenginleştirilmiş kullanıcı bilgilerini ekle
-        },
-      });
-
-      // 1) Link paylaşımı tespiti (basit regex) - ayrı bir event ile detaylı log
-      const content = String(message?.content || "");
-      const linkMatch = content.match(/https?:\/\/\S+/gi);
-      if (linkMatch && linkMatch.length > 0) {
-        await postLog({
-          event: "messageCreate_link",
-          ...baseGuild(message.guild),
-          ...baseChannel(message.channel),
-          ...baseUser(message.author),
-          data: {
-            content,
-            messageId: message.id,
-            links: linkMatch.slice(0, 10),
-            ...enrichedData, // Zenginleştirilmiş kullanıcı bilgilerini ekle
-          },
-        });
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      if (!apiKey) {
+        // Ortam değişkeni yoksa kullanıcıyı bilgilendir ve geri dön
+        if (Math.random() < 0.02) {
+          await message.channel.send("AI yanıt sistemi şu an devre dışı (OPENROUTER_API_KEY eksik).");
+        }
+        return;
       }
 
-      // 2) Mention'lar (user, role, everyone/here)
-      const userMentions = Array.from(message.mentions?.users?.values?.() || []).map((u) => ({
-        id: u.id,
-        username: u.username,
-      }));
-      const roleMentions = Array.from(message.mentions?.roles?.values?.() || []).map((r) => ({
-        id: r.id,
-        name: r.name,
-      }));
-      if (userMentions.length || roleMentions.length || message.mentions?.everyone) {
-        await postLog({
-          event: "messageCreate_mentions",
-          ...baseGuild(message.guild),
-          ...baseChannel(message.channel),
-          ...baseUser(message.author),
-          data: {
-            messageId: message.id,
-            userMentions,
-            roleMentions,
-            everyone: Boolean(message.mentions?.everyone),
-            ...enrichedData, // Zenginleştirilmiş kullanıcı bilgilerini ekle
-          },
-        });
-      }
+      const userText = String(message.content || "").trim();
+      if (!userText) return;
 
-      // 3) Basit komut/önek alanı (geleceğe hazır)
-      // const PREFIX = process.env.BOT_PREFIX || "!";
-      // if (content.startsWith(PREFIX)) { ... }
+      // 2) Kullanıcıya "typing" göster (maks 20s)
+      message.channel.sendTyping().catch(() => {});
+      const typingTimer = setInterval(() => {
+        message.channel.sendTyping().catch(() => {});
+      }, 7000);
 
-    } catch (e) {
-      console.warn("[events/messageCreate] error:", e?.message || e);
-      // hata da ingest'e düşsün
+      // 3) Mesajları hazırla (system prompt + user)
+      const messages = await buildMessagesForUser(userText);
+
+      // 4) OpenRouter çağrısı
+      let reply;
       try {
-        await postLog({
-          event: "messageCreate_error",
-          data: { message: String(e?.message || e) },
+        reply = await callOpenRouter(messages, {
+          // model: process.env.OPENROUTER_MODEL, // env ile override edilebilir
+          temperature: 0.7,
+          top_p: 0.9,
+          max_tokens: 400,
         });
+      } catch (err) {
+        console.error("[openrouter][error]", err?.message || err);
+        // Hata durumunda kısa bilgi
+        reply = "Şu an yanıt veremiyorum. Lütfen biraz sonra tekrar dener misin?";
+      } finally {
+        clearInterval(typingTimer);
+      }
+
+      // 5) Yanıtı güvenli uzunlukla kanala gönder
+      if (typeof reply !== "string" || !reply.trim()) {
+        reply = "Boş yanıt döndü. Lütfen mesajını tekrar gönder.";
+      }
+      const safe = reply.slice(0, MAX_DISCORD_REPLY_LEN);
+      await message.reply(safe);
+    } catch (e) {
+      console.error("[messageCreate][unhandled]", e?.message || e);
+      try {
+        await message.channel.send("İstek işlenirken beklenmeyen bir hata oluştu.");
       } catch {}
     }
   },
