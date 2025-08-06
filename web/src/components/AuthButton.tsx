@@ -6,6 +6,93 @@ import { useSession } from "next-auth/react";
 
 type RoleBadge = { id: string; name: string; color: number; position: number; hex?: string | null };
 
+type RolesPreviewProps = {
+  userRoles?: RoleBadge[] | undefined;
+  discordRoleIds?: string[] | undefined;
+};
+
+function RolesPreview({ userRoles, discordRoleIds }: RolesPreviewProps) {
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        // Önce window cache
+        const cached = (typeof window !== "undefined" && (window as any).__ROLE_NAME_CACHE__) || null;
+        if (cached?.roles) {
+          setNameMap(cached.roles as Record<string, string>);
+        }
+        // Sunucudan map çek
+        const r = await fetch("/api/resolve/roles", { cache: "no-store" });
+        if (!alive) return;
+        const j = await r.json().catch(() => ({}));
+        const rolesObj: Record<string, string> =
+          (j?.roles as Record<string, string>) ||
+          (Array.isArray(j)
+            ? Object.fromEntries(j.map((x: any) => [String(x?.id ?? ""), String(x?.name ?? "")]))
+            : {});
+        if (rolesObj && typeof rolesObj === "object") {
+          setNameMap(rolesObj);
+          if (typeof window !== "undefined") {
+            (window as any).__ROLE_NAME_CACHE__ = { roles: rolesObj };
+          }
+        }
+      } catch {}
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const hasUserRoles = Array.isArray(userRoles) && userRoles.length > 0;
+  const hasIds = Array.isArray(discordRoleIds) && discordRoleIds.length > 0;
+
+  return (
+    <div className="mt-3">
+      <div className="text-[11px] text-zinc-400 mb-1">Roller</div>
+      {hasUserRoles ? (
+        <div className="flex flex-wrap gap-1.5">
+          {userRoles!.slice(0, 6).map((r) => {
+            const hex = r.hex || `#${(r.color ?? 0).toString(16).padStart(6, "0")}`;
+            const label = r.name || nameMap[String(r.id)] || r.id;
+            return (
+              <span
+                key={r.id}
+                className="text-[10px] px-2 py-0.5 rounded-full border"
+                style={{ borderColor: `${hex}55`, background: `${hex}22`, color: "#e5e7eb" }}
+                title={label}
+              >
+                {label}
+              </span>
+            );
+          })}
+        </div>
+      ) : hasIds ? (
+        <div className="flex flex-wrap gap-1.5">
+          {discordRoleIds!.slice(0, 6).map((rid) => {
+            const label = nameMap[String(rid)] || `#${rid}`;
+            return (
+              <span
+                key={rid}
+                className="text-[10px] px-2 py-0.5 rounded-full border border-white/10 bg-white/5 text-zinc-200"
+                title={String(rid)}
+              >
+                {label}
+              </span>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex items-center gap-1.5">
+          <span className="h-4 w-16 rounded-full bg-white/5 border border-white/10 animate-pulse" />
+          <span className="h-4 w-10 rounded-full bg-white/5 border border-white/10 animate-pulse" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AuthButton() {
   const { data, status } = useSession();
   const loading = status === "loading";
@@ -203,44 +290,8 @@ export default function AuthButton() {
 
             {/* Officer kısayolu kaldırıldı — Officer erişimi yalnız sekmeler üzerinden */}
 
-            {/* Roles preview: guildMember.roles varsa isimleri göster; yoksa discordRoles ID’lerini kapsül olarak göster */}
-            <div className="mt-3">
-              <div className="text-[11px] text-zinc-400 mb-1">Roller</div>
-              {Array.isArray(user?.guildMember?.roles) && user.guildMember.roles.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {user.guildMember.roles.slice(0, 6).map((r) => {
-                    const hex = r.hex || `#${(r.color ?? 0).toString(16).padStart(6, "0")}`;
-                    return (
-                      <span
-                        key={r.id}
-                        className="text-[10px] px-2 py-0.5 rounded-full border"
-                        style={{ borderColor: `${hex}55`, background: `${hex}22`, color: "#e5e7eb" }}
-                        title={r.name ? `Pozisyon: ${r.position}` : r.id}
-                      >
-                        {r.name || r.id}
-                      </span>
-                    );
-                  })}
-                </div>
-              ) : Array.isArray(discordRoleIds) && discordRoleIds.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {discordRoleIds.slice(0, 6).map((rid: string) => (
-                    <span
-                      key={rid}
-                      className="text-[10px] px-2 py-0.5 rounded-full border border-white/10 bg-white/5 text-zinc-200"
-                      title={rid}
-                    >
-                      #{rid}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5">
-                  <span className="h-4 w-16 rounded-full bg-white/5 border border-white/10 animate-pulse" />
-                  <span className="h-4 w-10 rounded-full bg-white/5 border border-white/10 animate-pulse" />
-                </div>
-              )}
-            </div>
+            {/* Roles preview: guildMember.roles varsa isim; yoksa discordRoles ID’lerini isim map’i ile göster */}
+            <RolesPreview userRoles={user?.guildMember?.roles} discordRoleIds={discordRoleIds} />
 
             {/* Meta */}
             <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-zinc-400">
