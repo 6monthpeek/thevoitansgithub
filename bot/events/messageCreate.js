@@ -74,12 +74,16 @@ module.exports = {
       const contentRaw = String(message.content || "");
       const mentionsBot = message.mentions?.users?.has?.(client.user?.id);
       const hasPrefix = prefixes.some(p => contentRaw.startsWith(p));
-      if (!mentionsBot && !hasPrefix) {
-        try {
-          console.log("[bot][messageCreate] skip:no-mention-or-prefix");
-        } catch {}
+
+      // Çifte tetiklemeyi önlemek için: mention + prefix birlikte ise sadece BİR kez çalıştır.
+      // Tercih: mention öncelikli, prefix kullanımında mention varsa prefix akışını pas geç.
+      if (!(mentionsBot || hasPrefix)) {
+        try { console.log("[bot][messageCreate] skip:no-mention-or-prefix"); } catch {}
         return;
       }
+      // Aynı mesajda mention ve prefix birlikteyse, tek akış sinyali ayarla
+      const trigger = mentionsBot ? "mention" : "prefix";
+      try { console.log("[bot][messageCreate] trigger", { trigger, mentionsBot, hasPrefix }); } catch {}
 
       // Idempotent koruma: aynı message.id için tek kez çalış
       try {
@@ -405,7 +409,13 @@ module.exports = {
           reply = "Boş yanıt döndü. Lütfen mesajını tekrar gönder.";
         }
         const safe = reply.slice(0, MAX_DISCORD_REPLY_LEN);
-        await message.reply(safe);
+        // Birden fazla yanıtı önlemek için aynı mesaj için bir kere gönder
+        if (!message.__repliedOnce) {
+          message.__repliedOnce = true;
+          await message.reply(safe);
+        } else {
+          try { console.log("[bot][messageCreate] skip:already-replied-once"); } catch {}
+        }
       } else {
         clearInterval(typingTimer);
       }
