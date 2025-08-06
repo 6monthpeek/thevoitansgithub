@@ -74,11 +74,9 @@ async function callOpenRouter(messages, opts = {}) {
   for (let idx = 0; idx < keys.length; idx++) {
     const apiKey = keys[idx];
 
-    // 1) Try with preferred model; on 429, we can also try a fallback model once per key
-    const modelsToTry = [String(opts.model || DEFAULT_MODEL), "openrouter/auto"];
-
-    for (let mi = 0; mi < modelsToTry.length; mi++) {
-      const modelTry = modelsToTry[mi];
+    // Only preferred model. No fallback to "openrouter/auto".
+    const modelTry = String(opts.model || DEFAULT_MODEL);
+    {
 
       const abort = new AbortController();
       const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000));
@@ -101,15 +99,10 @@ async function callOpenRouter(messages, opts = {}) {
           const errText = await res.text().catch(() => "");
           if (res.status === 429) {
             console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, model: modelTry, status: 429, body: errText?.slice?.(0, 500) || errText });
-            // On 429 with first model, try fallback model (if not already)
-            if (mi === 0) {
-              // immediate next loop to try fallback model
-              continue;
-            }
-            // After trying both models for this key, backoff then go to next key
+            // On 429: backoff then rotate to next key (no model fallback)
             const wait = backoffsMs[Math.min(idx, backoffsMs.length - 1)];
             await new Promise(r => setTimeout(r, wait));
-            break; // break models loop -> next key
+            break; // go to next key
           }
           console.error("[openrouter][http-error]", { keyIndex: idx, model: modelTry, status: res.status, body: errText?.slice?.(0, 500) || errText });
           throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
@@ -132,13 +125,8 @@ async function callOpenRouter(messages, opts = {}) {
         clearTimeout(t);
         lastErr = e;
         console.error("[openrouter][fetch-error]", { keyIndex: idx, model: modelTry, err: e?.message || e });
-        // If network/timeout, try fallback model (if any left), else rotate key after small wait
-        if (mi === modelsToTry.length - 1) {
-          await new Promise(r => setTimeout(r, 300));
-        } else {
-          // try next model immediately
-          continue;
-        }
+        // Network/timeout: small wait then rotate to next key
+        await new Promise(r => setTimeout(r, 300));
       }
     }
     // proceed to next key
