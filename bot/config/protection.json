@@ -1,0 +1,30 @@
+{
+  "//": "Mineary benzeri koruma altyapısı - varsayılan kapalı. Bu dosyayı düzenleyerek tek tek açabilirsin.",
+  "guildId": "",
+  "logChannelId": "",
+  "moderatorRoleIds": ["1249512318929342505", "1178104722675204287"],
+  "bypassUserIds": [],
+  "rateLimits": {
+    "windowMs": 10000,
+    "channelCreate": 4,
+    "channelDelete": 2,
+    "roleCreate": 4,
+    "roleDelete": 2,
+    "banAdd": 3,
+    "kick": 5,
+    "webhookUpdate": 3,
+    "inviteCreate": 10,
+    "messagePerUser": 15
+  },
+  "guards": {
+    "antiNuke": { "enabled": false, "thresholdScore": 10, "actions": ["revert", "timeout"], "timeoutSeconds": 600 },
+    "roleGuard": { "enabled": false, "protectAdminPerms": true, "revertChanges": true },
+    "channelGuard": { "enabled": false, "recreateOnDelete": true, "lockdownOnSpike": true },
+    "webhookGuard": { "enabled": false, "blockUnknownWebhooks": true, "revertEdits": true },
+    "guildUpdateGuard": { "enabled": false, "lockVanityUrl": true, "lockNameIcon": true },
+    "memberGuard": { "enabled": false, "blockMassBan": true, "blockMassKick": true },
+    "messageGuard": { "enabled": false, "antiSpam": true, "antiMentionRaid": true, "maxMentions": 5, "antiMaliciousLinks": true },
+    "inviteGuard": { "enabled": false, "limitPerMinute": 20 },
+    "vanityGuard": { "enabled": false }
+  }
+}

@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits, Partials, Collection } = require("discord.js");
+const { attachGuards } = require("./guards");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
 const fs = require("fs");
@@ -80,6 +81,14 @@ try {
   console.log("✅ Merkezi event wiring aktif (_wireAll).");
 } catch (e) {
   console.warn("⚠️ _wireAll yüklenemedi:", e?.message || e);
+}
+
+// Koruma altyapısını bağla (varsayılan: tüm guard'lar kapalı).
+try {
+  attachGuards(client);
+  console.log("🛡️  Protection guards attached (defaults: disabled).");
+} catch (e) {
+  console.warn("⚠️ Guards attach sırasında hata:", e?.message || e);
 }
 
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || process.env.TOKEN;

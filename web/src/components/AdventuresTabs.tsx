@@ -402,9 +402,7 @@ function BDOPanel() {
     </section>
   );
 
-  // Öne çıkanlar ve kronoloji (JSON’dan)
-  const highlights = useMemo(() => pickHighlights(merged, 6), [merged]);
-  const months = useMemo(() => groupByMonth(merged), [merged]);
+  // Öne çıkanlar ve kronoloji kaldırıldı
 
   return (
     <div
@@ -431,81 +429,8 @@ function BDOPanel() {
         <div className="lg:col-span-1">{story}</div>
       </div>
 
-      {/* Highlights */}
-      {highlights.length > 0 && (
-        <section
-          className="rounded-2xl border border-white/10 bg-black/30 p-5"
-          style={{ contentVisibility: "auto" as any }}
-        >
-          <h3 className="text-sm font-semibold text-zinc-100 mb-3">Öne Çıkanlar</h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Örnek Victory Highlight kartları (statik placeholder) */}
-            <article className="rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-[13px] font-semibold text-zinc-100">WillOfFire — Ateşin İradesi</h4>
-                <span className="text-[11px] text-zinc-400">2023</span>
-              </div>
-              <p className="mt-1 text-[13px] text-zinc-200">
-                Dezavantajlı savaşta pozisyon üstünlüğü ve hızlı rotasyon ile kritik zafer. İttifak yok, saf disiplin.
-              </p>
-              <ul className="mt-2 text-[12px] text-zinc-400 space-y-0.5">
-                <li>• Konum: Miru</li>
-                <li>• Rakip: Bölgesel koalisyon</li>
-                <li>• Kompozisyon: Hybrid (frontline + ranged destek)</li>
-                <li>• Sonuç: Hat kırıldı, hedef alındı</li>
-              </ul>
-            </article>
-            <article className="rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-[13px] font-semibold text-zinc-100">Kamasylvia — TF Günleri</h4>
-                <span className="text-[11px] text-zinc-400">2017</span>
-              </div>
-              <p className="mt-1 text-[13px] text-zinc-200">
-                OldmanClub bünyesinde yoğun TF’ler. Taktik disiplin ve alan kontrolüyle istikrarlı ilerleme.
-              </p>
-              <ul className="mt-2 text-[12px] text-zinc-400 space-y-0.5">
-                <li>• Konum: Kamasylvia / Miru</li>
-                <li>• Taktik: Basınç + geri çekilme döngüsü</li>
-                <li>• Not: Ekip senkronizasyonu öncelik</li>
-              </ul>
-            </article>
 
-            {/* Arşivden gelen dinamik highlight’lar */}
-            {highlights.map((h) => (
-              <div key={h.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
-                <div className="text-[11px] text-zinc-400">{formatShort(h.timestamp)}</div>
-                <div className="text-[13px] text-zinc-200 whitespace-pre-wrap mt-1">
-                  {h.content?.slice(0, 240) || "(içerik yok)"}
-                  {(h.content?.length || 0) > 240 ? "…" : ""}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Kronoloji */}
-      <section
-        className="rounded-2xl border border-white/10 bg-black/30 p-5"
-        style={{ contentVisibility: "auto" as any }}
-      >
-        <h3 className="text-sm font-semibold text-zinc-100 mb-3">Kronoloji</h3>
-        <div className="space-y-5 max-h-[420px] overflow-auto pr-1">
-          {months.map((m) => (
-            <div key={m.key}>
-              <div className="text-xs uppercase tracking-wide text-zinc-400 mb-2">{m.title}</div>
-              <div className="space-y-2">
-                {m.items.slice(0, 4).map((it) => (
-                  <div key={it.id} className="rounded-lg border border-white/10 bg-white/5 p-2">
-                    <div className="text-[11px] text-zinc-400">{formatShort(it.timestamp)} • {it.author?.username || "User"}</div>
-                    <div className="text-[13px] text-zinc-200 whitespace-pre-wrap">{it.content?.slice(0, 220) || "(içerik yok)"}{(it.content?.length || 0) > 220 ? "…" : ""}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Kronoloji kaldırıldı */}
 
       {/* Medya bölümü kaldırıldı */}
     </div>
