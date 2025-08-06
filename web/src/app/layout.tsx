@@ -106,7 +106,7 @@ export default function RootLayout({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/pictures/thevoitanspurple-saturation100.gif"
+              src="/thevoitanspurple-saturation100.gif"
               alt=""
               style={{
                 width: "min(60vmin, 560px)",
