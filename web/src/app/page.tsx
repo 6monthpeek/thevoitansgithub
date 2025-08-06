@@ -1518,6 +1518,35 @@ const OfficerDashboardTabsDynamic = dynamic(() => Promise.resolve(OfficerDashboa
 
 function OfficerDashboardTabs(): React.JSX.Element {
   const [tab, setTab] = useState<"announce" | "logs">("announce");
+
+  // Görünür hata/teşhis UI state'i (announce tabına özel)
+  const [diag, setDiag] = useState<{ msg?: string } | null>(null);
+
+  // Announce tab aktif olduğunda küçük bir ping atıp görünür teşhis ver
+  useEffect(() => {
+    let alive = true;
+    async function diagPing() {
+      if (tab !== "announce") return;
+      try {
+        const r = await fetch("/api/discord/channels", { cache: "no-store" });
+        if (!alive) return;
+        if (!r.ok) {
+          const t = await r.text().catch(() => "");
+          setDiag({ msg: `/api/discord/channels -> ${r.status} ${t.slice(0, 140)}` });
+        } else {
+          setDiag(null);
+        }
+      } catch (e: any) {
+        if (!alive) return;
+        setDiag({ msg: `channels fetch error: ${e?.message || "unknown"}` });
+      }
+    }
+    diagPing();
+    return () => {
+      alive = false;
+    };
+  }, [tab]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Officer sekmeleri">
@@ -1541,6 +1570,13 @@ function OfficerDashboardTabs(): React.JSX.Element {
 
       {tab === "announce" && (
         <div role="tabpanel" aria-labelledby="">
+          {/* Hızlı teşhis mesajı (sadece sorun varsa görünür) */}
+          {diag?.msg ? (
+            <div className="mb-3 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
+              {diag.msg}
+            </div>
+          ) : null}
+
           {/* Görünürlüğü bileşen içinde garanti eden bağımsız duyuru formu */}
           <OfficerAnnounce />
         </div>
