@@ -113,7 +113,45 @@ try {
   console.warn("HTTP keep-alive server başlatılamadı:", e?.message || e);
 }
 
-client.login(BOT_TOKEN);
+/**
+ * Robust login with retry (exponential backoff + jitter)
+ */
+let loginAttempt = 0;
+async function robustLogin() {
+  const maxDelay = 60_000; // 60s cap
+  try {
+    loginAttempt += 1;
+    await client.login(BOT_TOKEN);
+    loginAttempt = 0; // success -> reset
+  } catch (err) {
+    const base = Math.min(1000 * Math.pow(2, loginAttempt), maxDelay);
+    const jitter = Math.floor(Math.random() * 1000);
+    const delay = base + jitter;
+    console.error(`[login][retry] attempt=${loginAttempt} in ${delay}ms`, err?.message || err);
+    setTimeout(robustLogin, delay);
+  }
+}
+robustLogin();
+
+// Reconnect/guard hooks
+client.on("shardError", (error) => {
+  console.error("[discord][shardError]", error?.message || error);
+});
+client.on("error", (error) => {
+  console.error("[discord][error]", error?.message || error);
+});
+client.on("warn", (m) => console.warn("[discord][warn]", m));
+client.on("disconnect", (e) => {
+  console.warn("[discord][disconnect]", e);
+  // Let discord.js attempt reconnect; if it fails, our robustLogin handles next tries
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("[process][unhandledRejection]", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[process][uncaughtException]", err);
+});
 
 // Slash komutlarını yükle
 (async () => {

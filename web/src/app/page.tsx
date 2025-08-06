@@ -747,6 +747,164 @@ function MembersSection() {
   );
 }
 
+/**
+ * OfficerAnnounce inline – görünürlük garantisi için bağımsız duyuru formu
+ * Tanım: Home bileşeninden ÖNCE olmalı, aksi halde JSX referansı bulunamaz.
+ * - Kanal listesi: GET /api/discord/channels
+ * - Gönderim: POST /api/officer/announce
+ * - Görünürlük: ID ve isim bazlı kontrol (SENIOR_OFFICER_ROLE_ID veya "Senior Officer")
+ */
+function OfficerAnnounce(): React.JSX.Element {
+  const { data: session } = useSession() as any;
+  const raw = Array.isArray(session?.user?.guildMember?.roles) ? session.user.guildMember.roles : [];
+  const roles: Array<{ id: string; name?: string }> = raw.map((r: any) => ({ id: String(r?.id ?? r), name: r?.name }));
+
+  const SENIOR_OFFICER_ROLE_ID =
+    (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SENIOR_OFFICER_ROLE_ID || process.env.SENIOR_OFFICER_ROLE_ID)) ||
+    "1249512318929342505";
+
+  const canView =
+    roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID)) ||
+    roles.some((r) => (r?.name || "").toLowerCase() === "senior officer");
+
+  const [channels, setChannels] = useState<Array<{ id: string; name: string; type: number }>>([]);
+  const [loadingChannels, setLoadingChannels] = useState(true);
+  const [form, setForm] = useState({ channelId: "", content: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    async function loadChannels() {
+      setLoadingChannels(true);
+      try {
+        const r = await fetch("/api/discord/channels", { cache: "no-store" });
+        const j = await r.json().catch(() => ({}));
+        if (!alive) return;
+        setChannels(Array.isArray(j?.channels) ? j.channels : []);
+      } catch {
+        if (!alive) return;
+        setChannels([]);
+      } finally {
+        if (alive) setLoadingChannels(false);
+      }
+    }
+    if (canView) loadChannels();
+    return () => {
+      alive = false;
+    };
+  }, [canView]);
+
+  const disabled = submitting || !form.content.trim() || !form.channelId.trim();
+  const postAnnouncement = async () => {
+    setSubmitting(true);
+    setError(null);
+    setOk(false);
+    try {
+      const r = await fetch("/api/officer/announce", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channelId: form.channelId, content: form.content }),
+      });
+      const j = await r.json().catch(() => ({} as any));
+      if (!r.ok) throw new Error((j as any)?.error || "Gönderilemedi");
+      setOk(true);
+      setForm((f) => ({ ...f, content: "" }));
+    } catch (e: any) {
+      setError(e?.message || "Gönderim sırasında hata oluştu");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!canView) return <div className="text-sm text-zinc-400">Bu alan yalnızca Senior Officer içindir.</div>;
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      {/* Sol: Kanal listesi */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-zinc-100">Kanallar</h3>
+          {loadingChannels && <span className="text-xs text-zinc-400">Yükleniyor…</span>}
+        </div>
+        <div className="max-h-72 overflow-auto pr-1">
+          {!channels.length && !loadingChannels ? (
+            <div className="text-xs text-zinc-500">Kanal bulunamadı.</div>
+          ) : (
+            <ul className="space-y-1">
+              {channels.map((c) => (
+                <li key={c.id}>
+                  <button
+                    className={`w-full text-left rounded-md border border-white/10 px-2 py-1.5 text-xs hover:border-white/20 ${
+                      form.channelId === c.id ? "bg-white/10" : "bg-transparent"
+                    }`}
+                    onClick={() => setForm((f) => ({ ...f, channelId: c.id }))}
+                    title={c.id}
+                  >
+                    #{c.name} {c.type === 5 ? "(announcement)" : ""}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Sağ: Duyuru formu */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+        <h3 className="text-sm font-semibold text-zinc-100 mb-2">Duyuru Gönder</h3>
+        <div className="grid gap-1.5">
+          <label className="text-sm text-zinc-300">Hedef Kanal</label>
+          <select
+            value={form.channelId}
+            onChange={(e) => setForm((f) => ({ ...f, channelId: e.target.value }))}
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+            disabled={loadingChannels}
+          >
+            <option value="">{loadingChannels ? "Kanallar yükleniyor…" : "Kanal seçin"}</option>
+            {channels.map((c) => (
+              <option key={c.id} value={c.id}>
+                #{c.name} {c.type === 5 ? "(announcement)" : ""}
+              </option>
+            ))}
+          </select>
+
+          <label className="text-sm text-zinc-300 mt-2">İçerik</label>
+          <textarea
+            value={form.content}
+            onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+            rows={6}
+            placeholder="Duyuru içeriğini yazın…"
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+          />
+        </div>
+
+        {error && (
+          <div className="mt-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            {error}
+          </div>
+        )}
+        {ok && (
+          <div className="mt-2 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+            Duyuru gönderildi.
+          </div>
+        )}
+
+        <div className="mt-3">
+          <button
+            disabled={disabled}
+            onClick={postAnnouncement}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 disabled:opacity-50 hover:border-white/20"
+          >
+            {submitting ? "Gönderiliyor…" : "Duyuruyu Gönder"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { data: session } = useSession() as any;
   const roles: Array<{ id: string; name: string }> =
@@ -1383,7 +1541,8 @@ function OfficerDashboardTabs(): React.JSX.Element {
 
       {tab === "announce" && (
         <div role="tabpanel" aria-labelledby="">
-          <OfficerPanel />
+          {/* Görünürlüğü bileşen içinde garanti eden bağımsız duyuru formu */}
+          <OfficerAnnounce />
         </div>
       )}
 
