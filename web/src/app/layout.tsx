@@ -76,8 +76,9 @@ export const metadata: Metadata = {
 };
 
 import React from "react";
-import AuthSessionProvider from "../components/AuthSessionProvider";
-import AuthButton from "../components/AuthButton";
+import dynamic from "next/dynamic";
+// Client-only bileşenleri server layout'ta dinamik yükle
+const ClientShell = dynamic(() => import("../components/LayoutClientShell"), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -156,14 +157,10 @@ export default function RootLayout({
 })();`
           }}
         />
-        {/* RSC uyarısını gidermek için provider'ı ayrı bir client bileşenine taşıyoruz */}
-        <AuthSessionProvider>
-          {/* Basit global auth butonu (geçici) */}
-          <div className="fixed top-3 right-3 z-50">
-            <AuthButton />
-          </div>
+        {/* Client-only parçaları ayrı bir shell içinde render et */}
+        <ClientShell>
           {children}
-        </AuthSessionProvider>
+        </ClientShell>
       </body>
     </html>
   );
