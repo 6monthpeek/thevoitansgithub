@@ -1,1 +1,1 @@
-microsoft/mai-ds-r1:free
+openrouter/horizon-beta
