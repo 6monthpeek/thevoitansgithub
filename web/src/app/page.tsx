@@ -1294,8 +1294,8 @@ export default function Home() {
                   <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
                     <div className="lg:col-span-2">
                       <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
-                        {/* Lazy Twitch Player */}<LazyTwitch
-  channel="ashesofcreation"
+{/* Lazy Twitch Player */}<LazyTwitch
+  channel="skipperofleague"
   title="Twitch Player"
  parents={["voitans.gg","voitans.vercel.app"]} />
                       </div>
@@ -1305,8 +1305,8 @@ export default function Home() {
                         Twitch Chat
                       </div>
                       <div className="relative w-full" style={{ aspectRatio: "9 / 16" }}>
-                        {/* Lazy Twitch Chat */}
-                        <LazyTwitch type="chat" channel="ashesofcreation"
+{/* Lazy Twitch Chat */}
+                        <LazyTwitch type="chat" channel="skipperofleague"
                           title="Twitch Chat"
                          parents={["voitans.gg","voitans.vercel.app"]} />
                       </div>
