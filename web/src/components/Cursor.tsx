@@ -12,7 +12,8 @@ export default function Cursor() {
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
   const [hovering, setHovering] = useState(false);
-  const [handMode, setHandMode] = useState(false);
+  // Spike mod: tıklanabilir öğe üzerinde hafif agresif ok ucu
+  const [spikeMode, setSpikeMode] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function Cursor() {
       const he = el as HTMLElement;
       if (hoverables.includes(el.tagName) || he.role === "button") return true;
       const style = window.getComputedStyle(he);
-      // Tailwind/utility ile cursor-pointer atanmış custom öğeleri de eldiven yap
+      // Tailwind/utility ile cursor-pointer atanmış custom öğeleri de clickable say
       return style.cursor === "pointer";
     };
 
@@ -54,8 +55,10 @@ export default function Cursor() {
       y = e.clientY;
 
       const el = document.elementFromPoint(x, y);
-      setHovering(isHoverable(el));
-      setHandMode(isClickable(el));
+      const hov = isHoverable(el);
+      const clk = isClickable(el);
+      setHovering(hov || clk);
+      setSpikeMode(clk);
       if (reducedMotion) {
         rx = x; ry = y;
         dot.style.transform = `translate(${rx - 4}px, ${ry - 4}px)`;
@@ -77,11 +80,23 @@ export default function Cursor() {
     window.addEventListener("mousemove", onMove, { passive: true });
     raf = requestAnimationFrame(loop);
 
+    // Sistem imlecini gizle: tüm tıklanabilir öğelerde de gizle
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-custom-cursor", "1");
+    styleEl.textContent = `
+      :root, body, * { cursor: none !important; }
+      @media (pointer: coarse) {
+        :root, body, * { cursor: auto !important; }
+      }
+    `;
+    document.head.appendChild(styleEl);
+
     document.body.style.cursor = "none";
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       document.body.style.cursor = "";
+      styleEl.remove();
     };
   }, [reducedMotion]);
 
@@ -104,7 +119,7 @@ export default function Cursor() {
           height: 24px;
           transform: translate(-9999px, -9999px);
           will-change: transform, opacity, filter;
-          opacity: 0.95;
+          opacity: 0.96;
           filter: drop-shadow(0 0 2px rgba(0,0,0,.45));
         }
         .cursor-arrow svg {
@@ -112,26 +127,13 @@ export default function Cursor() {
         }
         .cursor-arrow .shaft {
           fill: #ededed; /* kırık beyaz gövde */
-          transition: transform .12s ease;
+          transition: transform .12s ease, d .12s ease;
           transform-origin: 4px 4px; /* ok ucu referansı */
         }
         .cursor-arrow .edge {
           fill: #dcdcdc; /* hafif koyu kenar */
           transition: opacity .12s ease;
         }
-        /* Eldiven modu: ok çekilip el simgesine dönüşür (stilize glove) */
-        .cursor-hand {
-          position: fixed;
-          left: 0; top: 0;
-          width: 24px; height: 24px;
-          transform: translate(-9999px, -9999px);
-          will-change: transform, opacity, filter;
-          opacity: 0.98;
-          filter: drop-shadow(0 0 2px rgba(0,0,0,.45));
-        }
-        .cursor-hand svg { display:block; }
-        .cursor-hand .hand-base { fill: #ededed; }
-        .cursor-hand .hand-edge { fill: #dcdcdc; opacity: .9; }
         /* Hover aura – ok etrafında minimal mistik ışıma */
         .cursor-aura {
           position: fixed;
@@ -149,43 +151,41 @@ export default function Cursor() {
             0 0 8px color-mix(in oklab, var(--accent-lime) 14%, transparent) inset;
           background:
             radial-gradient(40% 40% at 50% 50%, rgba(237,237,237,0.22), transparent 70%);
-          transition: opacity .18s ease, width .15s ease, height .15s ease, border-radius .15s ease;
+          transition: opacity .18s ease, width .15s ease, height .15s ease, border-radius .15s ease, box-shadow .18s ease, background .18s ease;
         }
         .hovering .cursor-aura {
-          opacity: 0.45;
+          opacity: 0.48;
           width: 26px;
           height: 26px;
           border-radius: 12px;
+          box-shadow:
+            0 0 18px color-mix(in oklab, var(--accent-cyan) 28%, transparent),
+            0 0 10px color-mix(in oklab, var(--accent-lime) 18%, transparent) inset;
+          background:
+            radial-gradient(35% 35% at 50% 50%, rgba(255,255,255,0.22), transparent 70%),
+            radial-gradient(80% 80% at 50% 50%, rgba(53,180,255,0.10), transparent 80%);
+        }
+        .spike .cursor-arrow .shaft {
+          /* Spike hissi için hafif uzama/gerginlik */
+          transform: scale(1.06) translate(0.3px, -0.2px);
         }
         @media (pointer: coarse) {
           .cursor-root { display: none; }
         }
       `}</style>
-      <div className={`cursor-root${hovering ? " hovering" : ""}`}>
+      <div className={`cursor-root${hovering ? " hovering" : ""}${spikeMode ? " spike" : ""}`}>
         {/* Aura */}
         <div ref={ringRef} className="cursor-aura" />
-        {/* Arrow or Hand depending on context */}
-        {!handMode ? (
-          <div ref={dotRef} className="cursor-arrow" aria-hidden>
-            {/* 24x24 viewBox, ok ucu (uç noktası sol üst) olacak şekilde yön verildi */}
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              {/* Gövde (shaft) */}
-              <path className="shaft" d="M3 3 L12 8 L9 9 L14.5 18 L12.5 19 L7 10 L4.5 12 Z" />
-              {/* Kenar (edge/highlight) */}
-              <path className="edge" d="M3 3 L4.5 12 L7 10 L3 3 Z" />
-            </svg>
-          </div>
-        ) : (
-          <div ref={dotRef} className="cursor-hand" aria-hidden>
-            {/* Stilize eldiven/hand pointer (24x24) */}
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              {/* Başparmak ve avuç şekli (basitleştirilmiş) */}
-              <path className="hand-base" d="M7 8 C7 6.9 8.1 6 9.2 6 H10.2 V10 H11.8 V6.5 C11.8 5.67 12.47 5 13.3 5 14.13 5 14.8 5.67 14.8 6.5 V10 H16.3 V6.9 C16.3 6.07 16.97 5.4 17.8 5.4 18.63 5.4 19.3 6.07 19.3 6.9 V11.5 C19.3 12.3 19.08 13.07 18.67 13.73 L16.7 16.9 C15.9 18.2 14.47 19 12.95 19 H10.5 C8.57 19 7 17.43 7 15.5 V8 Z" />
-              {/* Kenar vurguları */}
-              <path className="hand-edge" d="M10.2 10 L11.8 10 L11.8 11.2 L10.2 11.2 Z M14.8 10 L16.3 10 L16.3 11.2 L14.8 11.2 Z" />
-            </svg>
-          </div>
-        )}
+        {/* Arrow always (spike mode anim ile) */}
+        <div ref={dotRef} className="cursor-arrow" aria-hidden>
+          {/* 24x24 viewBox, ok ucu (uç noktası sol üst) olacak şekilde yön verildi */}
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            {/* Gövde (shaft) */}
+            <path className="shaft" d="M3 3 L12 8 L9 9 L14.5 18 L12.5 19 L7 10 L4.5 12 Z" />
+            {/* Kenar (edge/highlight) */}
+            <path className="edge" d="M3 3 L4.5 12 L7 10 L3 3 Z" />
+          </svg>
+        </div>
       </div>
     </>
   );
