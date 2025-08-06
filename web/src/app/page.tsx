@@ -1141,39 +1141,27 @@ export default function Home() {
 
                         {/* Metin bloğu: sağ marj ve satır yüksekliği simetrik */}
                         <div className="flex-1 text-[15px] leading-[1.85] text-[#D6DBE1] selection:bg-white/10">
-                          <p className="mb-4">
-                            İlk kez girdin ve belki de aynı soruyu dillendiriyorsun:{" "}
-                            <em className="not-italic text-zinc-100">“Bir loncanın niye web sitesi olur?”</em>{" "}
-                            Çünkü burası sadece bir oyun listesi değil;{" "}
-                            <span className="text-zinc-100">iradenin, disiplinin ve kader ortaklığının</span>{" "}
-                            duvara kazındığı yer. Burası,{" "}
-                            <span className="inline-block will-change-transform [animation:floatY_8s_ease-in-out_infinite]">
-                              dağınık sesleri tek bir savaş çığlığına
-                            </span>{" "}
-                            dönüştüren merkez. Ve evet—burası,{" "}
-                            <strong className="text-zinc-100">senin hikâyenin başladığı yer.</strong>
-                          </p>
+<p className="mb-4">
+  Burası THE VOITANS. Sadece bir lonca değil; oyuna girdiğinde sana “kimsin, neredesin, neye ihtiyacın var?” diye soran bir ekip.
+  Bazen günaydınla başlarız, bazen “akşam 19:30 Discord” diyerek plan kurarız; kimi gün drop kovalayıp build tartışır,
+  kimi gün birimizin sevincine ortak olur, kaybında omuz veririz. Bizim için lonca, listelerde bir isim değil;
+  <span className="text-zinc-100">emek veren, birbirini kollayan, aynı çağrıda toplanan insanlar</span> demek.
+</p>
 
-                          <p className="mb-4">
-                            Bak, rastlantıyla kazanılan hiçbir zafer yok. Eski çağlarda loncalar, kılıcın çeliğini, kalkanın ağırlığını
-                            ve yeminlerin kıymetini taşırdı. Bugün biz, ekranlarımızın ışığında aynı ruhu taşıyoruz. Bu web sitesi,{" "}
-                            <span className="text-zinc-100">o ruhun haritası</span>: Stratejinin not defteri, disiplinin sahnesi,
-                            topluluğun kalbi. Burada tesadüflere yer yok. Her satır, her plan, her çağrı—<span className="text-zinc-100">
-                            hazırlık</span> demek. Ve hazırlık, kaderi yeniden yazmanın tek yoludur.
-                          </p>
+<p className="mb-4">
+  Burada “hoş geldin” demek bir formalite değil. Yeni katılanın adını anmak, birinin saatler süren emeğini takdir etmek,
+  “geliyorum” deyip sözünde durmak, denk geldiğinde yayını açıp paylaşmak… hepsi aynı kültürün parçaları.
+  Kimi gün bir tartışma çıkar, kimi gün yalnızca “iyi geceler” yazılır; ama bir sonraki gün yine aynı çağrıda buluşuruz.
+</p>
 
-                          <p className="mb-0">
-                            Eric Thomas’ın dediği gibi:{" "}
-                            <q className="text-zinc-100">“Başarı, nefes almak kadar istediğinde gelir.”</q>{" "}
-                            Bizim lügatimizde bu,{" "}
-                            <span className="text-zinc-100">savaşı nefes almak gibi istemek</span> demektir.
-                            Bu yüzden site var: Çünkü{" "}
-                            <span className="text-zinc-100">hazırlık nefesimiz</span>,{" "}
-                            <span className="text-zinc-100">düzen ritmimiz</span>,{" "}
-                            <span className="text-zinc-100">birliğimiz kalemiz</span>.
-                            {/* micro pulse marker */}
-                            <span className="inline-block align-middle ml-1 size-1.5 rounded-full bg-[#8bf0cb] shadow-[0_0_14px_#8bf0cb99] animate-[pulseSoft_2.6s_ease-in-out_infinite]" />
-                          </p>
+<p className="mb-0">
+  Eğer aradığın şey sadece bir etiket, bir rozet ya da rastgele bir kalabalık değilse; doğru yerdesin.
+  Burada başarı kibirle değil, yardımla büyür. Kural basittir:
+  <strong className="text-zinc-100"> Saygı, disiplin, birlik.</strong>
+  Bir şey eksik kaldıysa söyler, birlikte tamamlarız. Çünkü hikâye yazılırken herkesin bir satırı vardır ve belki de seninki,
+  <span className="text-zinc-100"> bugün burada başlar.</span>
+  <span className="inline-block align-middle ml-1 size-1.5 rounded-full bg-[#8bf0cb] shadow-[0_0_14px_#8bf0cb99] animate-[pulseSoft_2.6s_ease-in-out_infinite]" />
+</p>
 
                           {/* controls removed by request */}
                         </div>
