@@ -1,1 +1,1 @@
-z-ai/glm-4.5-air:free
+nousresearch/deephermes-3-llama-3-8b-preview:free
