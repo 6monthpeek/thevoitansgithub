@@ -87,12 +87,16 @@ function listApiKeys() {
   return uniq;
 }
 
+/**
+ * Simple memory cache to avoid retrying a rate-limited key for a cooldown window.
+ * In-memory per process. Map<apiKey, epochMsUntil>
+ */
+const rateLimitedUntil = new Map();
+
 async function callOpenRouter(messages, opts = {}) {
   const baseURL = DEFAULT_BASE;
 
-  // Build model list:
-  // - If USE_MODEL_LIST=1 and bot/config/models.md exists, read ordered list from there (ignore comments).
-  // - Else fallback to single model from opts.model or DEFAULT_MODEL.
+  // Build model list from file or env
   let modelList = [];
   const useModelList = String(process.env.USE_MODEL_LIST || "").trim() === "1";
   if (useModelList) {
@@ -119,13 +123,21 @@ async function callOpenRouter(messages, opts = {}) {
     modelList = [String(opts.model || DEFAULT_MODEL)];
   }
 
-  const keys = listApiKeys();
+  const keysRaw = listApiKeys();
+  // Apply cooldown filter: skip keys rate-limited within window
+  const now = Date.now();
+  const cooldownMs = Number(process.env.OPENROUTER_KEY_COOLDOWN_MS || 60 * 60 * 1000); // default 60 minutes
+  const keys = keysRaw.filter(k => {
+    const until = rateLimitedUntil.get(k) || 0;
+    return until <= now;
+  });
+
   console.log("[openrouter][config] flags", {
     USE_MODEL_LIST: String(process.env.USE_MODEL_LIST || ""),
     USE_KEY_LIST: String(process.env.USE_KEY_LIST || ""),
   });
-  console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length });
-  if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) or key list in bot/config/openrouter-keys.md");
+  console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length, skippedKeys: keysRaw.length - keys.length });
+  if (!keys.length) throw new Error("No usable OpenRouter keys (all cooling down or missing)");
 
   const payloadBase = {
     messages,
@@ -144,6 +156,13 @@ async function callOpenRouter(messages, opts = {}) {
     // Try models in order (from modelList). No implicit "openrouter/auto".
     for (let mi = 0; mi < modelList.length; mi++) {
       const modelTry = modelList[mi];
+
+      // If this key went rate-limited while iterating, break and rotate to next key immediately
+      const until = rateLimitedUntil.get(apiKey) || 0;
+      if (until > Date.now()) {
+        console.log("[openrouter][skip] key under cooldown", { keyIndex: idx, remainingMs: until - Date.now() });
+        break;
+      }
 
       const abort = new AbortController();
       const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000));
@@ -165,13 +184,11 @@ async function callOpenRouter(messages, opts = {}) {
         if (!res.ok) {
           const errText = await res.text().catch(() => "");
           if (res.status === 429) {
-            console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, model: modelTry, status: 429, body: errText?.slice?.(0, 500) || errText });
-            // On 429: if there are other models left for this key, try next model.
-            // If all models for this key exhausted, backoff then rotate to next key.
-            const moreModelsLeft = mi < modelList.length - 1;
-            if (moreModelsLeft) {
-              continue; // try next model with same key
-            }
+            // Mark key as rate-limited for cooldown window
+            rateLimitedUntil.set(apiKey, Date.now() + cooldownMs);
+            console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, model: modelTry, status: 429, body: errText?.slice?.(0, 500) || errText, cooldownMs });
+            // If there are other models left for this key, we could try them, but since provider rate-limit tends to be per-key,
+            // skip remaining models for this key and rotate to next key directly.
             const wait = backoffsMs[Math.min(idx, backoffsMs.length - 1)];
             await new Promise(r => setTimeout(r, wait));
             break; // break model loop -> next key
