@@ -16,7 +16,26 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: DISCORD_CLIENT_ID,
       clientSecret: DISCORD_CLIENT_SECRET,
-      authorization: { params: { scope: "identify guilds" } },
+      authorization: {
+        params: { scope: "identify guilds" },
+      },
+      // Ek teşhis: provider hazırlandığında kritik env ve auth URL’i logla
+      async profile(profile, tokens) {
+        try {
+          console.error("[next-auth][discord][profile]", {
+            got_profile_id: (profile as any)?.id || "-",
+            has_access_token: !!tokens?.access_token,
+          });
+        } catch {}
+        // Orijinal minimal mapping (id zorunlu)
+        return {
+          id: (profile as any)?.id,
+          name: (profile as any)?.global_name || (profile as any)?.username || "Discord User",
+          image: (profile as any)?.avatar
+            ? `https://cdn.discordapp.com/avatars/${(profile as any)?.id}/${(profile as any)?.avatar}.png?size=64`
+            : null,
+        } as any;
+      },
     }),
   ],
   pages: { error: "/api/auth/error" },
@@ -80,7 +99,17 @@ export const authOptions: NextAuthOptions = {
   },
   debug: true,
   events: {
-    signIn(message: any) {
+    // Authorization request/response sürecinde görülen hataları yakala
+    async linkAccount(message) {
+      try {
+        console.error("[next-auth][events][linkAccount]", {
+          provider: (message as any)?.account?.provider,
+          has_access_token: !!(message as any)?.account?.access_token,
+          has_refresh_token: !!(message as any)?.account?.refresh_token,
+        });
+      } catch {}
+    },
+    async signIn(message: any) {
       try {
         console.error("[next-auth][events][signIn]", {
           user: message?.user?.id || message?.user?.email || "-",
