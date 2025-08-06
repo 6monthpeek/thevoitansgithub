@@ -53,8 +53,19 @@ module.exports = {
         .setDescription("Bir guard'ı etkinleştir")
         .addStringOption(o =>
           o.setName("guard")
-            .setDescription(`Guard adı (${GUARD_KEYS.join(", ")})`)
+            .setDescription("Guard adı")
             .setRequired(true)
+            .addChoices(
+              { name: "antiNuke", value: "antiNuke" },
+              { name: "roleGuard", value: "roleGuard" },
+              { name: "channelGuard", value: "channelGuard" },
+              { name: "webhookGuard", value: "webhookGuard" },
+              { name: "guildUpdateGuard", value: "guildUpdateGuard" },
+              { name: "memberGuard", value: "memberGuard" },
+              { name: "messageGuard", value: "messageGuard" },
+              { name: "inviteGuard", value: "inviteGuard" },
+              { name: "vanityGuard", value: "vanityGuard" }
+            )
         )
     )
     .addSubcommand(sc =>
@@ -62,8 +73,19 @@ module.exports = {
         .setDescription("Bir guard'ı devre dışı bırak")
         .addStringOption(o =>
           o.setName("guard")
-            .setDescription(`Guard adı (${GUARD_KEYS.join(", ")})`)
+            .setDescription("Guard adı")
             .setRequired(true)
+            .addChoices(
+              { name: "antiNuke", value: "antiNuke" },
+              { name: "roleGuard", value: "roleGuard" },
+              { name: "channelGuard", value: "channelGuard" },
+              { name: "webhookGuard", value: "webhookGuard" },
+              { name: "guildUpdateGuard", value: "guildUpdateGuard" },
+              { name: "memberGuard", value: "memberGuard" },
+              { name: "messageGuard", value: "messageGuard" },
+              { name: "inviteGuard", value: "inviteGuard" },
+              { name: "vanityGuard", value: "vanityGuard" }
+            )
         )
     )
     .addSubcommand(sc =>
