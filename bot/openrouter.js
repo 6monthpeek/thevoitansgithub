@@ -82,6 +82,14 @@ const rateLimitedUntil = new Map();
 async function callOpenRouter(messages, opts = {}) {
   const baseURL = DEFAULT_BASE;
 
+  // DEBUG FLAG (env ile aç/kapat)
+  const DEBUG_OPENROUTER = String(process.env.DEBUG_OPENROUTER || "1") === "1";
+  const dbg = (...args) => {
+    try {
+      if (DEBUG_OPENROUTER) console.log("[openrouter][debug]", ...args);
+    } catch {}
+  };
+
   // Build model list from ENV or file (ENV preferred)
   let modelList = [];
 
@@ -128,11 +136,11 @@ async function callOpenRouter(messages, opts = {}) {
     return until <= now;
   });
 
-  console.log("[openrouter][config] flags", {
+  dbg("config flags", {
     USE_MODEL_LIST: String(process.env.USE_MODEL_LIST || ""),
     KEY_SOURCE: "ENV_ONLY", // harden: keys read only from ENV
   });
-  console.log("[openrouter][config] counts", { models: modelList.length, keys: keys.length, skippedKeys: keysRaw.length - keys.length });
+  dbg("config counts", { models: modelList.length, keys: keys.length, skippedKeys: (listApiKeys().length - keys.length) });
   if (!keys.length) throw new Error("No usable OpenRouter keys (all cooling down or missing)");
 
   const payloadBase = {
@@ -163,6 +171,7 @@ async function callOpenRouter(messages, opts = {}) {
       const abort = new AbortController();
       const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000));
       try {
+        dbg("fetch start", { keyIndex: idx, model: modelTry });
         const res = await fetch(`${baseURL}/chat/completions`, {
           method: "POST",
           headers: {
@@ -183,17 +192,18 @@ async function callOpenRouter(messages, opts = {}) {
             // Mark key as rate-limited for cooldown window
             rateLimitedUntil.set(apiKey, Date.now() + cooldownMs);
             console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, model: modelTry, status: 429, body: errText?.slice?.(0, 500) || errText, cooldownMs });
-            // If there are other models left for this key, we could try them, but since provider rate-limit tends to be per-key,
-            // skip remaining models for this key and rotate to next key directly.
+            dbg("rate-limit rotate-key", { keyIndex: idx, cooldownMs });
             const wait = backoffsMs[Math.min(idx, backoffsMs.length - 1)];
             await new Promise(r => setTimeout(r, wait));
             break; // break model loop -> next key
           }
           console.error("[openrouter][http-error]", { keyIndex: idx, model: modelTry, status: res.status, body: errText?.slice?.(0, 500) || errText });
+          dbg("http-error", { status: res.status, body: (errText || "").slice(0, 200) });
           throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
         }
 
         const json = await res.json();
+        dbg("response usage/choices", { usage: json?.usage, choicesLen: Array.isArray(json?.choices) ? json.choices.length : 0 });
         const text = json?.choices?.[0]?.message?.content?.trim?.();
 
         if (!text) {
@@ -202,6 +212,7 @@ async function callOpenRouter(messages, opts = {}) {
             usage: json?.usage,
             choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
           });
+          dbg("empty message.content", { model: modelTry });
           throw new Error("OpenRouter returned empty response");
         }
 
@@ -210,6 +221,7 @@ async function callOpenRouter(messages, opts = {}) {
         clearTimeout(t);
         lastErr = e;
         console.error("[openrouter][fetch-error]", { keyIndex: idx, model: modelTry, err: e?.message || e });
+        dbg("fetch-error detail", { err: String(e?.stack || e) .slice(0, 500) });
         // Network/timeout: try next model; if models exhausted, rotate key after small wait
         const moreModelsLeft = mi < modelList.length - 1;
         if (!moreModelsLeft) {
