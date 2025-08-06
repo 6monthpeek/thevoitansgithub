@@ -944,7 +944,8 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden overflow-y-hidden bg-[#0A0B0D]">
-      <LiquidLoader show={booting} />
+      {/* İlk açılışta görünen pembe/mavi daire efektini kapatıyoruz */}
+      <LiquidLoader show={false} />
       <Cursor />
 
       {/* Background tamamen tek ton: üstte renkli bant yok */}
