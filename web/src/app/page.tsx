@@ -1533,12 +1533,14 @@ function OfficerDashboardTabs(): React.JSX.Element {
   );
 }
 
-/* Officer Logs embed – client-only dynamic import */
-const LogsEmbed = dynamic(async () => {
-  // next/dynamic içinde import kullan (require yerine) – stable ve tree-shake friendly
-  const mod = await import("./officer/logs/page");
-  return mod.default;
-}, { ssr: false });
+/* Officer Logs embed – client-only dynamic import KALDIRILDI (tek URL mimarisi) */
+function LogsEmbed(): React.JSX.Element {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-4 text-sm text-zinc-300">
+      Loglar sekmesi tek URL mimarisine uyarlandı. Akış: Officer → Loglar. Buraya inline log arayüzü entegre edilecek.
+    </div>
+  );
+}
 
 /* Officer Panel – gerçek React bileşeni (inline) */
 /**
