@@ -42,6 +42,18 @@ module.exports = {
         ? member.roles.cache.map(r => r.id).includes(String(SENIOR_ROLE_ID || ""))
         : false;
 
+      // DEBUG (geçici): rol ve kontrol çıktıları
+      try {
+        const roleIds = member?.roles?.cache ? member.roles.cache.map(r => r.id) : [];
+        console.log("[moderation][debug] senior_check", {
+          SENIOR_ROLE_ID: String(SENIOR_ROLE_ID || ""),
+          user: { id: message.author.id, tag: message.author.tag },
+          guild: { id: message.guild?.id, name: message.guild?.name },
+          memberRoleIds: roleIds,
+          isSeniorOfficer,
+        });
+      } catch {}
+
       // 2) Kanal geçmişini al (son 30 mesaj, metin + mention/ek özet)
       let history = [];
       try {
