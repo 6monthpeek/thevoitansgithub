@@ -1492,6 +1492,14 @@ function OfficerDashboardTabs(): React.JSX.Element {
         >
           Loglar
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === "protection"}
+          onClick={() => setTab("protection")}
+          className={`px-3 py-1.5 text-sm rounded-full border ${tab === "protection" ? "text-white border-white/20 bg-white/5" : "text-zinc-300 border-white/10 hover:border-white/20 hover:bg-white/5"}`}
+        >
+          Protection
+        </button>
       </div>
 
       {tab === "announce" && (
@@ -1516,17 +1524,8 @@ function OfficerDashboardTabs(): React.JSX.Element {
       )}
       {tab === "protection" && (
         <div role="tabpanel" aria-labelledby="">
-          <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-4">
-            <a
-              href="/officer/protection"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5"
-            >
-              Protection Panelini Aç
-            </a>
-            <div className="text-xs text-zinc-500 mt-2">
-              Not: Bu bağlantı yalnızca Senior Officer için çalışır.
-            </div>
-          </div>
+          {/* Tek URL dashboard ilkesi: Protection panelini doğrudan sekme içinde render et */}
+          <ProtectionPanelInline />
         </div>
       )}
     </div>
