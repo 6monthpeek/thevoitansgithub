@@ -94,8 +94,8 @@ export const authOptions: NextAuthOptions = {
         session.user.username = (token as any).username || session.user?.name || "Discord User";
         session.user.avatar = (token as any).avatar || session.user?.image || null;
 
-        // HYDRATE: Discord guildMember.roles -> session.user.guildMember.roles
-        // Server-side çağrı; Vercel'de çalışır, client bundle'a girmez.
+        // HYDRATE: Discord guildMember.roles -> session.user.guildMember.roles + düz dizi discordRoles
+        // Server-side çağrı; Vercel'de çalışır.
         try {
           const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
           const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
@@ -109,19 +109,21 @@ export const authOptions: NextAuthOptions = {
             if (gm.ok) {
               const j = (await gm.json().catch(() => ({}))) as { roles?: string[]; nick?: string | null };
               const roleIds = Array.isArray(j?.roles) ? (j.roles as string[]) : [];
-              // Minimal shape: sadece id ile UI koşulu için yeterli
-              const roles = roleIds.map((id) => ({ id, name: undefined as unknown as string | undefined }));
+
+              // Düz dizi: UI ve API kontrolleri için
+              (session.user as any).discordRoles = roleIds;
+
+              // Opsiyonel detay objesi
+              const roles = roleIds.map((id) => ({ id }));
               session.user.guildMember = {
                 ...(session.user.guildMember || {}),
                 nick: j?.nick ?? (session.user.guildMember?.nick ?? null),
                 roles,
               };
             } else {
-              // Hata durumunu logla ama sessiyonu bozma
               console.error("[next-auth][hydrate][guildMember] failed", gm.status);
             }
           } else {
-            // Eksik ENV logu
             console.error("[next-auth][hydrate][guildMember] missing DISCORD_BOT_TOKEN or DISCORD_GUILD_ID");
           }
         } catch (e: any) {
