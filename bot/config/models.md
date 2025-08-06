@@ -1,1 +1,1 @@
-qwen/qwen2.5-14b-instruct:free
+microsoft/mai-ds-r1:free
