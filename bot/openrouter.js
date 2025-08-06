@@ -29,65 +29,101 @@ async function readPrompt() {
  * @param {object} opts
  * @returns {Promise<string>} assistant text
  */
-async function callOpenRouter(messages, opts = {}) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing OPENROUTER_API_KEY in environment");
+/**
+ * Rotating API keys on 429:
+ * - Primary: OPENROUTER_API_KEY
+ * - Secondary: OPENROUTER_API_KEY1, OPENROUTER_API_KEY2, ...
+ * When 429 received, we retry once per additional key with small backoff.
+ * NOTE: Prefer official pooling (Integrations) for production. This is a best-effort fallback.
+ */
+function listApiKeys() {
+  const keys = [];
+  const primary = process.env.OPENROUTER_API_KEY ? String(process.env.OPENROUTER_API_KEY).trim() : "";
+  if (primary) keys.push(primary);
+  let i = 1;
+  while (true) {
+    const k = process.env[`OPENROUTER_API_KEY${i}`];
+    if (!k) break;
+    const v = String(k).trim();
+    if (v) keys.push(v);
+    i += 1;
+    if (i > 20) break; // hard cap
   }
+  return keys;
+}
+
+async function callOpenRouter(messages, opts = {}) {
   const baseURL = DEFAULT_BASE;
   const model = String(opts.model || DEFAULT_MODEL);
 
-  const abort = new AbortController();
-  const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000)); // 20s hard timeout
+  const keys = listApiKeys();
+  if (!keys.length) throw new Error("Missing OPENROUTER_API_KEY (and OPENROUTER_API_KEY1..N) in environment");
 
-  try {
-    const payload = {
-      model,
-      messages,
-      temperature: opts.temperature ?? 0.7,
-      top_p: opts.top_p ?? 0.9,
-      max_tokens: opts.max_tokens ?? 400,
-    };
+  const payload = {
+    model,
+    messages,
+    temperature: opts.temperature ?? 0.7,
+    top_p: opts.top_p ?? 0.9,
+    max_tokens: opts.max_tokens ?? 400,
+  };
 
-    const res = await fetch(`${baseURL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": process.env.SITE_URL || "https://thevoitansgithub.vercel.app",
-        "X-Title": "VOITANS Discord Bot",
-      },
-      body: JSON.stringify(payload),
-      signal: abort.signal,
-    });
-
-    clearTimeout(t);
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      console.error("[openrouter][http-error]", res.status, errText?.slice?.(0, 500) || errText);
-      throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
-    }
-
-    const json = await res.json();
-    const text = json?.choices?.[0]?.message?.content?.trim?.();
-
-    // Ek teşhis logu (sadece başarısız/boş durumda)
-    if (!text) {
-      console.error("[openrouter][empty-response]", {
-        usage: json?.usage,
-        choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
+  let lastErr;
+  for (let idx = 0; idx < keys.length; idx++) {
+    const apiKey = keys[idx];
+    const abort = new AbortController();
+    const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000));
+    try {
+      const res = await fetch(`${baseURL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.SITE_URL || "https://thevoitansgithub.vercel.app",
+          "X-Title": "VOITANS Discord Bot",
+        },
+        body: JSON.stringify(payload),
+        signal: abort.signal,
       });
-      throw new Error("OpenRouter returned empty response");
-    }
 
-    return text;
-  } catch (e) {
-    clearTimeout(t);
-    // Global hata logu (tek satırlık)
-    console.error("[openrouter][fetch-error]", e?.message || e);
-    throw e;
+      clearTimeout(t);
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        // Detect 429 and rotate to next key
+        if (res.status === 429) {
+          console.error("[openrouter][http-error][rate-limit]", { keyIndex: idx, status: 429, body: errText?.slice?.(0, 500) || errText });
+          // small backoff before next key
+          await new Promise(r => setTimeout(r, 500));
+          continue; // try next key
+        }
+        console.error("[openrouter][http-error]", res.status, errText?.slice?.(0, 500) || errText);
+        throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
+      }
+
+      const json = await res.json();
+      const text = json?.choices?.[0]?.message?.content?.trim?.();
+
+      if (!text) {
+        console.error("[openrouter][empty-response]", {
+          usage: json?.usage,
+          choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
+        });
+        throw new Error("OpenRouter returned empty response");
+      }
+
+      return text;
+    } catch (e) {
+      clearTimeout(t);
+      lastErr = e;
+      console.error("[openrouter][fetch-error]", { keyIndex: idx, err: e?.message || e });
+      // If network/timeout, rotate to next key as well
+      await new Promise(r => setTimeout(r, 300));
+      continue;
+    }
   }
+
+  // All keys failed
+  throw lastErr || new Error("All OpenRouter keys failed");
 }
 
 /**
