@@ -45,7 +45,41 @@ module.exports = {
 
       // 1) Filtreler
       if (!message || !message.channel || !message.author) return;
-      if (message.author.bot) return; // bot mesajları yok
+
+      // Bot mesajlarını (webhook botları dahil) ve sistem mesajlarını atla
+      if (message.author.bot || message.webhookId || message.system) {
+        try {
+          console.log("[bot][messageCreate] skip:bot-or-webhook", {
+            authorBot: !!message.author?.bot,
+            webhookId: message.webhookId || null,
+            system: !!message.system
+          });
+        } catch {}
+        return;
+      }
+
+      // Sadece izinli kanallarda ve mention/prefix ile çalış
+      const ENABLED_CHANNELS = (process.env.AI_ENABLED_CHANNELS || String(TARGET_CHANNEL_ID)).split(",").map(s => s.trim()).filter(Boolean);
+      if (!ENABLED_CHANNELS.includes(String(message.channel.id))) {
+        try {
+          console.log("[bot][messageCreate] skip:not-allowed-channel", {
+            here: String(message.channel.id),
+            allowed: ENABLED_CHANNELS
+          });
+        } catch {}
+        return;
+      }
+
+      const prefixes = (process.env.AI_PREFIXES || "!ai,!ask,/ai").split(",").map(s => s.trim()).filter(Boolean);
+      const contentRaw = String(message.content || "");
+      const mentionsBot = message.mentions?.users?.has?.(client.user?.id);
+      const hasPrefix = prefixes.some(p => contentRaw.startsWith(p));
+      if (!mentionsBot && !hasPrefix) {
+        try {
+          console.log("[bot][messageCreate] skip:no-mention-or-prefix");
+        } catch {}
+        return;
+      }
 
       // Idempotent koruma: aynı message.id için tek kez çalış
       try {
@@ -217,7 +251,40 @@ module.exports = {
         history = [];
       }
 
-      // 3) Kullanıcıya "typing" göster (maks 20s)
+      // 3) Kullanıcı başına basit cooldown ve günlük limit (ENV ile ayarlanabilir)
+      const COOLDOWN_SEC = Number(process.env.AI_USER_COOLDOWN_SEC || 15);
+      const DAILY_LIMIT = Number(process.env.AI_USER_DAILY_LIMIT || 20);
+      const userId = message.author.id;
+      const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+      // Global hafızada kullanıcı sayaçları
+      global.__aiUserLastTs = global.__aiUserLastTs || new Map();
+      global.__aiUserDaily = global.__aiUserDaily || new Map();
+
+      // Cooldown
+      const lastTs = global.__aiUserLastTs.get(userId) || 0;
+      const nowTs = Date.now();
+      if (nowTs - lastTs < COOLDOWN_SEC * 1000) {
+        try { console.log("[bot][messageCreate] skip:user-cooldown", { userId, remainMs: COOLDOWN_SEC * 1000 - (nowTs - lastTs) }); } catch {}
+        return;
+      }
+
+      // Daily counter
+      const dayMap = global.__aiUserDaily.get(todayKey) || new Map();
+      const used = dayMap.get(userId) || 0;
+      if (used >= DAILY_LIMIT) {
+        try {
+          await message.react("⏳").catch(() => {});
+          await message.reply(`Günlük limitine ulaştın (${DAILY_LIMIT}). Yarın tekrar dene.`).catch(() => {});
+        } catch {}
+        return;
+      }
+      // Sayaçları güncelle
+      dayMap.set(userId, used + 1);
+      global.__aiUserDaily.set(todayKey, dayMap);
+      global.__aiUserLastTs.set(userId, nowTs);
+
+      // 4) Kullanıcıya "typing" göster (maks 20s)
       message.channel.sendTyping().catch(() => {});
       const typingTimer = setInterval(() => {
         message.channel.sendTyping().catch(() => {});
@@ -352,8 +419,14 @@ module.exports = {
           });
         } catch (err) {
           console.error("[openrouter][error]", err?.message || err);
-          // Hata durumunda kısa bilgi
-          reply = "Şu an yanıt veremiyorum. Lütfen biraz sonra tekrar dener misin?";
+          // 429 için özel mesaj (Retry-After varsa ona göre)
+          const msg = String(err?.message || "");
+          if (/429|rate limit/i.test(msg)) {
+            const minutes = Math.max(1, Math.ceil((Number(process.env.AI_RATE_LIMIT_COOLDOWN_MS || 3600000)) / 60000));
+            reply = `Kota doldu. Lütfen yaklaşık ${minutes} dk sonra tekrar dene.`;
+          } else {
+            reply = "Şu an yanıt veremiyorum. Lütfen biraz sonra tekrar dener misin?";
+          }
         } finally {
           clearInterval(typingTimer);
         }
