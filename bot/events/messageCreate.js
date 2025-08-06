@@ -6,7 +6,8 @@ const HISTORY_LIMIT = Number(process.env.OPENROUTER_HISTORY_LIMIT || 30); // Son
 const THINKING_EMOJI = "💭";
 
 // Senior Officer rol ID (ENV)
-const SENIOR_ROLE_ID = process.env.SENIOR_OFFICER_ROLE_ID || process.env.SENIOR_OFFICER_ROLE_ID?.trim();
+const rawSenior = process.env.SENIOR_OFFICER_ROLE_ID || "";
+const SENIOR_ROLE_ID = String(rawSenior).trim();
 
 /**
  * messageCreate
@@ -38,15 +39,21 @@ module.exports = {
 
       // Senior Officer kontrolü (AI moderasyon/silme komutları için şart)
       const member = await message.guild?.members.fetch(message.author.id).catch(() => null);
-      const isSeniorOfficer = !!member && Array.isArray(member.roles?.cache?.map)
-        ? member.roles.cache.map(r => r.id).includes(String(SENIOR_ROLE_ID || ""))
+
+      // Normalize role ids (trim to avoid invisible characters) and compare as strings
+      const memberRoleIdsNorm = !!member && member.roles?.cache
+        ? member.roles.cache.map(r => String(r.id).trim())
+        : [];
+
+      const isSeniorOfficer = SENIOR_ROLE_ID.length > 0
+        ? memberRoleIdsNorm.includes(SENIOR_ROLE_ID)
         : false;
 
       // DEBUG (geçici): rol ve kontrol çıktıları
       try {
-        const roleIds = member?.roles?.cache ? member.roles.cache.map(r => r.id) : [];
+        const roleIds = memberRoleIdsNorm || [];
         console.log("[moderation][debug] senior_check", {
-          SENIOR_ROLE_ID: String(SENIOR_ROLE_ID || ""),
+          SENIOR_ROLE_ID: SENIOR_ROLE_ID,
           user: { id: message.author.id, tag: message.author.tag },
           guild: { id: message.guild?.id, name: message.guild?.name },
           memberRoleIds: roleIds,
