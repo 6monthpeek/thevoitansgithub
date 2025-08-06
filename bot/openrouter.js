@@ -41,22 +41,23 @@ async function callOpenRouter(messages, opts = {}) {
   const t = setTimeout(() => abort.abort(), Math.min(20000, Number(process.env.OPENROUTER_TIMEOUT_MS) || 20000)); // 20s hard timeout
 
   try {
+    const payload = {
+      model,
+      messages,
+      temperature: opts.temperature ?? 0.7,
+      top_p: opts.top_p ?? 0.9,
+      max_tokens: opts.max_tokens ?? 400,
+    };
+
     const res = await fetch(`${baseURL}/chat/completions`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        // These are recommended headers per OpenRouter spec (optional):
         "HTTP-Referer": process.env.SITE_URL || "https://thevoitansgithub.vercel.app",
         "X-Title": "VOITANS Discord Bot",
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: opts.temperature ?? 0.7,
-        top_p: opts.top_p ?? 0.9,
-        max_tokens: opts.max_tokens ?? 400,
-      }),
+      body: JSON.stringify(payload),
       signal: abort.signal,
     });
 
@@ -64,15 +65,27 @@ async function callOpenRouter(messages, opts = {}) {
 
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
+      console.error("[openrouter][http-error]", res.status, errText?.slice?.(0, 500) || errText);
       throw new Error(`OpenRouter HTTP ${res.status} ${errText}`);
     }
 
     const json = await res.json();
     const text = json?.choices?.[0]?.message?.content?.trim?.();
-    if (!text) throw new Error("OpenRouter returned empty response");
+
+    // Ek teşhis logu (sadece başarısız/boş durumda)
+    if (!text) {
+      console.error("[openrouter][empty-response]", {
+        usage: json?.usage,
+        choices0_keys: json?.choices ? Object.keys(json.choices[0] || {}) : [],
+      });
+      throw new Error("OpenRouter returned empty response");
+    }
+
     return text;
   } catch (e) {
     clearTimeout(t);
+    // Global hata logu (tek satırlık)
+    console.error("[openrouter][fetch-error]", e?.message || e);
     throw e;
   }
 }
