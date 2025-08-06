@@ -106,7 +106,7 @@ export default function RootLayout({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/thevoitanspurple-saturation100.gif"
+              src="https://github.com/6monthpeek/thevoitansgithub/blob/main/web/pictures/thevoitanspurple-saturation100.gif?raw=true"
               alt=""
               style={{
                 width: "min(60vmin, 560px)",
@@ -116,6 +116,8 @@ export default function RootLayout({
                 filter: "saturate(1) contrast(1.05) brightness(1.05)",
                 pointerEvents: "none",
               }}
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
             />
           </div>
           <div
