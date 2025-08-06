@@ -805,34 +805,7 @@ export default function Home() {
         }}
       >
         {/* Header */}
-{/* Header: üst bar (logo • menü • auth) */}
-<header className="site-header sticky top-0 z-40 border-b border-white/5 backdrop-blur">
-  <div className="mx-auto max-w-6xl px-4 py-2 flex items-center justify-between">
-    {/* Sol: Logo */}
-    <a href="/" className="inline-flex items-center gap-2">
-      <img src="/voitans-logo.svg" alt="Voitans" className="h-6 w-6" />
-      <span className="text-sm text-zinc-200">Voitans</span>
-    </a>
-
-    {/* Orta: Menü */}
-    <nav className="hidden md:flex items-center gap-4 text-sm text-zinc-300">
-      <a href="#home" className="hover:text-white/90">Ana Sayfa</a>
-      <a href="#about" className="hover:text-white/90">Hakkımızda</a>
-      <a href="#adventures" className="hover:text-white/90">Maceralarımız</a>
-      <a href="#members" className="hover:text-white/90">Üyeler</a>
-      {/* Officer: navbar’da buton (rol kontrolü ile) */}
-      {/* Not: UI görünürlüğü için client tarafında session gerekir; SSR hydration çakışmaması adına basit bir client hook kullanalım */}
-      {/* Bu sayfa server component; Officer linkini güvenli şekilde client’ta enjekte edeceğiz */}
-      <span id="officer-nav-anchor" />
-    </nav>
-
-    {/* Sağ: Auth */}
-    <div className="flex items-center gap-2">
-      {/* Client AuthButton bileşeni navbar içinde gösterilebilir */}
-      {/* Eğer ayrı bir AuthButton kullanıyorsan import edip buraya koyabilirsin */}
-    </div>
-  </div>
-</header>
+{/* Header kaldırıldı: önceki sade tasarım korunuyor (üst bar yok). */}
 
         {/* Tabs */}
         <div className="px-6 sm:px-10 pb-16">

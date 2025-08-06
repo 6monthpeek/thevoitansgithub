@@ -192,16 +192,7 @@ export default function AuthButton() {
               </button>
             </div>
 
-            {/* Officer kısayolu */}
-            {isOfficer && (
-              <a
-                href="/officer/logs"
-                className="mt-2 block rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200 hover:border-emerald-400/50 text-center"
-                title="Officer Paneline Git"
-              >
-                Officer Paneli
-              </a>
-            )}
+            {/* Officer kısayolu kaldırıldı — Officer erişimi yalnız sekmeler üzerinden */}
 
             {/* Roles preview (first 3) */}
             {user.guildMember?.roles?.length ? (
