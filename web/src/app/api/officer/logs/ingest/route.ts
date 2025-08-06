@@ -85,8 +85,10 @@ export async function POST(req: Request) {
     // 4) Yazma hedefi:
     // - Prod (Vercel): /tmp/site-logs.json (runtime yazılabilir)
     // - Local/dev: web/output/site-logs.json (repo içi)
+    // Ek olarak NDJSON paralel yazım: /tmp/site-logs.ndjson veya web/output/site-logs.ndjson
     try {
       const targetPath = isProd ? "/tmp/site-logs.json" : "web/output/site-logs.json";
+      const targetNdjson = isProd ? "/tmp/site-logs.ndjson" : "web/output/site-logs.ndjson";
 
       // Mevcut içeriği oku (yoksa boş dizi)
       let arr: any[] = [];
@@ -107,11 +109,27 @@ export async function POST(req: Request) {
         const dir = dirname(targetPath);
         await (await import("fs/promises")).mkdir(dir, { recursive: true });
       } catch {}
+      // NDJSON için de klasör hazır olsun
+      try {
+        const { dirname } = await import("path");
+        const dir = dirname(targetNdjson);
+        await (await import("fs/promises")).mkdir(dir, { recursive: true });
+      } catch {}
 
+      // JSON array dosyasını güncelle
       await (await import("fs/promises")).writeFile(targetPath, JSON.stringify(arr, null, 2), "utf8");
+      // NDJSON dosyasına satır ekle (append)
+      try {
+        await (await import("fs/promises")).appendFile(targetNdjson, JSON.stringify(entry) + "\n", "utf8");
+      } catch (e) {
+        console.error("[log-ingest][ndjson-append-error]", (e as any)?.message || e);
+      }
 
       const took = Date.now() - start;
-      return NextResponse.json({ ok: true, tookMs: took, mode: isProd ? "prod-tmp" : "local-file", path: targetPath }, { status: 200 });
+      return NextResponse.json(
+        { ok: true, tookMs: took, mode: isProd ? "prod-tmp" : "local-file", paths: { json: targetPath, ndjson: targetNdjson } },
+        { status: 200 }
+      );
     } catch (e: any) {
       return NextResponse.json({ error: "storage error", code: "IO_ERROR", message: e?.message || "io-failed" }, { status: 500 });
     }
