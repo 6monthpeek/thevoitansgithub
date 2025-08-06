@@ -9,6 +9,9 @@ const THINKING_EMOJI = "💭";
 const rawSenior = process.env.SENIOR_OFFICER_ROLE_ID || "";
 const SENIOR_ROLE_ID = String(rawSenior).trim();
 
+// Ek yetkili rol (örn. 302812332915032064)
+const EXTRA_OFFICER_ROLE_ID = "302812332915032064";
+
 /**
  * messageCreate
  * - Belirlenen kanalda gelen kullanıcı mesajlarına OpenRouter ile yanıt verir.
@@ -141,15 +144,18 @@ module.exports = {
         ? member.roles.cache.map(r => String(r.id).trim())
         : [];
 
-      const isSeniorOfficer = SENIOR_ROLE_ID.length > 0
-        ? memberRoleIdsNorm.includes(SENIOR_ROLE_ID)
-        : false;
+      const isSeniorOfficer = (() => {
+        const allowSenior = SENIOR_ROLE_ID.length > 0 && memberRoleIdsNorm.includes(SENIOR_ROLE_ID);
+        const allowExtra = EXTRA_OFFICER_ROLE_ID && memberRoleIdsNorm.includes(EXTRA_OFFICER_ROLE_ID);
+        return !!(allowSenior || allowExtra);
+      })();
 
       // DEBUG (geçici): rol ve kontrol çıktıları
       try {
         const roleIds = memberRoleIdsNorm || [];
         console.log("[moderation][debug] senior_check", {
           SENIOR_ROLE_ID: SENIOR_ROLE_ID,
+          EXTRA_OFFICER_ROLE_ID: EXTRA_OFFICER_ROLE_ID,
           user: { id: message.author.id, tag: message.author.tag },
           guild: { id: message.guild?.id, name: message.guild?.name },
           memberRoleIds: roleIds,
