@@ -37,6 +37,7 @@ export default function Cursor() {
     let ry = y;
 
     let raf = 0;
+    let inside = true; // pencere içinde mi?
 
     const hoverables = ["A", "BUTTON", "INPUT", "SELECT", "TEXTAREA"];
     const isHoverable = (el: Element | null) =>
@@ -54,11 +55,14 @@ export default function Cursor() {
       x = e.clientX;
       y = e.clientY;
 
-      const el = document.elementFromPoint(x, y);
+      // Pencere sınırı içinde mi?
+      inside = x >= 0 && y >= 0 && x <= window.innerWidth && y <= window.innerHeight;
+
+      const el = inside ? document.elementFromPoint(x, y) : null;
       const hov = isHoverable(el);
       const clk = isClickable(el);
-      setHovering(hov || clk);
-      setSpikeMode(clk);
+      setHovering(inside && (hov || clk));
+      setSpikeMode(inside && clk);
       if (reducedMotion) {
         rx = x; ry = y;
         dot.style.transform = `translate(${rx - 4}px, ${ry - 4}px)`;
@@ -67,7 +71,11 @@ export default function Cursor() {
     };
 
     const loop = () => {
-      if (!reducedMotion) {
+      // Pencere dışına çıkıldığında tamamen sakla
+      if (!inside) {
+        dot.style.transform = `translate(-9999px, -9999px)`;
+        ring.style.transform = `translate(-9999px, -9999px)`;
+      } else if (!reducedMotion) {
         // İnterpolasyon: ring geriden gelsin, dot doğrudan gider
         rx += (x - rx) * 0.18;
         ry += (y - ry) * 0.18;
@@ -78,6 +86,8 @@ export default function Cursor() {
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseleave", () => { inside = false; }, { passive: true });
+    window.addEventListener("mouseenter", () => { inside = true; }, { passive: true });
     raf = requestAnimationFrame(loop);
 
     // Sistem imlecini gizle: tüm tıklanabilir öğelerde de gizle
@@ -95,6 +105,8 @@ export default function Cursor() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseleave", () => { inside = false; });
+      window.removeEventListener("mouseenter", () => { inside = true; });
       document.body.style.cursor = "";
       styleEl.remove();
     };
