@@ -57,9 +57,13 @@ module.exports = function wireAll(client) {
     send("shardResume", { data: { shardId, replayedEvents } })
   );
 
-  // message
+  // messageCreate LOG + HANDLER: Tek noktadan bind
+  // - Hem ingest logu yolla
+  // - Hem de ana yanıtlayıcıyı burada require edip çalıştır
+  const handleMessageCreate = require("./messageCreate");
   client.on("messageCreate", (message) => {
     if (!message) return;
+    // 1) LOG (ingest)
     send("messageCreate", {
       ...baseGuild(message.guild),
       ...baseChannel(message.channel),
@@ -68,6 +72,14 @@ module.exports = function wireAll(client) {
         content: message.content,
       },
     });
+    // 2) ANA HANDLER (yanıtlayıcı)
+    try {
+      if (handleMessageCreate && typeof handleMessageCreate.execute === "function") {
+        handleMessageCreate.execute(message, client);
+      }
+    } catch (e) {
+      console.warn("[wireAll:messageCreate][handler-error]", e?.message || e);
+    }
   });
 
   client.on("messageUpdate", (oldMessage, newMessage) => {
