@@ -261,21 +261,66 @@ async function callOpenRouter(messages, opts = {}) {
  * - Reads system prompt and builds messages array with user content
  * - Applies a length cap to user content to avoid excessive tokens
  */
+/**
+ * Basit niyet yönlendirme ve iki modlu mesaj kurucu:
+ * - moderation: sadece JSON şemasıyla dön (doğal dil yok)
+ * - chat: kısa ve konu dışına kaçma
+ */
+function detectIntent(text) {
+  const s = (text || "").toLowerCase();
+  const modHints = [
+    "/purge", "/ban", "/kick", "/timeout",
+    "mesajları sil", "sil", "temizle",
+    "banla", "kick at", "sustur", "moderasyon"
+  ];
+  if (modHints.some(h => s.includes(h))) return "moderation";
+  return "chat";
+}
+
 async function buildMessagesForUser(userText) {
-  const SYSTEM = await readPrompt();
-  const capped = String(userText || "").slice(0, 3000); // cap user content
+  const SYSTEM_BASE = await readPrompt();
+  const capped = String(userText || "").slice(0, 2000);
+  const intent = detectIntent(capped);
+
   const messages = [];
 
-  if (SYSTEM && SYSTEM.trim().length > 0) {
+  if (intent === "moderation") {
+    const SYSTEM = `
+${SYSTEM_BASE}
+
+GÖREV: Yalnızca aşağıdaki JSON şemasında cevap ver; doğal dil, açıklama veya ekstra karakter yazma.
+ŞEMA:
+{
+  "action": "purge" | "ban" | "kick" | "timeout",
+  "params": {
+    "amount"?: number,      // purge için 1..100
+    "userId"?: string,      // ban/kick/timeout için
+    "reason"?: string,
+    "durationSec"?: number  // timeout için
+  }
+}
+
+KURALLAR:
+- Metinden niyeti çıkart ve eksik parametreleri null/undefined bırakma; yoksa hiç koyma.
+- Yetki/izin kontrolü yapma; onu bot yapacak. Sen sadece niyeti JSON’a dök.
+- Bilinmiyorsa boş JSON yerine { "action": "purge", "params": {} } gibi en mantıklı minimal yapıyı ver.
+- ÇIKTI: SADECE TEK BİR JSON nesnesi.`;
     messages.push({ role: "system", content: SYSTEM });
-  } else {
-    messages.push({
-      role: "system",
-      content:
-        "You are VOITANS guild assistant. Be concise, helpful, and respectful. Answer in Turkish unless the user clearly writes in another language.",
-    });
+    messages.push({ role: "user", content: capped });
+    return messages;
   }
 
+  // chat intent
+  const SYSTEM = SYSTEM_BASE?.trim()
+    ? `${SYSTEM_BASE}
+
+Davranış ekleri:
+- Kısa ve konuya odaklı cevap ver.
+- Veri yoksa "Elimde buna dair veri yok." de, konu değiştirme.
+- Kişiler hakkında yargı üretme; sadece kanıtlanabilir/veri tabanlı ise konuş.`
+    : `You are VOITANS guild assistant. Keep answers short, on-topic and in Turkish. If you don't have data, say so briefly.`;
+
+  messages.push({ role: "system", content: SYSTEM });
   messages.push({ role: "user", content: capped });
   return messages;
 }
