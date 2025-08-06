@@ -251,39 +251,8 @@ module.exports = {
         history = [];
       }
 
-      // 3) Kullanıcı başına basit cooldown ve günlük limit (ENV ile ayarlanabilir)
-      const COOLDOWN_SEC = Number(process.env.AI_USER_COOLDOWN_SEC || 15);
-      const DAILY_LIMIT = Number(process.env.AI_USER_DAILY_LIMIT || 20);
-      const userId = message.author.id;
-      const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
-      // Global hafızada kullanıcı sayaçları
-      global.__aiUserLastTs = global.__aiUserLastTs || new Map();
-      global.__aiUserDaily = global.__aiUserDaily || new Map();
-
-      // Cooldown
-      const lastTs = global.__aiUserLastTs.get(userId) || 0;
-      const nowTs = Date.now();
-      if (nowTs - lastTs < COOLDOWN_SEC * 1000) {
-        try { console.log("[bot][messageCreate] skip:user-cooldown", { userId, remainMs: COOLDOWN_SEC * 1000 - (nowTs - lastTs) }); } catch {}
-        return;
-      }
-
-      // Daily counter
-      const dayMap = global.__aiUserDaily.get(todayKey) || new Map();
-      const used = dayMap.get(userId) || 0;
-      if (used >= DAILY_LIMIT) {
-        try {
-          await message.react("⏳").catch(() => {});
-          await message.reply(`Günlük limitine ulaştın (${DAILY_LIMIT}). Yarın tekrar dene.`).catch(() => {});
-        } catch {}
-        return;
-      }
-      // Sayaçları güncelle
-      dayMap.set(userId, used + 1);
-      global.__aiUserDaily.set(todayKey, dayMap);
-      global.__aiUserLastTs.set(userId, nowTs);
-
+      // 3) (İSTEK ÜZERİNE) Kullanıcı başına cooldown/daily limit KAPATILDI.
+      // İstenirse tekrar açmak için aşağıdaki blok geri getirilebilir veya ENV ile koşullu yapılabilir.
       // 4) Kullanıcıya "typing" göster (maks 20s)
       message.channel.sendTyping().catch(() => {});
       const typingTimer = setInterval(() => {
