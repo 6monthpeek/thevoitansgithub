@@ -1443,7 +1443,7 @@ const OfficerDashboardTabsDynamic = dynamic(() => Promise.resolve(OfficerDashboa
 });
 
 function OfficerDashboardTabs(): React.JSX.Element {
-  const [tab, setTab] = useState<"announce" | "logs">("announce");
+  const [tab, setTab] = useState<"announce" | "logs" | "protection">("announce");
 
   // Görünür hata/teşhis UI state'i (announce tabına özel)
   const [diag, setDiag] = useState<{ msg?: string } | null>(null);
@@ -1512,6 +1512,21 @@ function OfficerDashboardTabs(): React.JSX.Element {
         <div role="tabpanel" aria-labelledby="">
           {/* Dinamik import ile client tarafında yüklensin */}
           <LogsEmbed />
+        </div>
+      )}
+      {tab === "protection" && (
+        <div role="tabpanel" aria-labelledby="">
+          <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-4">
+            <a
+              href="/officer/protection"
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5"
+            >
+              Protection Panelini Aç
+            </a>
+            <div className="text-xs text-zinc-500 mt-2">
+              Not: Bu bağlantı yalnızca Senior Officer için çalışır.
+            </div>
+          </div>
         </div>
       )}
     </div>
