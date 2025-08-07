@@ -95,14 +95,20 @@ module.exports = {
       const hasPrefix = prefixes.some(p => contentRaw.startsWith(p));
 
       // Çifte tetiklemeyi önlemek için: mention + prefix birlikte ise sadece BİR kez çalıştır.
-      // Tercih: mention öncelikli, prefix kullanımında mention varsa prefix akışını pas geç.
-      if (!(mentionsBot || hasPrefix)) {
-        try { console.log("[bot][messageCreate] skip:no-mention-or-prefix"); } catch {}
+      // Tercih: mention öncelikli. Prefix tetikleyicisini devre dışı bırakmak için PREFIX_DISABLE=1 kullan.
+      const PREFIX_DISABLE = String(process.env.PREFIX_DISABLE || "0") === "1";
+      const allowPrefix = !PREFIX_DISABLE;
+
+      const triggeredByMention = mentionsBot;
+      const triggeredByPrefix = allowPrefix && !mentionsBot && hasPrefix;
+
+      if (!(triggeredByMention || triggeredByPrefix)) {
+        try { console.log("[bot][messageCreate] skip:no-mention-or-prefix", { mentionsBot, hasPrefix, allowPrefix }); } catch {}
         return;
       }
-      // Aynı mesajda mention ve prefix birlikteyse, tek akış sinyali ayarla
-      const trigger = mentionsBot ? "mention" : "prefix";
-      try { console.log("[bot][messageCreate] trigger", { trigger, mentionsBot, hasPrefix, channelId: String(message.channel.id), guildId: String(message.guild?.id || "") }); } catch {}
+
+      const trigger = triggeredByMention ? "mention" : "prefix";
+      try { console.log("[bot][messageCreate] trigger", { trigger, mentionsBot, hasPrefix, allowPrefix, channelId: String(message.channel.id), guildId: String(message.guild?.id || "") }); } catch {}
 
       // Idempotent koruma: aynı message.id için tek kez çalış
       try {
