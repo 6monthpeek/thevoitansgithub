@@ -239,8 +239,8 @@ async function callOpenRouter(messages, opts = {}) {
       } catch (e) {
         clearTimeout(t);
         lastErr = e;
-        console.error("[openrouter][fetch-error]", { keyIndex: idx, model: modelTry, err: e?.message || e });
-        dbg("fetch-error detail", { err: String(e?.stack || e) .slice(0, 500) });
+        console.error("[openrouter][fetch-error]", { keyIndex: idx, model: modelTry, err: e?.message || e, stack: String(e?.stack||"").slice(0,500) });
+        dbg("fetch-error detail", { err: String(e?.stack || e).slice(0, 500) });
         // Network/timeout: try next model; if models exhausted, rotate key after small wait
         const moreModelsLeft = mi < modelList.length - 1;
         if (!moreModelsLeft) {
