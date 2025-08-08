@@ -393,9 +393,8 @@ module.exports = {
       }
 
       if (!handledDelete) {
-        // 5) Normal yanıt üretimi: Mesajları hazırla (system prompt + HISTORY + user)
-        const historyBlock = history.length ? `Geçmiş:\n${history.join("\n")}\n---\n` : "";
-        const messages = await buildMessagesForUser(`${historyBlock}${userText}`);
+      // 5) Normal yanıt üretimi: Mesajları hazırla (system prompt + user)
+      const messages = await buildMessagesForUser(userText, history);
 
         // 6) OpenRouter çağrısı
         let reply;

@@ -280,7 +280,7 @@ function detectIntent(text) {
   return "chat";
 }
 
-async function buildMessagesForUser(userText) {
+async function buildMessagesForUser(userText, history = []) {
   const SYSTEM_BASE = await readPrompt();
   const capped = String(userText || "").slice(0, 2000);
   const intent = detectIntent(capped);
@@ -324,7 +324,15 @@ Davranış ekleri:
     : `You are VOITANS guild assistant. Keep answers short, on-topic and in Turkish. If you don't have data, say so briefly.`;
 
   messages.push({ role: "system", content: SYSTEM });
+
+  // Sadece kullanıcı mesajını ekle, geçmişi sistem mesajına dahil et
   messages.push({ role: "user", content: capped });
+
+  // Geçmişi sadece istenirse ekle (şimdilik her zaman ekleme)
+  // if (history && history.length > 0) {
+  //   messages.push({ role: "system", content: `Geçmiş sohbet:\n${history.join("\n")}` });
+  // }
+
   return messages;
 }
 
