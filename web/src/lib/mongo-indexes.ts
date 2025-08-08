@@ -3,6 +3,11 @@ import clientPromise from './mongo';
 export async function createIndexes() {
   try {
     const client = await clientPromise;
+    if (!client) {
+      console.warn('⚠️ MongoDB not configured - skipping index creation');
+      return;
+    }
+    
     const db = client.db('voitans');
     const collection = db.collection('logs');
 

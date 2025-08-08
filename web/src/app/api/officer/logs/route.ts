@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 import { z } from "zod";
 import clientPromise from "@/lib/mongo";
+import type { Document, WithId } from "mongodb";
 
 /**
  * Powerful Officer Logs API
@@ -152,6 +153,13 @@ export async function GET(req: Request) {
 
     // MongoDB'ye bağlan
     const client = await clientPromise;
+    if (!client) {
+      return NextResponse.json(
+        { ok: false, code: "MONGODB_NOT_CONFIGURED", error: "MongoDB not configured", items: [], total: 0 },
+        { status: 503 }
+      );
+    }
+    
     const db = client.db('voitans');
     const collection = db.collection('logs');
 
@@ -219,22 +227,23 @@ export async function GET(req: Request) {
       .skip(skip)
       .limit(limit);
 
-    const logs = await cursor.toArray() as LogEntry[];
+    const logs = await cursor.toArray() as WithId<Document>[];
     const total = await collection.countDocuments(query);
 
     // Kullanıcı bilgilerini zenginleştir
     const enrichedLogs = await Promise.all(
-      logs.map(async (log) => {
+      logs.map(async (log: WithId<Document>) => {
+        const logData = log as unknown as LogEntry;
         let enrichedUser: EnrichedUser | null = null;
-        if (log.userId) {
-          enrichedUser = await fetchGuildMemberSafe(log.userId);
+        if (logData.userId) {
+          enrichedUser = await fetchGuildMemberSafe(logData.userId);
         }
 
         return {
-          ...log,
-          timestamp: log.ts.toISOString(),
-          userIdShort: log.userId ? log.userId.slice(-4) : undefined,
-          data: log.payload,
+          ...logData,
+          timestamp: logData.ts.toISOString(),
+          userIdShort: logData.userId ? logData.userId.slice(-4) : undefined,
+          data: logData.payload,
           enrichedUser
         };
       })

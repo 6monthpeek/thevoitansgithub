@@ -64,6 +64,13 @@ export async function POST(request: NextRequest) {
 
     // MongoDB'ye bağlan
     const client = await clientPromise;
+    if (!client) {
+      return NextResponse.json(
+        { error: 'MongoDB not configured' },
+        { status: 503 }
+      );
+    }
+    
     const db = client.db('voitans');
     const collection = db.collection('logs');
 
