@@ -18,6 +18,7 @@ import {
 } from "@/components/magic-ui-skyrim";
 // Cursor arkaplan efektleri temizlendi
 import { MemberCard } from "@/components/MemberCard";
+import { MemberMiniCard } from "@/components/MemberMiniCard";
 import AdventuresTabs from "@/components/AdventuresTabs";
 import LazyTwitch from "@/components/LazyTwitch";
 import { SplashCursor } from "@/components/SplashCursor";
@@ -484,7 +485,7 @@ function MembersSection() {
 
   const cards = useMemo(() => {
     return members.map((m) => {
-      const roleName = m.dominantRoleName ?? (m.dominantRole ? undefined : undefined);
+      const roleName = m.dominantRoleName || undefined;
       let roleColor = m.dominantRoleColor || undefined;
       if (!roleColor && roleName) {
         const map: Record<string, string> = {
@@ -498,11 +499,10 @@ function MembersSection() {
         roleColor = map[roleName] || undefined;
       }
       return (
-        <MemberCard
+        <MemberMiniCard
           key={m.id}
           username={m.username || "Discord User"}
           avatarUrl={m.avatarUrl}
-          dominantRole={m.dominantRole || undefined}
           dominantRoleColor={roleColor}
           dominantRoleName={roleName}
         />
@@ -586,7 +586,7 @@ function MembersSection() {
       </div>
 
       {meta.loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite" aria-busy="true">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3" aria-live="polite" aria-busy="true">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-4">
               <div className="w-12 h-12 rounded-lg bg-white/10 mb-3"></div>
@@ -607,17 +607,11 @@ function MembersSection() {
         </div>
       ) : (
         <>
-          <ChromaGrid 
-            items={members.map(m => ({
-              id: m.id,
-              title: m.username || "Discord User",
-              subtitle: m.dominantRoleName || "Üye",
-              color: m.dominantRoleColor || "#8b5cf6"
-            }))}
-            className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+            {cards}
+          </div>
 
-          <div className="flex items-center justify-center gap-3 mt-2" aria-live="polite">
+          <div className="flex items-center justify-center gap-3 mt-3" aria-live="polite">
             <MagicButtonSkyrim 
               onClick={() => setMeta((m) => ({ ...m, page: Math.max(1, m.page - 1) }))} 
               disabled={meta.page <= 1}
