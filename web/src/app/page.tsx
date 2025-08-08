@@ -913,14 +913,20 @@ export default function Home() {
                       <div id="intro-content-border" className="flex items-start gap-6 p-4 border border-purple-500/30 rounded-lg dimmed">
                         <div className="flex-shrink-0 mt-1.5">
                           <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                            <img
-                              src="/voitans-logo.svg"
-                              alt="VOITANS Logo"
-                              className="w-full h-full object-contain"
-                              referrerPolicy="no-referrer"
-                              loading="eager"
-                              decoding="sync"
-                            />
+                            <video
+                              className="w-full h-full object-cover"
+                              style={{ display: 'block', objectPosition: 'center 40%' }}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              preload="metadata"
+                              poster="/voitans-logo.svg"
+                              aria-label="VOITANS animated logo"
+                            >
+                              <source src="/voitans.mp4" type="video/mp4" />
+                              <img src="/voitans-logo.svg" alt="VOITANS Logo" />
+                            </video>
                           </div>
                         </div>
                         <div className="flex-1 space-y-3 text-[14px] leading-relaxed text-white">
