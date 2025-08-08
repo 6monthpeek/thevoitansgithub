@@ -15,17 +15,17 @@ import {
   StaggeredList,
   ListItem,
   MagicGrid
-} from "../components/magic-ui-skyrim";
+} from "@/components/magic-ui-skyrim";
 // Cursor arkaplan efektleri temizlendi
-import { MemberCard } from "../components/MemberCard";
-import AdventuresTabs from "../components/AdventuresTabs";
-import LazyTwitch from "../components/LazyTwitch";
-import { SplashCursor } from "../components/SplashCursor";
-import { AnimatedBackground } from "../components/AnimatedBackground";
-import { TypeWriter, GradientText, RotatingText, CountUp } from "../components/TextAnimations";
-import { ChromaGrid } from "../components/ChromaGrid";
-import { GooeyNav } from "../components/GooeyNav";
-import { LightRaysBackground } from "../components/LightRaysBackground";
+import { MemberCard } from "@/components/MemberCard";
+import AdventuresTabs from "@/components/AdventuresTabs";
+import LazyTwitch from "@/components/LazyTwitch";
+import { SplashCursor } from "@/components/SplashCursor";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { TypeWriter, GradientText, RotatingText, CountUp } from "@/components/TextAnimations";
+import { ChromaGrid } from "@/components/ChromaGrid";
+import { GooeyNav } from "@/components/GooeyNav";
+import { LightRaysBackground } from "@/components/LightRaysBackground";
 
 function escapeHtml(s: string) {
   return s
