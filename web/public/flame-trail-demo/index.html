@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced.team Flame Trail Cursor Demo</title>
+    <!-- styles.css dosyasını bağla -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 
+      WebGL fluid simülasyonu için ana canvas elemanı.
+      - id="fluid-canvas": script.js dosyasında bu ID ile elemana erişilecek.
+      - position: fixed; ile tam ekranı kaplar.
+      - pointer-events: none; ile fare tıklamalarını ve diğer olayları alttaki elemanlara iletmeyi engeller.
+      - z-index: 9999; ile tüm diğer içeriklerin üzerine yer alır.
+    -->
+    <canvas id="fluid-canvas"></canvas>
+
+    <!-- script.js dosyasını bağla -->
+    <script src="script.js"></script>
+</body>
+</html>

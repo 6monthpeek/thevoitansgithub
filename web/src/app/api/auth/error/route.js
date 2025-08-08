@@ -1,0 +1,59 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GET = GET;
+exports.POST = POST;
+const server_1 = require("next/server");
+/**
+ * Plain-text error endpoint to avoid browser 405/406 and to surface real error details.
+ * NextAuth will redirect to /api/auth/error?error=SomeCode
+ * Example codes: OAuthSignin, OAuthCallback, OAuthAccountNotLinked, Configuration, Callback
+ */
+async function GET(req) {
+    const url = new URL(req.url);
+    const code = url.searchParams.get("error") || "unknown";
+    const ua = req.headers.get("user-agent") || "-";
+    const ref = req.headers.get("referer") || "-";
+    const host = req.headers.get("host") || "-";
+    const xfproto = req.headers.get("x-forwarded-proto") || "-";
+    const xfhost = req.headers.get("x-forwarded-host") || "-";
+    // Basic runtime visibility in server logs
+    console.error("[next-auth][error]", {
+        code,
+        host,
+        xfproto,
+        xfhost,
+        ref,
+        ua,
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL ? "[set]" : "[missing]",
+        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "[set]" : "[missing]",
+        DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID ? "[set]" : "[missing]",
+        DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET ? "[set]" : "[missing]",
+    });
+    const hint = code === "Configuration"
+        ? "Check NEXTAUTH_URL / NEXTAUTH_SECRET and provider credentials."
+        : code === "OAuthCallback"
+            ? "Check Discord Redirect URL and Client Secret / ID match."
+            : code === "OAuthSignin"
+                ? "Provider initiation failed. Verify clientId/secret and scopes."
+                : "";
+    const body = `Auth Error\n` +
+        `Code: ${code}\n` +
+        (hint ? `Hint: ${hint}\n` : "") +
+        `Runtime headers:\n` +
+        `- host: ${host}\n` +
+        `- x-forwarded-proto: ${xfproto}\n` +
+        `- x-forwarded-host: ${xfhost}\n` +
+        `- referer: ${ref}\n` +
+        `If running locally, ensure:\n` +
+        `- NEXTAUTH_URL=http://localhost:3000 (prod: your https URL)\n` +
+        `- NEXTAUTH_SECRET is a strong random string (server restarted after change)\n` +
+        `- Discord Redirect URL: <BASE_URL>/api/auth/callback/discord\n`;
+    return new server_1.NextResponse(body, {
+        status: 200,
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+}
+// Disallow other methods explicitly to avoid 405 noise
+async function POST() {
+    return new server_1.NextResponse("Method Not Allowed", { status: 405 });
+}

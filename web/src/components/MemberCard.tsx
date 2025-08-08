@@ -62,29 +62,30 @@ export function MemberCard({ username, avatarUrl, dominantRole, dominantRoleColo
           display: grid;
           grid-template-columns: 64px 1fr;
           gap: 14px;
-          border: 1px solid rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.08); /* Daha ince ve belirgin kenar */
           /* Medieval/epic çerçeve & arkaplan */
           background:
             radial-gradient(120% 160% at 10% 0%, rgba(255,255,255,0.03), transparent 65%),
             linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
           border-radius: 14px;
           padding: 12px 14px;
-          transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
+          transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .3s ease;
           box-shadow:
             inset 0 0 0 1px rgba(255,255,255,0.04),
-            0 1px 0 rgba(0,0,0,0.25);
+            0 1px 0 rgba(0,0,0,0.15); /* Daha hafif başlangıç gölgesi */
           overflow: hidden;
           will-change: transform, box-shadow;
         }
         .card:hover {
-          border-color: rgba(255,255,255,0.12);
+          border-color: rgba(255,255,255,0.15); /* Daha belirgin hover kenarı */
           background:
             radial-gradient(120% 160% at 10% 0%, rgba(255,255,255,0.05), transparent 65%),
             linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
-          transform: translateY(-1px);
+          transform: translateY(-2px); /* Hafif yukarı hareket */
           box-shadow:
             inset 0 0 0 1px rgba(255,255,255,0.06),
-            0 6px 16px rgba(0,0,0,0.24);
+            0 8px 20px rgba(0,0,0,0.3), /* Daha belirgin ve yumuşak gölge */
+            0 0 15px rgba(139, 92, 246, 0.08); /* Hafif mor/parlak vurgu gölgesi */
         }
         .edge {
           position: absolute;

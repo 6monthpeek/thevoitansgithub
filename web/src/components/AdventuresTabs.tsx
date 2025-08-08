@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { MagicCard, MagicCardHeader, MagicCardContent, MagicBadge } from "./ui";
 
 type TabId = "aoc" | "bdo" | "nw";
 
@@ -429,10 +430,68 @@ function BDOPanel() {
         <div className="lg:col-span-1">{story}</div>
       </div>
 
+      {/* Magic Card ile gelişmiş gösterim */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <MagicCard className="border-amber-500/20 hover:border-amber-500/40 transition-all duration-300" glowColor="rgba(255, 209, 68, 0.3)">
+          <MagicCardHeader>
+            <h3 className="text-lg font-semibold text-amber-300">Ekonomi ve Node Savaşları</h3>
+            <MagicBadge className="text-amber-400 border-amber-500/30">
+              BDO
+            </MagicBadge>
+          </MagicCardHeader>
+          <MagicCardContent>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Black Desert Online'da node savaşları ve ekonomik düzenleme bizim için stratejinin temelini oluşturur. 
+              Her bir node'un kontrolü, lonca olarak gücümüzü ve etkimizi artırır.
+            </p>
+          </MagicCardContent>
+        </MagicCard>
 
-      {/* Kronoloji kaldırıldı */}
+        <MagicCard className="border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300" glowColor="rgba(52, 211, 153, 0.3)">
+          <MagicCardHeader>
+            <h3 className="text-lg font-semibold text-emerald-300">WillOfFire Dönemi</h3>
+            <MagicBadge className="text-emerald-400 border-emerald-500/30">
+              MİRAS
+            </MagicBadge>
+          </MagicCardHeader>
+          <MagicCardContent>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              2023'te WillOfFire adıyla geri döndük. Dezavantajlı savaşları tercih ederek, 
+              zorlu mücadeleler kazandık ve sahada yazılan hikayemize yeni bir bölüm ekledik.
+            </p>
+          </MagicCardContent>
+        </MagicCard>
 
-      {/* Medya bölümü kaldırıldı */}
+        <MagicCard className="border-purple-500/20 hover:border-purple-500/40 transition-all duration-300" glowColor="rgba(139, 71, 137, 0.3)">
+          <MagicCardHeader>
+            <h3 className="text-lg font-semibold text-purple-300">Strateji ve Taktik</h3>
+            <MagicBadge className="text-purple-400 border-purple-500/30">
+              SAVAŞ
+            </MagicBadge>
+          </MagicCardHeader>
+          <MagicCardContent>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Her savaşta farklı taktikler geliştiririz. Rakiplerimizi analiz eder, 
+              en avantajlı pozisyonları belirler ve takımımızla koordinasyon halinde hareket ederiz.
+            </p>
+          </MagicCardContent>
+        </MagicCard>
+
+        <MagicCard className="border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300" glowColor="rgba(53, 180, 255, 0.3)">
+          <MagicCardHeader>
+            <h3 className="text-lg font-semibold text-cyan-300">Topluluk ve İşbirliği</h3>
+            <MagicBadge className="text-cyan-400 border-cyan-500/30">
+              BİRLİK
+            </MagicBadge>
+          </MagicCardHeader>
+          <MagicCardContent>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              BDO'daki başarımızın sırrı, güçlü bir topluluk ve işbirliği anlayışında yatar. 
+              Birbirimize destek olarak zorlukları aşarız ve birlikte büyürüz.
+            </p>
+          </MagicCardContent>
+        </MagicCard>
+      </div>
     </div>
   );
 }

@@ -79,7 +79,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 // Server Component içinde ssr:false kullanılamaz; bu nedenle sadece dynamic import kullanıp
 // ssr bayrağını kaldırıyoruz. LayoutClientShell zaten "use client" içerir.
-const ClientShell = dynamic(() => import("../components/LayoutClientShell"));
+const ClientShell = dynamic(() => import("../components/LayoutClientShell.tsx").then(mod => mod.default));
 
 export default function RootLayout({
   children,
@@ -91,14 +91,14 @@ export default function RootLayout({
   // - cz-shortcut-listen vb. 3rd-party eklenti attribute farkları için suppressHydrationWarning html seviyesinde zaten aktif.
   const bodyClass =
     `${cinzel.variable} ${inter.variable} ${unifraktur.variable} ${orbitron.variable} ${anton.variable} ${zenDots.variable} ${sora.variable} ${jetbrains.variable} antialiased ` +
-    `bg-grid text-[color:var(--fg)]`;
+    `text-[color:var(--fg)]`;
 
   return (
     <html lang="tr" suppressHydrationWarning>
       {/* body'de 3P uzantıların enjekte ettiği beklenmeyen attribute'ları tolere et */}
       <body className={bodyClass} suppressHydrationWarning>
         {/* Advanced.team benzeri iskelet: ortalanmış GIF arka plan katmanı */}
-        <div aria-hidden className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           {/* styled-jsx kullanmadan inline style ile (Server Component uyumlu) */}
           <div
             className="absolute inset-0 grid place-items-center"

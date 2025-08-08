@@ -1,322 +1,330 @@
 "use client";
-import clsx from "clsx";
-// framer-motion'u dinamik ve koşullu (reduced-motion uyumlu) yükle
-import dynamic from "next/dynamic";
-const MotionDiv = dynamic(
-  () => import("framer-motion").then((m) => m.motion.div),
-  { ssr: false, loading: () => <div /> }
+
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
 );
 
-/* Utility */
-export function cn(...inputs: Array<string | false | null | undefined>) {
-  return inputs.filter(Boolean).join(" ");
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
 }
 
-/* Panel - glassmorphism + hairline */
-export function Panel({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        // Sade panel: tek hairline, hafif blur ve düşük gölge
-        "rounded-2xl border border-white/10",
-        "bg-black/30 backdrop-blur-[2px]",
-        "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-/* NeonButton - primary/outline */
-export function NeonButton({
-  children,
-  size = "md",
-  variant = "primary",
-  className,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  size?: "md" | "lg";
-  variant?: "primary" | "outline";
-}) {
-  // Ölçek: md h-11 (44px), lg h-12 (48px)
-  const sizes =
-    size === "lg"
-      ? "h-12 px-5 text-[17px]"
-      : "h-11 px-4 text-base";
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40 " +
-    sizes;
-
-  if (variant === "outline") {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
     return (
-      <button
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
         {...props}
-        className={cn(
-          base,
-          "border border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/5 shadow-[inset_0_0_0_1px_rgba(255,255,255,.04)]",
-          className
-        )}
-      >
-        {children}
-      </button>
+      />
     );
   }
+);
+Button.displayName = "Button";
+
+export { Button, buttonVariants };
+
+// MagicButton bileşeni - minimalist ve Skyrim havası
+const MagicButtonVariants = cva(
+  "relative inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-medium text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:border-white/30",
+skyrim: "bg-gradient-to-r from-purple-900 to-purple-800 border-2 border-purple-600 text-purple-100 hover:from-purple-800 hover:to-purple-700 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:-translate-y-0.5",
+"skyrim-minimal": "border-purple-900/30 bg-purple-950/5 text-purple-200 hover:bg-purple-950/10 hover:border-purple-700/50 transition-all duration-300",
+        minimal: "bg-black/20 text-white border border-white/10 hover:bg-white/10 hover:border-white/20",
+        violet: "bg-gradient-to-r from-purple-900/30 to-violet-900/30 text-purple-100 border border-purple-700/50 hover:from-purple-800/50 hover:to-violet-800/50 hover:border-purple-600 hover:shadow-lg hover:shadow-purple-500/20",
+      },
+      size: {
+        default: "h-12 px-6 py-3",
+        sm: "h-10 px-4 py-2 text-sm",
+        lg: "h-14 px-8 py-4 text-base",
+        icon: "h-10 w-10 p-0",
+        skyrim: "h-14 px-8 py-4 text-base font-bold uppercase tracking-wider",
+        "skyrim-minimal": "h-11 px-5 py-2.5 text-base font-semibold",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+export interface MagicButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof MagicButtonVariants> {
+  asChild?: boolean;
+  size?: "default" | "sm" | "lg" | "icon" | "skyrim";
+}
+
+const MagicButton = React.forwardRef<HTMLButtonElement, MagicButtonProps>(
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(MagicButtonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      >
+        {variant === "skyrim" && (
+          <>
+            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-amber-500/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent to-amber-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          </>
+        )}
+        {variant === "violet" && (
+          <>
+            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent to-violet-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          </>
+        )}
+        <span className="relative z-10 flex items-center gap-2">
+          {children}
+        </span>
+      </Comp>
+    );
+  }
+);
+MagicButton.displayName = "MagicButton";
+
+// MagicCard bileşeni - minimalist ve Skyrim havası
+const MagicCardVariants = cva(
+  "relative overflow-hidden rounded-lg border border-white/10 bg-black/20 backdrop-blur-sm transition-all duration-300 hover:border-white/20",
+  {
+    variants: {
+      variant: {
+        default: "",
+        glowing: "shadow-[0_0_20px_rgba(255,255,255,0.1)]",
+skyrim: "border-purple-900/30 bg-gradient-to-br from-purple-950/20 to-purple-900/10 hover:border-purple-700/50 hover:shadow-[0_0_30px_rgba(147,112,219,0.15)]",
+        minimal: "border-white/5 bg-black/10 hover:border-white/10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface MagicCardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof MagicCardVariants> {
+  glowColor?: string;
+  variant?: "default" | "glowing" | "skyrim" | "minimal";
+}
+
+const MagicCard = React.forwardRef<HTMLDivElement, MagicCardProps>(
+  ({ className, variant, glowColor, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(MagicCardVariants({ variant }), className)}
+      style={glowColor ? { boxShadow: `0 0 20px ${glowColor}` } : undefined}
+      {...props}
+    >
+      {variant === "skyrim" && (
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+      )}
+      {children}
+    </div>
+  )
+);
+MagicCard.displayName = "MagicCard";
+
+const MagicCardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+));
+MagicCardHeader.displayName = "MagicCardHeader";
+
+const MagicCardTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "text-2xl font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+));
+MagicCardTitle.displayName = "MagicCardTitle";
+
+const MagicCardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+MagicCardDescription.displayName = "MagicCardDescription";
+
+const MagicCardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+));
+MagicCardContent.displayName = "MagicCardContent";
+
+const MagicCardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+));
+MagicCardFooter.displayName = "MagicCardFooter";
+
+// MagicBadge bileşeni
+const MagicBadgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface MagicBadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof MagicBadgeVariants> {}
+
+const MagicBadge = React.forwardRef<HTMLDivElement, MagicBadgeProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(MagicBadgeVariants({ variant }), className)}
+      {...props}
+    />
+  )
+);
+MagicBadge.displayName = "MagicBadge";
+
+// NeonButton bileşeni
+export const NeonButton = ({
+  children,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
+      className={`
+        relative px-6 py-3 font-medium text-white transition-all duration-300 before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-purple-600 before:to-pink-600 before:transition-all before:duration-300 hover:before:scale-105 active:scale-95 ${className}
+      `}
       {...props}
-      className={cn(
-        base,
-        "font-semibold text-black bg-[color:var(--accent-cyan)] hover:bg-[#57dbff] shadow-[0_5px_14px_rgba(57,208,255,.15)]",
-        className
-      )}
     >
-      {children}
+      <span className="relative z-10">{children}</span>
     </button>
   );
-}
+};
 
-/* Badge - small capsule */
-export function Badge({
+// PaginationCapsule bileşeni
+export const PaginationCapsule = ({
   children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] leading-4 tracking-tight",
-        "bg-white/5 border border-white/10 text-zinc-300",
-        "shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
-        className
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-/* Section header */
-export function SectionHeader({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle?: string;
-}) {
-  return (
-    <div className="mb-6">
-      <h2 className="display text-2xl font-semibold tracking-tight">{title}</h2>
-      {subtitle ? (
-        <p className="text-zinc-400 mt-1 max-w-2xl">{subtitle}</p>
-      ) : null}
-    </div>
-  );
-}
-
-/* PaginationCapsule - previous/next with page indicator */
-export function PaginationCapsule({
-  page,
-  totalPages,
-  onPrev,
-  onNext,
-  size = "md",
-}: {
-  page: number;
-  totalPages: number;
-  onPrev: () => void;
-  onNext: () => void;
-  size?: "md" | "lg";
-}) {
-  const btnSize = size === "lg" ? "h-12 px-5 text-[17px]" : "h-11 px-4 text-base";
-  return (
-    <div className="flex items-center justify-center gap-3 mt-6 text-sm text-zinc-300">
-      <button
-        onClick={onPrev}
-        disabled={page <= 1}
-        className={cn(
-          "rounded-full border border-white/10 disabled:opacity-40 hover:border-white/20 hover:bg-white/5 transition-colors",
-          btnSize
-        )}
-      >
-        Önceki
-      </button>
-      <span className="px-2 text-zinc-400">
-        Sayfa {page} / {totalPages}
-      </span>
-      <button
-        onClick={onNext}
-        disabled={page >= totalPages}
-        className={cn(
-          "rounded-full border border-white/10 disabled:opacity-40 hover:border-white/20 hover:bg-white/5 transition-colors",
-          btnSize
-        )}
-      >
-        Sonraki
-      </button>
-    </div>
-  );
-}
-
-/* RoleDot - tiny colored dot */
-export function RoleDot({ role }: { role: "Tank" | "Healer" | "DPS" }) {
-  const color =
-    role === "Tank" ? "bg-cyan-400" : role === "Healer" ? "bg-lime-400" : "bg-pink-500";
-  return <span className={cn("size-2 rounded-full", color)} />;
-}
-
-/* Motion preference hook (prefers-reduced-motion) */
-function usePrefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  } catch {
-    return false;
-  }
-}
-
-/* Parallax container + layer */
-export function Parallax({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn("relative overflow-hidden will-change-transform", className)}>
-      {children}
-    </div>
-  );
-}
-
-export function ParallaxLayer({
-  depth = 10,
-  children,
-  className,
-}: {
-  depth?: number; // px offset max
-  children: React.ReactNode;
-  className?: string;
-}) {
-  // Reduced motion tercihinde parallax devre dışı (erişilebilirlik)
-  const reduced = usePrefersReducedMotion();
-
-  // Lightweight mouse parallax with throttling for 60fps
-  let raf = 0;
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduced) return;
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      const t = e.currentTarget.getBoundingClientRect();
-      const cx = t.left + t.width / 2;
-      const cy = t.top + t.height / 2;
-      const dx = (e.clientX - cx) / t.width;
-      const dy = (e.clientY - cy) / t.height;
-      const tx = -(dx * depth);
-      const ty = -(dy * depth);
-      (e.currentTarget as HTMLElement).style.setProperty(
-        "transform",
-        `translate3d(${tx}px, ${ty}px, 0)`
-      );
-      raf = 0;
-    });
-  };
-
+  className = "",
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn("absolute inset-0", className)}
-      onMouseMove={handleMove}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.setProperty(
-          "transform",
-          "translate3d(0,0,0)"
-        );
-      }}
-      style={{
-        transition: reduced ? "none" : "transform .3s ease",
-        willChange: reduced ? "auto" : "transform",
-      }}
-      aria-hidden={reduced ? true : undefined}
+      className={`
+        inline-flex items-center gap-1 rounded-full bg-black/20 px-4 py-2 backdrop-blur-sm ${className}
+      `}
+      {...props}
     >
       {children}
     </div>
   );
-}
+};
 
-/* Liquid Loader */
-export function LiquidLoader({
-  show,
-}: {
-  show: boolean;
-}) {
-  if (!show) return null;
-
-  const reduced = usePrefersReducedMotion();
-
-  // Reduced motion: statik ve düşük görsel gürültü ile degrade
-  if (reduced) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="fixed inset-0 z-[9999] grid place-items-center bg-[radial-gradient(600px_400px_at_50%_40%,rgba(57,208,255,.06),transparent_60%)]"
-      >
-        <div
-          className="size-16 rounded-full"
-          style={{
-            boxShadow:
-              "inset 0 0 28px rgba(57,208,255,.35), 0 0 40px rgba(57,208,255,.18)",
-            background:
-              "radial-gradient(closest-side, rgba(57,208,255,.45), rgba(255,77,157,.35))",
-            filter: "blur(1.5px)",
-          }}
-        />
-        <span className="sr-only">Yükleniyor…</span>
-      </div>
-    );
-  }
-
-  // Normal durumda framer-motion bileşenini dinamik (client-only) kullan
+// Parallax bileşeni
+export const Parallax = ({ children, speed = 0.5 }: { children: React.ReactNode; speed?: number }) => {
   return (
-    <MotionDiv
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[9999] grid place-items-center bg-[radial-gradient(600px_400px_at_50%_40%,rgba(57,208,255,.08),transparent_60%)]"
-    >
-      <MotionDiv
-        className="size-24 rounded-full"
-        style={{
-          boxShadow:
-            "inset 0 0 40px rgba(57,208,255,.4), 0 0 80px rgba(57,208,255,.25)",
-          background:
-            "radial-gradient(closest-side, rgba(57,208,255,.6), rgba(255,77,157,.5))",
-          filter: "blur(2px)",
-        }}
-        animate={{
-          borderRadius: [
-            "30% 70% 65% 35% / 30% 30% 70% 70%",
-            "50% 50% 50% 50%",
-            "70% 30% 35% 65% / 60% 60% 40% 40%",
-          ],
-        }}
-        transition={{
-          duration: 2.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-          repeatType: "mirror",
-        }}
-      />
-    </MotionDiv>
+    <div className="relative overflow-hidden">
+      {children}
+    </div>
   );
-}
+};
+
+export const ParallaxLayer = ({ children, speed, offset }: { children: React.ReactNode; speed: number; offset: number }) => {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        transform: `translateY(${offset * speed}px)`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// LiquidLoader bileşeni
+export const LiquidLoader = ({ className = "" }: { className?: string }) => {
+  return (
+    <div className={`relative h-2 w-full overflow-hidden rounded-full bg-gray-200 ${className}`}>
+      <div className="absolute inset-y-0 left-0 h-full w-1/3 bg-gradient-to-r from-blue-500 to-purple-600 animate-pulse"></div>
+    </div>
+  );
+};
+
+export { MagicCard, MagicCardHeader, MagicCardTitle, MagicCardDescription, MagicCardContent, MagicCardFooter };
+export { MagicBadge, MagicBadgeVariants };
+export { MagicButton, MagicButtonVariants };

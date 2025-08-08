@@ -1,30 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&family=Cinzel:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 @import "../styles/tokens.css";
 /* NOTE: @import rules must come first to satisfy PostCSS/Tailwind parser */
 
-/* Base theme + Obsidian Royal tokens */
+/* Skyrim-themed color palette */
 :root {
+  --skyrim-dark: #0a0a0a;
+  --skyrim-stone: #1a1a1a;
+  --skyrim-gold: #800080; /* Sarıdan mora */
+  --skyrim-purple: #4a148c;
+  --skyrim-red: #8b0000;
+  --skyrim-snow: #f0f8ff;
+  --skyrim-shadow: rgba(0, 0, 0, 0.7);
+  --skyrim-royal: #4A148C;
+  --skyrim-crimson: #8b0000;
+  --skyrim-emerald: #50c878;
+  --skyrim-sapphire: #0f4c75;
+  --skyrim-amber: #800080;
+  --skyrim-silver: #c0c0c0;
+  --skyrim-bronze: #cd7f32;
+  
   /* Bridge CSS custom props to tokens.css for global usage */
-  --background: var(--bg-0);
-  --foreground: var(--fg);
-
-  /* Brand palette mapping to tokens */
-  --obsidian: var(--bg-0);
-  --royal: var(--accent-pink);
-  --royal-2: color-mix(in oklab, var(--accent-pink) 68%, #7c3aed 32%);
-  --cyber: var(--accent-cyan);
-  --glow: var(--accent-pink);
-
-  /* Surfaces from tokens */
-  --panel: var(--panel);
-  --hairline: var(--hairline);
-  --blur: var(--blur);
-
-  /* Accents as CSS vars used by components */
-  --accent-1: var(--accent-cyan);
-  --accent-2: var(--accent-pink);
-  --accent-3: var(--accent-lime);
+  --background: var(--skyrim-dark);
+  --foreground: var(--skyrim-snow);
+  
+  /* Surfaces */
+  --panel: rgba(26, 26, 26, 0.9);
+  --hairline: rgba(147, 112, 219, 0.1);
+  --blur: blur(16px);
+  
+  /* Accents */
+  --accent-1: var(--skyrim-purple); /* Gold yerine purple */
+  --accent-2: var(--skyrim-purple);
+  --accent-3: var(--skyrim-red);
+  --accent-4: var(--skyrim-emerald);
+  --accent-5: var(--skyrim-sapphire);
+  --accent-6: var(--skyrim-purple);
+  
+  /* Shadows */
+  --shadow-gold: 0 0 30px rgba(74, 20, 140, 0.4); /* Gold shadow'u purple yaptık */
+  --shadow-purple: 0 0 30px rgba(74, 20, 140, 0.4);
+  --shadow-red: 0 0 30px rgba(139, 0, 0, 0.4);
+  --shadow-royal: 0 0 40px rgba(74, 20, 140, 0.6);
+  
+  /* Gradients */
+  --gradient-gold: linear-gradient(135deg, var(--skyrim-gold), var(--skyrim-purple));
+  --gradient-royal: linear-gradient(135deg, var(--skyrim-royal), var(--skyrim-purple));
+  --gradient-crimson: linear-gradient(135deg, var(--skyrim-crimson), var(--skyrim-red));
+  --gradient-magic: linear-gradient(135deg, var(--skyrim-purple), var(--skyrim-gold), var(--skyrim-purple));
+  
+  /* Advanced effects */
+  --glow-intense: 0 0 40px rgba(147, 112, 219, 0.8);
+  --magic-particles: radial-gradient(circle at 20% 50%, rgba(147, 112, 219, 0.1) 0%, transparent 50%),
+                     radial-gradient(circle at 80% 80%, rgba(74, 20, 140, 0.1) 0%, transparent 50%),
+                     radial-gradient(circle at 40% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
 }
 
 @theme inline {
@@ -35,162 +64,826 @@
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
   --font-display: Cinzel, "Trajan Pro", "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  /* Update display font to Cinzel (from next/font, className is injected on body) */
-  --font-display: Cinzel, "Times New Roman", serif;
 }
 
 /* Global base */
 html, body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  /* Global typeface set to Members section font */
+  /* Global typeface */
   font-family: var(--font-sans);
-  /* Dark fantasy deep background with GIF */
-  background: rgba(10, 11, 13, 0.5) url('/thevoitanspurple-saturation100.gif') center / contain no-repeat fixed;
-  color: color-mix(in oklab, var(--fg) 90%, #cbd5e1 10%); /* daha yumuşak metin */
+  /* Skyrim background */
+  background: var(--skyrim-dark);
+  color: var(--skyrim-snow);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  cursor: auto; /* Native pointer */
-  font-family: var(--font-sans);
   position: relative;
 }
 
-/* Removed global noise layer to prevent top-half visual mismatch */
-body::before {}
-
-@media (prefers-reduced-motion: no-preference) {
-  body {
-    background-attachment: scroll;
-  }
+/* Subtle background pattern */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(147, 112, 219, 0.01) 2px, rgba(147, 112, 219, 0.01) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(74, 20, 140, 0.01) 2px, rgba(74, 20, 140, 0.01) 4px);
+  pointer-events: none;
+  z-index: 0;
 }
-
-/* Mystic bottom glow (softer) */
-/* Removed bottom glow to keep background fully uniform */
-body::after {}
 
 /* Ensure native cursor is visible on interactive elements */
 a, button, [role="button"], input, select, textarea {
   cursor: pointer;
 }
 
-/* Headings use display font (Cinzel via body class) + stronger glow */
+/* Headings use display font */
 h1,h2,h3,.display {
   font-family: var(--font-display);
-  letter-spacing: 0.01em;
-  text-shadow:
-    0 0 18px color-mix(in oklab, var(--accent-cyan) 12%, transparent),
-    0 0 6px color-mix(in oklab, var(--accent-lime) 10%, transparent);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(147, 112, 219, 0.2);
 }
 
-/* Micro interactions – enhanced */
+/* Enhanced micro interactions */
 a, button {
-  transition:
-    background-color .18s ease,
-    border-color .18s ease,
-    color .18s ease,
-    transform .18s ease,
-    box-shadow .18s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, box-shadow;
 }
 a:hover, button:hover {
   transform: translateY(-1px);
-  box-shadow:
-    0 8px 22px rgba(0,0,0,.32),
-    inset 0 0 0 1px rgba(255,255,255,.06);
+  box-shadow: 0 4px 12px rgba(147, 112, 219, 0.2);
 }
 
-/* Ornament lines for epic sections */
+/* Ornament lines */
 .hr-ornament {
   position: relative;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.2), transparent);
+  margin: 2rem 0;
 }
-.hr-ornament::before,
-.hr-ornament::after {
+
+/* Enhanced panels */
+.panel {
+  background: var(--panel);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-purple), var(--skyrim-gold));
+  border-radius: 8px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.panel:hover::before {
+  opacity: 0.1;
+}
+
+/* Text styles */
+.prose, .panel, p, li {
+  line-height: 1.6;
+}
+
+p, li {
+  color: rgba(240, 248, 255, 0.8);
+}
+
+ul { padding-left: 1.5rem; }
+
+/* Skyrim-inspired card hover effects */
+.member-card, .announcement-card {
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.member-card:hover, .announcement-card:hover {
+  border-color: var(--skyrim-gold);
+  box-shadow: 0 0 20px rgba(147, 112, 219, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Enhanced Skyrim cursor animations */
+@keyframes pulseSoft {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(147, 112, 219, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(147, 112, 219, 0.8), 0 0 30px rgba(74, 20, 140, 0.4); }
+}
+
+@keyframes magicShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes runeGlow {
+  0%, 100% { 
+    text-shadow: 0 0 10px rgba(147, 112, 219, 0.5),
+                 0 0 20px rgba(147, 112, 219, 0.3),
+                 0 0 30px rgba(74, 20, 140, 0.2);
+  }
+  50% { 
+    text-shadow: 0 0 20px rgba(147, 112, 219, 0.8),
+                 0 0 30px rgba(147, 112, 219, 0.5),
+                 0 0 40px rgba(74, 20, 140, 0.4);
+  }
+}
+
+@keyframes portalOpen {
+  0% { 
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes enchantment {
+  0% { 
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% { 
+    filter: hue-rotate(30deg) brightness(1.2);
+  }
+  100% { 
+    filter: hue-rotate(0deg) brightness(1);
+  }
+}
+
+@keyframes swordSwing {
+  0% { transform: rotate(-30deg); }
+  50% { transform: rotate(30deg); }
+  100% { transform: rotate(-30deg); }
+}
+
+@keyframes spellCast {
+  0% { 
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes dragonWings {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.1); }
+}
+
+@keyframes magicCircle {
+  0% { 
+    transform: rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: rotate(180deg) scale(1.05);
+    opacity: 1;
+  }
+  100% { 
+    transform: rotate(360deg) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1, h2, h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Skyrim-specific styles */
+.sword-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-red));
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  margin-right: 6px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px rgba(147, 112, 219, 0.5));
+}
+
+.scroll-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--skyrim-stone), var(--skyrim-dark));
+  border: 1px solid var(--skyrim-gold);
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+  position: relative;
+  box-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+}
+
+.scroll-icon::before {
+  content: "✦";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--skyrim-gold);
+  font-size: 10px;
+  animation: runeGlow 2s ease-in-out infinite;
+}
+
+/* Magic UI components */
+.magic-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(74, 20, 140, 0.4));
+  border: 1px solid rgba(147, 112, 219, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.magic-button::before {
   content: "";
   position: absolute;
   top: 50%;
-  width: 10px; height: 10px;
-  border: 1px solid rgba(255,255,255,.22);
-  transform: translateY(-50%) rotate(45deg);
-  background: color-mix(in oklab, var(--accent-lime) 12%, transparent);
-}
-.hr-ornament::before { left: 16px; }
-.hr-ornament::after  { right: 16px; }
-
-/* Panels with inner/outer glow */
-.panel {
-  background: color-mix(in oklab, var(--panel) 92%, #0b0d12 8%);
-  backdrop-filter: blur(5px) saturate(120%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.04),
-    0 16px 48px rgba(0,0,0,.35),
-    0 0 0 0.5px color-mix(in oklab, var(--royal) 18%, transparent);
-  border-radius: 16px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(147, 112, 219, 0.2) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              height 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Fancy buttons */
-.btn-epic {
+.magic-button:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.magic-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(147, 112, 219, 0.4);
+  box-shadow: 0 8px 25px rgba(147, 112, 219, 0.2);
+}
+
+.magic-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  border: 1px solid rgba(255,255,255,.12);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  color: #0a0b0d;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: .65rem 1.1rem;
-  box-shadow:
-    0 10px 28px rgba(0,0,0,.35),
-    0 0 0 0.5px color-mix(in oklab, var(--accent-lime) 40%, transparent);
-}
-.btn-epic:hover {
-  border-color: rgba(255,255,255,.22);
-  box-shadow:
-    0 14px 34px rgba(0,0,0,.42),
-    0 0 0 0.5px color-mix(in oklab, var(--accent-lime) 55%, transparent),
-    0 0 26px color-mix(in oklab, var(--accent-cyan) 22%, transparent);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(74, 20, 140, 0.2));
+  border: 1px solid rgba(147, 112, 219, 0.1);
+  backdrop-filter: var(--blur);
 }
 
-/* Header polish */
-.site-header {
-  background: color-mix(in oklab, var(--obsidian) 86%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255,255,255,.08);
+.magic-card::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-purple), var(--skyrim-amber), var(--skyrim-gold));
+  border-radius: 12px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradient 5s ease infinite;
+  background-size: 400% 400%;
+  filter: blur(8px);
 }
 
-/* Animated grid backdrop */
-.bg-grid {
-  /* Animated sky / battlefield horizon */
-  background:
-    radial-gradient(1200px 600px at 50% 100%, rgba(53,180,255,0.08), transparent 60%),
-    radial-gradient(1000px 520px at 20% 20%, rgba(139,240,203,0.06), transparent 65%),
-    radial-gradient(900px 480px at 80% 30%, rgba(255,209,68,0.05), transparent 62%),
-    linear-gradient(#0A0B0D, #0A0B0D);
-  background-size: auto;
-  background-position: 0 0;
-  animation: bgFloat 12s ease-in-out infinite;
-}
-@keyframes bgFloat {
-  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  50% { background-position: 0 -8px, 0 -5px, 0 0, 0 0, 0 0; }
-  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+.magic-card:hover::after {
+  opacity: 0.6;
 }
 
-/* Tabs container and readable text blocks */
-.tablist {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 72rem;
-  padding-left: .25rem;
-  padding-right: .25rem;
+.magic-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(74, 20, 140, 0.3);
+  border-color: rgba(147, 112, 219, 0.3);
 }
-.prose, .panel, p, li {
-  line-height: 1.7;
+
+/* Enhanced panel effects */
+.panel {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(74, 20, 140, 0.1));
+  backdrop-filter: var(--blur);
+  border: 1px solid rgba(147, 112, 219, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
 }
-p, li {
-  color: color-mix(in oklab, var(--fg) 92%, #cbd5e1 8%);
+
+.panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-purple), var(--skyrim-gold));
+  border-radius: 12px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradient 5s ease infinite;
+  background-size: 400% 400%;
 }
-ul { padding-left: 1.1rem; }
-section .text-zinc-300 { color: color-mix(in oklab, #d1d5db 90%, #cbd5e1 10%); }
+
+.panel:hover::before {
+  opacity: 0.2;
+}
+
+/* Advanced animations */
+@keyframes magicFloat {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  25% { 
+    transform: translateY(-10px) rotate(1deg);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-5px) rotate(-1deg);
+    opacity: 0.9;
+  }
+  75% { 
+    transform: translateY(-15px) rotate(0.5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes magicPulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+  }
+  50% { 
+    transform: scale(1.05);
+    filter: brightness(1.2) saturate(1.3);
+  }
+}
+
+@keyframes magicShimmer {
+  0% { 
+    background-position: -200% 0;
+    opacity: 0.5;
+  }
+  50% { 
+    background-position: 0% 0;
+    opacity: 0.8;
+  }
+  100% { 
+    background-position: 200% 0;
+    opacity: 0.5;
+  }
+}
+
+@keyframes magicGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(147, 112, 219, 0.3),
+                0 0 40px rgba(74, 20, 140, 0.2),
+                inset 0 0 20px rgba(147, 112, 219, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(147, 112, 219, 0.5),
+                0 0 60px rgba(74, 20, 140, 0.4),
+                inset 0 0 30px rgba(147, 112, 219, 0.2);
+  }
+}
+
+@keyframes magicRune {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: rotate(180deg) scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Enhanced text effects */
+.enchanted-text {
+  background: var(--gradient-magic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(147, 112, 219, 0.3));
+  animation: magicPulse 3s ease-in-out infinite;
+}
+
+.rune-text {
+  color: var(--skyrim-gold);
+  text-shadow: 
+    0 0 10px rgba(147, 112, 219, 0.5),
+    0 0 20px rgba(147, 112, 219, 0.3),
+    0 0 30px rgba(74, 20, 140, 0.2);
+  animation: runeGlow 2s ease-in-out infinite;
+}
+
+/* Advanced hover effects */
+.hover-magic:hover {
+  color: var(--skyrim-gold);
+  text-shadow: 
+    0 0 15px rgba(147, 112, 219, 0.6),
+    0 0 30px rgba(147, 112, 219, 0.4),
+    0 0 45px rgba(74, 20, 140, 0.3);
+  transform: translateY(-2px);
+}
+
+.hover-enchanted:hover {
+  background: var(--gradient-magic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: magicPulse 1s ease-in-out infinite;
+}
+
+/* Glass morphism effects */
+.glass-enchanted {
+  background: linear-gradient(135deg, rgba(147, 112, 219, 0.05), rgba(74, 20, 140, 0.1));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(147, 112, 219, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-magic {
+  background: rgba(26, 26, 26, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(147, 112, 219, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(147, 112, 219, 0.1);
+}
+
+/* Magic border effects */
+.magic-border-enchanted {
+  position: relative;
+  border: 1px solid rgba(147, 112, 219, 0.2);
+  box-shadow: 
+    0 0 20px rgba(147, 112, 219, 0.1),
+    inset 0 0 20px rgba(74, 20, 140, 0.1);
+}
+
+.magic-border-enchanted::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-purple), var(--skyrim-amber), var(--skyrim-gold));
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradient 5s ease infinite;
+  background-size: 400% 400%;
+  filter: blur(10px);
+}
+
+.magic-border-enchanted:hover::before {
+  opacity: 0.8;
+}
+
+/* Particle effects */
+.particle-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, var(--skyrim-gold), transparent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat 8s infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Scroll animations */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Interactive elements */
+.interactive-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.interactive-card:hover::before {
+  left: 100%;
+}
+
+.interactive-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(147, 112, 219, 0.4);
+  border-color: rgba(147, 112, 219, 0.3);
+}
+
+/* Minimalist animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .magic-card {
+    padding: 1rem;
+  }
+}
+
+/* New animation classes */
+.animate-magic-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: magicShimmer 3s infinite;
+}
+
+.animate-rune-glow {
+  animation: runeGlow 2s ease-in-out infinite;
+}
+
+.animate-portal-open {
+  animation: portalOpen 1.5s ease-out forwards;
+}
+
+.animate-enchantment {
+  animation: enchantment 4s ease-in-out infinite;
+}
+
+.animate-sword-swing {
+  animation: swordSwing 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-spell-cast {
+  animation: spellCast 2s ease-in-out infinite;
+}
+
+.animate-dragon-wings {
+  animation: dragonWings 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-magic-circle {
+  animation: magicCircle 6s linear infinite;
+}
+
+/* Enhanced hover effects */
+.hover-gold:hover {
+  color: var(--skyrim-gold);
+  text-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+}
+
+.hover-purple:hover {
+  color: var(--skyrim-purple);
+  text-shadow: 0 0 10px rgba(74, 20, 140, 0.5);
+}
+
+.hover-amber:hover {
+  color: var(--skyrim-amber);
+  text-shadow: 0 0 10px rgba(255, 191, 0, 0.5);
+}
+
+/* Gradient text effects */
+.gradient-gold-text {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-royal-text {
+  background: var(--gradient-royal);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-crimson-text {
+  background: var(--gradient-crimson);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism effects */
+.glass-gold {
+  background: rgba(147, 112, 219, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(147, 112, 219, 0.1);
+}
+
+.glass-purple {
+  background: rgba(74, 20, 140, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(74, 20, 140, 0.1);
+}
+
+.glass-royal {
+  background: rgba(74, 20, 140, 0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(74, 20, 140, 0.2);
+}
+
+/* Magic border effects */
+.magic-border-gold {
+  position: relative;
+  border: 1px solid rgba(147, 112, 219, 0.2);
+}
+
+.magic-border-gold::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--skyrim-gold), var(--skyrim-amber), var(--skyrim-gold));
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  animation: gradient 3s ease infinite;
+  background-size: 400% 400%;
+}
+
+.magic-border-gold:hover::before {
+  opacity: 1;
+}
+
+/* Scroll animations */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Parallax effects */
+.parallax-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* Interactive elements */
+.interactive-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.interactive-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(147, 112, 219, 0.3);
+}
+
+.interactive-card:active {
+  transform: translateY(-2px) scale(1.01);
+}
