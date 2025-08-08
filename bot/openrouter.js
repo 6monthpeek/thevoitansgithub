@@ -271,10 +271,12 @@ function detectIntent(text) {
   const s = (text || "").toLowerCase();
   const modHints = [
     "/purge", "/ban", "/kick", "/timeout",
-    "mesajları sil", "sil", "temizle",
+    "mesajları sil", "tamamen sil", "temizle",
     "banla", "kick at", "sustur", "moderasyon"
   ];
-  if (modHints.some(h => s.includes(h))) return "moderation";
+  // Tam kelime eşleşmesi için regex kullan
+  const modRegex = new RegExp(`\\b(${modHints.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`);
+  if (modRegex.test(s)) return "moderation";
   return "chat";
 }
 
