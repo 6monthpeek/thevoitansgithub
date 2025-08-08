@@ -915,12 +915,12 @@ export default function Home() {
                           <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                             <video
                               className="w-full h-full object-cover"
-                              style={{ display: 'block', objectPosition: 'center 40%' }}
+                              style={{ display: 'block', objectPosition: 'center 45%' }}
                               autoPlay
                               loop
                               muted
                               playsInline
-                              preload="metadata"
+                              preload="auto"
                               poster="/voitans-logo.svg"
                               aria-label="VOITANS animated logo"
                             >
