@@ -821,7 +821,7 @@ export default function Home() {
       <LightRaysBackground />
       
       <main className="relative z-10">
-        <div className="absolute inset-0 z-5 pointer-events-none">
+        <div className="absolute inset-0 -z-10 pointer-events-none">
           <SplashCursor className="default" />
         </div>
         
