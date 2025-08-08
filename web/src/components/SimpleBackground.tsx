@@ -62,17 +62,17 @@ color: `rgba(128, 0, 128, ${Math.random() * 0.3 + 0.1})`,
 
       // Arka plan gradyanı
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      gradient.addColorStop(0, '#0a0a0a');
-      gradient.addColorStop(0.5, '#1a0033');
-      gradient.addColorStop(1, '#000000');
+      gradient.addColorStop(0, '#0A0B0D');
+      gradient.addColorStop(0.5, '#11121A');
+      gradient.addColorStop(1, '#0A0B0D');
       
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Fare etrafında ışık halkası
       const mouseGradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 200);
-mouseGradient.addColorStop(0, 'rgba(128, 0, 128, 0.1)');
-      mouseGradient.addColorStop(0.5, 'rgba(212, 175, 55, 0.05)');
+      mouseGradient.addColorStop(0, 'rgba(147, 112, 219, 0.12)');
+      mouseGradient.addColorStop(0.5, 'rgba(147, 112, 219, 0.06)');
       mouseGradient.addColorStop(1, 'transparent');
       
       ctx.fillStyle = mouseGradient;
@@ -105,7 +105,7 @@ mouseGradient.addColorStop(0, 'rgba(128, 0, 128, 0.1)');
         // Parçacığı çiz
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color.replace(/[\d.]+\)$/, `${particle.opacity})`);
+        ctx.fillStyle = particle.color.replace(/[\d.]+\)$/i, `${particle.opacity})`);
         ctx.fill();
 
         // Bağlantı çizgileri
@@ -119,7 +119,7 @@ mouseGradient.addColorStop(0, 'rgba(128, 0, 128, 0.1)');
               ctx.beginPath();
               ctx.moveTo(particle.x, particle.y);
               ctx.lineTo(otherParticle.x, otherParticle.y);
-ctx.strokeStyle = `rgba(128, 0, 128, ${0.05 * (1 - distance / 80) * Math.min(particle.opacity, otherParticle.opacity)})`;
+              ctx.strokeStyle = `rgba(147, 112, 219, ${0.05 * (1 - distance / 80) * Math.min(particle.opacity, otherParticle.opacity)})`;
               ctx.lineWidth = 0.5;
               ctx.stroke();
             }

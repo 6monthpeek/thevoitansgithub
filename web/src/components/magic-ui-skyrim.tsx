@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, createContext, useContext } from "react";
 
 // Animated Background Component
 export function AnimatedBackground() {
@@ -124,76 +124,8 @@ export function AnimatedBackground() {
   );
 }
 
-// Cursor Trail Component
-export function CursorTrail() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorVisible, setCursorVisible] = useState(false);
-  const trailRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setCursorVisible(true);
-    };
-
-    const handleMouseEnter = () => {
-      setCursorVisible(true);
-    };
-
-    const handleMouseLeave = () => {
-      setCursorVisible(false);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseenter", handleMouseEnter);
-    document.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={trailRef}
-      className="fixed inset-0 pointer-events-none z-50"
-      style={{ mixBlendMode: "difference" }}
-    >
-      <AnimatePresence>
-        {cursorVisible && (
-          <>
-            {/* Main cursor */}
-            <motion.div
-              className="fixed w-6 h-6 rounded-full bg-white/10 backdrop-blur-sm border border-white/20"
-              style={{
-                left: mousePosition.x - 12,
-                top: mousePosition.y - 12,
-              }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-            {/* Cursor trail */}
-            <motion.div
-              className="fixed w-3 h-3 rounded-full bg-amber-400/20 backdrop-blur-sm"
-              style={{
-                left: mousePosition.x - 6,
-                top: mousePosition.y - 6,
-              }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            />
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+// Cursor Trail kaldırıldı; sade kullanım için no-op döndürüyoruz
+export function CursorTrail() { return null; }
 
 // Skyrim Title Component
 interface SkyrimTitleProps {
@@ -204,14 +136,11 @@ interface SkyrimTitleProps {
 export function SkyrimTitle({ children, className = "" }: SkyrimTitleProps) {
   return (
     <motion.h1
-      className={`text-3xl md:text-4xl font-bold text-center tracking-wider ${className}`}
+      className={`text-3xl md:text-4xl font-extrabold text-center tracking-tight text-white ${className}`}
       style={{
         fontFamily: "'Cinzel', 'Times New Roman', serif",
-        background: "linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        textShadow: "0 0 20px rgba(212, 175, 55, 0.3)",
-        letterSpacing: "0.1em",
+        letterSpacing: "0.02em",
+        textShadow: "0 0 20px rgba(147, 112, 219, 0.15)",
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -231,7 +160,7 @@ interface SkyrimSubtitleProps {
 export function SkyrimSubtitle({ children, className = "" }: SkyrimSubtitleProps) {
   return (
     <motion.p
-      className={`text-base md:text-lg text-center text-amber-100/70 max-w-3xl mx-auto ${className}`}
+      className={`text-base md:text-lg text-center text-purple-100/80 max-w-3xl mx-auto ${className}`}
       style={{
         fontFamily: "'Cinzel', 'Times New Roman', serif",
         letterSpacing: "0.05em",
@@ -255,16 +184,16 @@ interface MagicCardSkyrimMinimalProps {
 export function MagicCardSkyrimMinimal({ children, className = "", glow = false }: MagicCardSkyrimMinimalProps) {
   return (
     <motion.div
-      className={`relative rounded-xl border border-amber-500/20 bg-black/40 backdrop-blur-sm p-5 ${className} ${glow ? 'shadow-lg shadow-amber-500/10' : ''}`}
+      className={`relative rounded-xl border border-purple-500/25 bg-black/40 backdrop-blur-sm p-5 ${className} ${glow ? 'shadow-lg shadow-purple-500/10' : ''}`}
       whileHover={{ 
         y: -4, 
-        borderColor: "rgba(212, 175, 55, 0.4)",
-        boxShadow: glow ? "0 20px 40px rgba(212, 175, 55, 0.2)" : "0 10px 30px rgba(0, 0, 0, 0.5)"
+        borderColor: "rgba(147, 112, 219, 0.45)",
+        boxShadow: glow ? "0 20px 40px rgba(147, 112, 219, 0.22)" : "0 10px 30px rgba(0, 0, 0, 0.5)"
       }}
       transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 20 }}
     >
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-500/8 via-transparent to-amber-600/5 opacity-0 hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.1)_0%,transparent_70%)] opacity-0 hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500/10 via-transparent to-purple-600/10 opacity-0 hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(147,112,219,0.12)_0%,transparent_70%)] opacity-0 hover:opacity-100 transition-opacity duration-700" />
       <div className="relative z-10">{children}</div>
     </motion.div>
   );
@@ -291,21 +220,21 @@ export function MagicButtonSkyrim({
   
   const variants = {
     default: {
-      base: "bg-gradient-to-r from-amber-600/10 to-amber-700/10 border border-amber-500/20 text-amber-100 hover:from-amber-600/20 hover:to-amber-700/20 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/10",
+      base: "bg-gradient-to-r from-purple-600/10 to-purple-700/10 border border-purple-500/25 text-purple-100 hover:from-purple-600/20 hover:to-purple-700/20 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10",
       disabled: "opacity-50 cursor-not-allowed",
       hover: { scale: 1.02 },
       tap: { scale: 0.98 }
     },
     outline: {
-      base: "border border-amber-500/30 text-amber-100 hover:bg-amber-500/10 hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/10",
+      base: "border border-purple-500/35 text-purple-100 hover:bg-purple-500/10 hover:border-purple-500/55 hover:shadow-lg hover:shadow-purple-500/10",
       disabled: "opacity-50 cursor-not-allowed",
       hover: { scale: 1.02 },
       tap: { scale: 0.98 }
     },
     glow: {
-      base: "bg-gradient-to-r from-amber-600/20 to-amber-700/20 border border-amber-500/40 text-amber-100 shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30",
-      disabled: "opacity-50 cursor-not-allowed shadow-amber-500/10",
-      hover: { scale: 1.05, boxShadow: "0 0 30px rgba(212, 175, 55, 0.4)" },
+      base: "bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/45 text-purple-100 shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30",
+      disabled: "opacity-50 cursor-not-allowed shadow-purple-500/10",
+      hover: { scale: 1.05, boxShadow: "0 0 30px rgba(147, 112, 219, 0.4)" },
       tap: { scale: 0.95 }
     }
   };
@@ -327,14 +256,14 @@ export function MagicButtonSkyrim({
       <span className="relative z-10">{children}</span>
       {!disabled && variant !== "outline" && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-amber-500/15 to-amber-600/15 opacity-0"
+          className="absolute inset-0 bg-gradient-to-r from-purple-500/15 to-purple-600/15 opacity-0"
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         />
       )}
       {!disabled && variant === "glow" && (
         <motion.div
-          className="absolute inset-0 rounded-lg bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.3)_0%,transparent_70%)] opacity-0"
+          className="absolute inset-0 rounded-lg bg-[radial-gradient(ellipse_at_center,rgba(147,112,219,0.3)_0%,transparent_70%)] opacity-0"
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         />
@@ -386,7 +315,7 @@ interface GlowTextProps {
   className?: string;
 }
 
-export function GlowText({ children, color = "gold", className = "" }: GlowTextProps) {
+export function GlowText({ children, color = "purple", className = "" }: GlowTextProps) {
   const colorClasses = {
     gold: "text-amber-400",
     cyan: "text-cyan-400",
@@ -399,7 +328,7 @@ export function GlowText({ children, color = "gold", className = "" }: GlowTextP
       className={`font-bold ${colorClasses[color as keyof typeof colorClasses] || colorClasses.gold} ${className}`}
       style={{
         fontFamily: "'Cinzel', 'Times New Roman', serif",
-        textShadow: `0 0 15px currentColor, 0 0 30px currentColor`,
+        textShadow: `0 0 8px currentColor, 0 0 15px currentColor`,
         letterSpacing: "0.05em",
       }}
       whileHover={{ scale: 1.05 }}
@@ -491,5 +420,223 @@ export function MagicGrid({ children, columns = 3, gap = 6, className = "" }: Ma
     <div className={`grid ${getGridClass()} ${className}`}>
       {children}
     </div>
+  );
+}
+
+// Premium Card Component with new color palette
+interface PremiumCardProps {
+  children: React.ReactNode;
+  className?: string;
+  variant?: "default" | "glass" | "gradient" | "premium";
+  glow?: boolean;
+}
+
+export function PremiumCard({ children, className = "", variant = "default", glow = false }: PremiumCardProps) {
+  const variantClasses = {
+    default: "bg-gradient-to-br from-[#09020E] to-[#0B0410] border border-[#110513]/30",
+    glass: "bg-[#09020E]/20 backdrop-blur-xl border border-[#110513]/40",
+    gradient: "bg-gradient-to-br from-[#09020E] via-[#0F0311] to-[#140617] border border-[#120614]/50",
+    premium: "bg-gradient-to-br from-[#09020E] via-[#0B0410] to-[#110513] border border-[#140617]/60 shadow-2xl"
+  };
+
+  const glowClasses = glow ? "shadow-[0_0_30px_rgba(147,112,219,0.3)]" : "";
+
+  return (
+    <motion.div
+      className={`relative overflow-hidden rounded-xl p-6 ${variantClasses[variant]} ${glowClasses} ${className}`}
+      whileHover={{ 
+        scale: 1.02,
+        boxShadow: glow ? "0 0 40px rgba(147,112,219,0.4)" : "0 8px 32px rgba(0,0,0,0.3)"
+      }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
+      {glow && (
+        <div className="absolute inset-0 bg-gradient-to-r from-[#140617]/20 to-[#120614]/20 rounded-xl blur-xl"></div>
+      )}
+      <div className="relative z-10">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+// Premium Button Component
+interface PremiumButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+  variant?: "default" | "gradient" | "glass" | "premium";
+  size?: "sm" | "md" | "lg";
+}
+
+export function PremiumButton({ 
+  children, 
+  onClick, 
+  className = "", 
+  disabled = false, 
+  variant = "default",
+  size = "md"
+}: PremiumButtonProps) {
+  const variantClasses = {
+    default: "bg-gradient-to-r from-[#0B0410] to-[#110513] border border-[#140617]/50 hover:border-[#140617]/80",
+    gradient: "bg-gradient-to-r from-[#09020E] via-[#0F0311] to-[#140617] border border-[#120614]/60",
+    glass: "bg-[#09020E]/30 backdrop-blur-lg border border-[#110513]/40 hover:bg-[#09020E]/50",
+    premium: "bg-gradient-to-r from-[#09020E] via-[#0B0410] to-[#110513] border border-[#140617]/70 shadow-lg"
+  };
+
+  const sizeClasses = {
+    sm: "px-4 py-2 text-sm",
+    md: "px-6 py-3 text-base",
+    lg: "px-8 py-4 text-lg"
+  };
+
+  return (
+    <motion.button
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        relative overflow-hidden rounded-lg font-semibold transition-all duration-300
+        ${variantClasses[variant]} ${sizeClasses[size]} ${className}
+        ${disabled ? "opacity-50 cursor-not-allowed" : "hover:scale-105 active:scale-95"}
+      `}
+      whileHover={!disabled ? { 
+        boxShadow: "0 8px 25px rgba(147,112,219,0.3)",
+        y: -2
+      } : {}}
+      whileTap={!disabled ? { scale: 0.98 } : {}}
+    >
+      <div className="relative z-10">{children}</div>
+      {variant === "premium" && (
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#140617]/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+      )}
+    </motion.button>
+  );
+}
+
+// Animated Gradient Background Component
+interface AnimatedGradientProps {
+  className?: string;
+  colors?: string[];
+  duration?: number;
+}
+
+export function AnimatedGradient({ 
+  className = "", 
+  colors = ["#09020E", "#0B0410", "#110513", "#140617", "#120614"],
+  duration = 10 
+}: AnimatedGradientProps) {
+  return (
+    <div 
+      className={`absolute inset-0 ${className}`}
+      style={{
+        background: `linear-gradient(-45deg, ${colors.join(", ")})`,
+        backgroundSize: `${colors.length * 100}% ${colors.length * 100}%`,
+        animation: `gradientShift ${duration}s ease infinite`
+      }}
+    />
+  );
+}
+
+// Color Theme System
+interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
+}
+
+const themes: Record<string, ThemeColors> = {
+  default: {
+    primary: "#9370DB",
+    secondary: "#6A5ACD",
+    accent: "#8b0000",
+    background: "#0A0B0D",
+    surface: "#1a1a1a",
+    text: "#f0f8ff"
+  },
+  premium: {
+    primary: "#140617",
+    secondary: "#110513",
+    accent: "#0F0311",
+    background: "#09020E",
+    surface: "#0B0410",
+    text: "#f0f8ff"
+  },
+  dark: {
+    primary: "#2d1b69",
+    secondary: "#1a103f",
+    accent: "#4a148c",
+    background: "#0a0a0a",
+    surface: "#1a1a1a",
+    text: "#ffffff"
+  }
+};
+
+// Theme Context and Hook
+
+interface ThemeContextType {
+  theme: string;
+  colors: ThemeColors;
+  setTheme: (theme: string) => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState("default");
+
+  const setTheme = (newTheme: string) => {
+    setThemeState(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "default";
+    setTheme(savedTheme);
+  }, []);
+
+  const colors = themes[theme] || themes.default;
+
+  return (
+    <ThemeContext.Provider value={{ theme, colors, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+}
+
+// Theme Switcher Component
+export function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <motion.div className="flex gap-2 p-2 bg-[#09020E]/50 backdrop-blur-lg rounded-lg border border-[#110513]/30">
+      {Object.keys(themes).map((themeName) => (
+        <motion.button
+          key={themeName}
+          onClick={() => setTheme(themeName)}
+          className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+            theme === themeName
+              ? "bg-[#140617] text-white shadow-lg"
+              : "bg-[#0B0410]/50 text-gray-300 hover:bg-[#110513]/50"
+          }`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
+        </motion.button>
+      ))}
+    </motion.div>
   );
 }

@@ -2,7 +2,9 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {},
-  eslint: { ignoreDuringBuilds: true },
+  eslint: { 
+    ignoreDuringBuilds: process.env.NODE_ENV === 'production' 
+  },
 
   // Replit/Riker proxy arkasında doğru host/proto'yu NextAuth'a yansıtmak için header'ları sabitle
   async headers() {

@@ -1,4 +1,5 @@
 const { buildMessagesForUser, callOpenRouter } = require("../openrouter");
+const { MemoryMessageHandler } = require("../handlers/memory-message-handler");
 
 // Idempotency guard: aynı mesajı birden fazla kez işlemeyi önle
 const __processedMessageIds = global.__processedMessageIds || new Set();
@@ -8,6 +9,9 @@ const TARGET_CHANNEL_ID = process.env.OPENROUTER_CHANNEL_ID || "1140379269705502
 const MAX_DISCORD_REPLY_LEN = 1800; // 2000 limitine güvenli tampon
 const HISTORY_LIMIT = Number(process.env.OPENROUTER_HISTORY_LIMIT || 30); // Son 30 mesaj
 const THINKING_EMOJI = "💭";
+
+// Memory handler instance
+const memoryHandler = new MemoryMessageHandler();
 
 // Kanal beyaz listesi davranışı:
 // AI_ONLY_ENABLED_CHANNELS=1 ise yalnızca AI_ENABLED_CHANNELS içinde çalışır.
@@ -393,19 +397,25 @@ module.exports = {
       }
 
       if (!handledDelete) {
-      // 5) Normal yanıt üretimi: Mesajları hazırla (system prompt + user)
-      const messages = await buildMessagesForUser(userText, history);
-
-        // 6) OpenRouter çağrısı
+        // 5) Memory-enhanced AI yanıt üretimi
         let reply;
         try {
-          reply = await callOpenRouter(messages, {
-            // model: process.env.OPENROUTER_MODEL, // env ile override edilebilir
-            temperature: 0.7,
-            top_p: 0.9,
-            // Daha stabil yanıtlar için biraz daha düşük token sınırı
-            max_tokens: 256,
-          });
+          // Memory handler ile mesajı işle
+          const memoryResponse = await memoryHandler.handleMessage(message, false);
+          
+          if (memoryResponse.success) {
+            reply = memoryResponse.message;
+            console.log('[Memory] AI response generated with memory context');
+          } else {
+            // Memory system başarısız olursa fallback
+            console.log('[Memory] Fallback to original system');
+            const messages = await buildMessagesForUser(userText, history);
+            reply = await callOpenRouter(messages, {
+              temperature: 0.7,
+              top_p: 0.9,
+              max_tokens: 256,
+            });
+          }
         } catch (err) {
           console.error("[openrouter][error]", err?.message || err);
           // 429 için özel mesaj (Retry-After varsa ona göre)

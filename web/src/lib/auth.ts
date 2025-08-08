@@ -133,7 +133,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   events: {
     // Authorization request/response sürecinde görülen hataları yakala
     async linkAccount(message) {

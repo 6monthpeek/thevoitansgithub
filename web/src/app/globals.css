@@ -1,14 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 @import "../styles/tokens.css";
+
+@custom-variant dark (&:is(.dark *));
 /* NOTE: @import rules must come first to satisfy PostCSS/Tailwind parser */
 
 /* Skyrim-themed color palette */
 :root {
-  --skyrim-dark: #0a0a0a;
+  --skyrim-dark: #0A0B0D;
   --skyrim-stone: #1a1a1a;
-  --skyrim-gold: #800080; /* Sarıdan mora */
-  --skyrim-purple: #4a148c;
+  --skyrim-gold: #9370DB; /* MediumPurple */
+  --skyrim-purple: #6A5ACD; /* SlateBlue */
   --skyrim-red: #8b0000;
   --skyrim-snow: #f0f8ff;
   --skyrim-shadow: rgba(0, 0, 0, 0.7);
@@ -19,41 +21,83 @@
   --skyrim-amber: #800080;
   --skyrim-silver: #c0c0c0;
   --skyrim-bronze: #cd7f32;
-  
+
+  /* New premium color palette - Ana renk paleti */
+  --premium-dark-1: #09020E;
+  --premium-dark-2: #0B0410;
+  --premium-dark-3: #110513;
+  --premium-dark-4: #090510;
+  --premium-dark-5: #0F0311;
+  --premium-dark-6: #140617;
+  --premium-dark-7: #0E0210;
+  --premium-dark-8: #100412;
+  --premium-dark-9: #0C0310;
+  --premium-dark-10: #120614;
+
   /* Bridge CSS custom props to tokens.css for global usage */
-  --background: var(--skyrim-dark);
-  --foreground: var(--skyrim-snow);
-  
+
   /* Surfaces */
   --panel: rgba(26, 26, 26, 0.9);
   --hairline: rgba(147, 112, 219, 0.1);
   --blur: blur(16px);
-  
+
   /* Accents */
-  --accent-1: var(--skyrim-purple); /* Gold yerine purple */
+  --accent-1: var(--skyrim-gold); /* Ana renk olarak medium purple */
   --accent-2: var(--skyrim-purple);
   --accent-3: var(--skyrim-red);
   --accent-4: var(--skyrim-emerald);
   --accent-5: var(--skyrim-sapphire);
   --accent-6: var(--skyrim-purple);
-  
+
   /* Shadows */
   --shadow-gold: 0 0 30px rgba(74, 20, 140, 0.4); /* Gold shadow'u purple yaptık */
   --shadow-purple: 0 0 30px rgba(74, 20, 140, 0.4);
   --shadow-red: 0 0 30px rgba(139, 0, 0, 0.4);
   --shadow-royal: 0 0 40px rgba(74, 20, 140, 0.6);
-  
+
   /* Gradients */
   --gradient-gold: linear-gradient(135deg, var(--skyrim-gold), var(--skyrim-purple));
   --gradient-royal: linear-gradient(135deg, var(--skyrim-royal), var(--skyrim-purple));
   --gradient-crimson: linear-gradient(135deg, var(--skyrim-crimson), var(--skyrim-red));
   --gradient-magic: linear-gradient(135deg, var(--skyrim-purple), var(--skyrim-gold), var(--skyrim-purple));
-  
+
   /* Advanced effects */
   --glow-intense: 0 0 40px rgba(147, 112, 219, 0.8);
   --magic-particles: radial-gradient(circle at 20% 50%, rgba(147, 112, 219, 0.1) 0%, transparent 50%),
                      radial-gradient(circle at 80% 80%, rgba(74, 20, 140, 0.1) 0%, transparent 50%),
                      radial-gradient(circle at 40% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 @theme inline {
@@ -64,6 +108,39 @@
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
   --font-display: Cinzel, "Trajan Pro", "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 /* Global base */
@@ -72,18 +149,28 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Ana sayfa için kaydırma çubuğunu gizle */
+.home-page {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.home-page::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 body {
   /* Global typeface */
   font-family: var(--font-sans);
-  /* Skyrim background */
-  background: var(--skyrim-dark);
+  /* Clean, minimalist background */
+  background: #0A0B0D;
   color: var(--skyrim-snow);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
 }
 
-/* Subtle background pattern */
+/* Modern minimalist background with animated glow and bloom effects */
 body::before {
   content: "";
   position: fixed;
@@ -91,11 +178,61 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(147, 112, 219, 0.01) 2px, rgba(147, 112, 219, 0.01) 4px),
-    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(74, 20, 140, 0.01) 2px, rgba(74, 20, 140, 0.01) 4px);
+  background: 
+    /* Multi-layer gradient using new hex colors */
+    radial-gradient(circle at 20% 80%, rgba(9, 2, 14, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(11, 4, 16, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(17, 5, 19, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, rgba(20, 6, 23, 0.15) 0%, transparent 50%),
+    /* Subtle animated gradient overlay */
+    linear-gradient(135deg, 
+      rgba(9, 2, 14, 0.05) 0%, 
+      rgba(12, 3, 16, 0.03) 25%, 
+      rgba(16, 4, 18, 0.04) 50%, 
+      rgba(14, 2, 16, 0.03) 75%, 
+      rgba(18, 6, 20, 0.02) 100%
+    );
   pointer-events: none;
   z-index: 0;
+}
+
+/* Animated glow and bloom effects */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    /* Primary glow orbs - very subtle */
+    radial-gradient(circle at 25% 25%, rgba(147, 112, 219, 0.03) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, rgba(74, 20, 140, 0.02) 0%, transparent 60%),
+    radial-gradient(circle at 50% 10%, rgba(139, 0, 0, 0.015) 0%, transparent 60%),
+    radial-gradient(circle at 10% 50%, rgba(20, 6, 23, 0.02) 0%, transparent 60%),
+    radial-gradient(circle at 90% 50%, rgba(12, 3, 16, 0.015) 0%, transparent 60%);
+  animation: glowFloat 30s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes glowFloat {
+  0%, 100% {
+    opacity: 0.15;
+    transform: translateY(0px) scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.25;
+    transform: translateY(-10px) scale(1.02) rotate(0.5deg);
+  }
+  50% {
+    opacity: 0.2;
+    transform: translateY(-5px) scale(0.99) rotate(-0.25deg);
+  }
+  75% {
+    opacity: 0.3;
+    transform: translateY(-15px) scale(1.01) rotate(0.25deg);
+  }
 }
 
 /* Ensure native cursor is visible on interactive elements */
@@ -208,91 +345,7 @@ ul { padding-left: 1.5rem; }
   50% { box-shadow: 0 0 20px rgba(147, 112, 219, 0.8), 0 0 30px rgba(74, 20, 140, 0.4); }
 }
 
-@keyframes magicShimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes runeGlow {
-  0%, 100% { 
-    text-shadow: 0 0 10px rgba(147, 112, 219, 0.5),
-                 0 0 20px rgba(147, 112, 219, 0.3),
-                 0 0 30px rgba(74, 20, 140, 0.2);
-  }
-  50% { 
-    text-shadow: 0 0 20px rgba(147, 112, 219, 0.8),
-                 0 0 30px rgba(147, 112, 219, 0.5),
-                 0 0 40px rgba(74, 20, 140, 0.4);
-  }
-}
-
-@keyframes portalOpen {
-  0% { 
-    transform: scale(0) rotate(0deg);
-    opacity: 0;
-  }
-  50% { 
-    transform: scale(1.1) rotate(180deg);
-    opacity: 0.8;
-  }
-  100% { 
-    transform: scale(1) rotate(360deg);
-    opacity: 1;
-  }
-}
-
-@keyframes enchantment {
-  0% { 
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  50% { 
-    filter: hue-rotate(30deg) brightness(1.2);
-  }
-  100% { 
-    filter: hue-rotate(0deg) brightness(1);
-  }
-}
-
-@keyframes swordSwing {
-  0% { transform: rotate(-30deg); }
-  50% { transform: rotate(30deg); }
-  100% { transform: rotate(-30deg); }
-}
-
-@keyframes spellCast {
-  0% { 
-    transform: scale(0) rotate(0deg);
-    opacity: 0;
-  }
-  50% { 
-    transform: scale(1.2) rotate(180deg);
-    opacity: 1;
-  }
-  100% { 
-    transform: scale(1) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@keyframes dragonWings {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.1); }
-}
-
-@keyframes magicCircle {
-  0% { 
-    transform: rotate(0deg) scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: rotate(180deg) scale(1.05);
-    opacity: 1;
-  }
-  100% { 
-    transform: rotate(360deg) scale(1);
-    opacity: 0.8;
-  }
-}
+/* Kullanılmayan keyframe'ler kaldırıldı - performans optimizasyonu */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -543,6 +596,11 @@ ul { padding-left: 1.5rem; }
   100% { background-position: 0% 50%; }
 }
 
+@keyframes gradient {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
 /* Enhanced text effects */
 .enchanted-text {
   background: var(--gradient-magic);
@@ -731,42 +789,7 @@ ul { padding-left: 1.5rem; }
   }
 }
 
-/* New animation classes */
-.animate-magic-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.1), transparent);
-  background-size: 200% 100%;
-  animation: magicShimmer 3s infinite;
-}
-
-.animate-rune-glow {
-  animation: runeGlow 2s ease-in-out infinite;
-}
-
-.animate-portal-open {
-  animation: portalOpen 1.5s ease-out forwards;
-}
-
-.animate-enchantment {
-  animation: enchantment 4s ease-in-out infinite;
-}
-
-.animate-sword-swing {
-  animation: swordSwing 2s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.animate-spell-cast {
-  animation: spellCast 2s ease-in-out infinite;
-}
-
-.animate-dragon-wings {
-  animation: dragonWings 3s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.animate-magic-circle {
-  animation: magicCircle 6s linear infinite;
-}
+/* Kullanılmayan animasyonlar kaldırıldı - performans optimizasyonu */
 
 /* Enhanced hover effects */
 .hover-gold:hover {
@@ -886,4 +909,175 @@ ul { padding-left: 1.5rem; }
 
 .interactive-card:active {
   transform: translateY(-2px) scale(1.01);
+}
+
+/* Premium UI Animations */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes premiumGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(147, 112, 219, 0.2),
+                0 0 40px rgba(74, 20, 140, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(147, 112, 219, 0.4),
+                0 0 60px rgba(74, 20, 140, 0.2);
+  }
+}
+
+@keyframes premiumFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(-15px) rotate(0.5deg);
+  }
+}
+
+/* Premium UI Classes */
+.premium-card {
+  background: linear-gradient(135deg, var(--premium-dark-1), var(--premium-dark-2), var(--premium-dark-3));
+  border: 1px solid rgba(20, 6, 23, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(16px);
+}
+
+.premium-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(147, 112, 219, 0.2);
+  border-color: rgba(20, 6, 23, 0.5);
+}
+
+.premium-button {
+  background: linear-gradient(135deg, var(--premium-dark-2), var(--premium-dark-4));
+  border: 1px solid rgba(20, 6, 23, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-button:hover {
+  background: linear-gradient(135deg, var(--premium-dark-3), var(--premium-dark-5));
+  border-color: rgba(20, 6, 23, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(147, 112, 219, 0.3);
+}
+
+.glass-morphism {
+  background: rgba(9, 2, 14, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(20, 6, 23, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, var(--premium-dark-1), var(--premium-dark-3));
+  padding: 1px;
+  border-radius: 12px;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--premium-dark-2), var(--premium-dark-4), var(--premium-dark-6));
+  border-radius: inherit;
+  padding: 1px;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* Intro Content Container Border Yanma/Sönme Efekti */
+.ring-highlight {
+  animation: introBorderGlow 1s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: rgba(168, 85, 247, 0.8) !important;
+  box-shadow: 
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 40px rgba(168, 85, 247, 0.2),
+    0 0 60px rgba(168, 85, 247, 0.1) !important;
+  /* Logo ve intro metnini kapsayan container'ın border'ı yanar */
+  will-change: border-color, box-shadow;
+}
+
+.dimmed {
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: none;
+  transition: border-color 0.5s ease-out, box-shadow 0.5s ease-out;
+  /* Başlangıç durumu - sakin ve minimal */
+}
+
+@keyframes introBorderGlow {
+  0% {
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+  50% {
+    border-color: rgba(168, 85, 247, 1);
+    box-shadow: 
+      0 0 30px rgba(168, 85, 247, 0.6),
+      0 0 60px rgba(168, 85, 247, 0.4),
+      0 0 90px rgba(168, 85, 247, 0.2);
+  }
+  100% {
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

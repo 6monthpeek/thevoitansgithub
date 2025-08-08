@@ -97,40 +97,7 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       {/* body'de 3P uzantıların enjekte ettiği beklenmeyen attribute'ları tolere et */}
       <body className={bodyClass} suppressHydrationWarning>
-        {/* Advanced.team benzeri iskelet: ortalanmış GIF arka plan katmanı */}
-        <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          {/* styled-jsx kullanmadan inline style ile (Server Component uyumlu) */}
-          <div
-            className="absolute inset-0 grid place-items-center"
-            style={{ pointerEvents: "none" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/thevoitanspurple-saturation100.gif"
-              alt=""
-              style={{
-                width: "min(60vmin, 560px)",
-                height: "auto",
-                opacity: 0.22,
-                imageRendering: "crisp-edges",
-                filter: "saturate(1) contrast(1.05) brightness(1.05)",
-                pointerEvents: "none",
-              }}
-            />
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              inset: "-10%",
-              pointerEvents: "none",
-              mixBlendMode: "normal",
-              background:
-                "radial-gradient(60% 60% at 50% 40%, rgba(80,80,120,0.20), transparent 65%)," +
-                "radial-gradient(80% 80% at 50% 80%, rgba(0,0,0,0.45), transparent 60%)," +
-                "linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.60))",
-            }}
-          />
-        </div>
+        {/* Background artık AnimatedBackground bileşeninden yönetiliyor */}
         {/* First paint'te body üzerindeki bilinmeyen attribute'ları temizle */}
         <script
           dangerouslySetInnerHTML={{
