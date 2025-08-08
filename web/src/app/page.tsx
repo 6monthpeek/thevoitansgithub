@@ -923,7 +923,9 @@ export default function Home() {
 
                   <section id="voitans-intro" className="mt-8">
                     <div className="max-w-3xl mx-auto p-6 rounded-xl transition-all duration-500">
-                      <div id="intro-content-border" className="flex items-start gap-6 p-4 border border-purple-500/30 rounded-lg dimmed">
+                      <div id="intro-content-border" className="relative overflow-hidden flex items-start gap-6 p-4 border border-purple-500/30 rounded-lg dimmed">
+                        {/* Background layer to match site background for better text contrast */}
+                        <div className="site-bg -z-10" />
                         <div className="flex-shrink-0 mt-1.5">
                           <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                             <video
