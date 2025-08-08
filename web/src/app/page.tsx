@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { 
-  CursorTrail, 
   SkyrimTitle, 
   SkyrimSubtitle, 
   MagicCardSkyrimMinimal, 
@@ -17,12 +16,16 @@ import {
   ListItem,
   MagicGrid
 } from "../components/magic-ui-skyrim";
-import AdvancedTeamCursorBackground from "../components/AdvancedTeamCursorBackground";
+// Cursor arkaplan efektleri temizlendi
 import { MemberCard } from "../components/MemberCard";
 import AdventuresTabs from "../components/AdventuresTabs";
-import SimpleBackground from "../components/SimpleBackground";
-import SplashCursor from "../components/SplashCursor";
+import LazyTwitch from "../components/LazyTwitch";
+import { SplashCursor } from "../components/SplashCursor";
 import { AnimatedBackground } from "../components/AnimatedBackground";
+import { TypeWriter, GradientText, RotatingText, CountUp } from "../components/TextAnimations";
+import { ChromaGrid } from "../components/ChromaGrid";
+import { GooeyNav } from "../components/GooeyNav";
+import { LightRaysBackground } from "../components/LightRaysBackground";
 
 function escapeHtml(s: string) {
   return s
@@ -507,8 +510,34 @@ function MembersSection() {
     });
   }, [members]);
 
+  const [totalMembers, setTotalMembers] = useState(0);
+
+  // Üye sayısını al
+  useEffect(() => {
+    const fetchTotalMembers = async () => {
+      try {
+        const response = await fetch('/api/members?limit=1');
+        const data = await response.json();
+        setTotalMembers(data.total || 0);
+      } catch (error) {
+        console.error('Üye sayısı alınamadı:', error);
+      }
+    };
+    fetchTotalMembers();
+  }, []);
+
   return (
     <section className="space-y-4">
+      {/* Üye Sayısı */}
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-semibold text-white mb-2">Toplam Üye Sayısı</h3>
+        <CountUp 
+          end={totalMembers} 
+          className="text-3xl font-bold text-purple-400"
+          suffix=" Üye"
+        />
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
         <input
           aria-label="Üye ara"
@@ -578,9 +607,15 @@ function MembersSection() {
         </div>
       ) : (
         <>
-          <MagicGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" columns={3} gap={6}>
-            {cards}
-          </MagicGrid>
+          <ChromaGrid 
+            items={members.map(m => ({
+              id: m.id,
+              title: m.username || "Discord User",
+              subtitle: m.dominantRoleName || "Üye",
+              color: m.dominantRoleColor || "#8b5cf6"
+            }))}
+            className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          />
 
           <div className="flex items-center justify-center gap-3 mt-2" aria-live="polite">
             <MagicButtonSkyrim 
@@ -757,14 +792,15 @@ function OfficerAnnounce(): React.JSX.Element {
 }
 
 export default function Home() {
-  const { data: session } = useSession() as any;
+  const { data: session } = useSession();
   const roles: Array<{ id: string; name: string }> =
-    (session?.user?.guildMember?.roles as any[])?.map((r) => ({ id: String(r.id), name: r.name })) ?? [];
+    ((session?.user as any)?.guildMember?.roles as any[])?.map((r: any) => ({ id: String(r.id), name: r.name })) ?? [];
 
   const SENIOR_OFFICER_ROLE_ID =
     (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SENIOR_OFFICER_ROLE_ID || process.env.SENIOR_OFFICER_ROLE_ID)) ||
     "1249512318929342505";
-  const isSeniorOfficer = roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID));
+  const isSeniorOfficer = (roles.some((r) => String(r.id) === String(SENIOR_OFFICER_ROLE_ID)) || 
+    ((session?.user as any)?.discordRoles as string[])?.includes(SENIOR_OFFICER_ROLE_ID)) ?? false;
 
   const [tab, setTab] = useState<
     "home" | "about" | "adventures" | "members" | "announcements" | "streams" | "schedule" | "officer"
@@ -780,50 +816,31 @@ export default function Home() {
   const locale = pathname?.split("/")[1] === "en" ? "en" : "tr";
 
   return (
-    <div className="relative min-h-screen overflow-hidden overflow-y-auto bg-black">
+    <div className="relative min-h-screen overflow-hidden bg-[#0A0B0D] home-page">
       <AnimatedBackground />
-      <AdvancedTeamCursorBackground />
-      <SimpleBackground />
-      <CursorTrail />
+      <LightRaysBackground />
       
       <main className="relative z-10">
-        <div className="absolute inset-0 -z-10 pointer-events-none">
-          <SplashCursor />
+        <div className="absolute inset-0 z-5 pointer-events-none">
+          <SplashCursor className="default" />
         </div>
         
-        <div className="px-6 sm:px-10 pb-16">
+        <div className="px-6 sm:px-10 pb-8">
           <div className="max-w-6xl mx-auto px-1">
-            <div className="tablist flex items-center justify-center gap-2 py-5" role="tablist" aria-label="Site sekmeleri">
-              {[
-                { id: "home", label: "Ana Sayfa" },
-                { id: "about", label: "Hakkımızda" },
-                { id: "adventures", label: "Maceralarımız" },
-                { id: "members", label: "Üyeler" },
-                { id: "announcements", label: "Duyurular" },
-                { id: "streams", label: "Yayınlar" },
-                { id: "schedule", label: "Takvim" },
-                ...(isSeniorOfficer ? [{ id: "officer", label: "Officer" }] as const : []),
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  role="tab"
-                  id={`tab-${t.id}`}
-                  aria-controls={`panel-${t.id}`}
-                  aria-selected={tab === (t.id as any)}
-                  onClick={() => setTab(t.id as typeof tab)}
-                  className={`magic-button px-4 py-2 text-sm rounded-full border shadow-[inset_0_0_0_1px_rgba(255,255,255,.04)] transition-all ${
-                    tab === t.id
-                      ? "text-white border-purple-500/30 bg-purple-500/10 shadow-[0_8px_20px_rgba(147,112,219,.15)] magic-border-gold"
-                      : "text-zinc-300 border-white/10 hover:border-purple-500/30 hover:bg-purple-500/5"
-                  }`}
-                >
-                  {t.id === "adventures" ? (
-                    <GlowText color="gold">{t.label}</GlowText>
-                  ) : (
-                    <span className="hover-gold transition-colors duration-300">{t.label}</span>
-                  )}
-                </button>
-              ))}
+                            <div className="tablist flex items-center justify-center gap-2 py-3 px-4" role="tablist" aria-label="Site sekmeleri">
+              <GooeyNav
+                items={[
+                  { id: "home", label: "Ana Sayfa", onClick: () => setTab("home") },
+                  { id: "about", label: "Hakkımızda", onClick: () => setTab("about") },
+                  { id: "adventures", label: "Maceralarımız", onClick: () => setTab("adventures") },
+                  { id: "members", label: "Üyeler", onClick: () => setTab("members") },
+                  { id: "announcements", label: "Duyurular", onClick: () => setTab("announcements") },
+                  { id: "streams", label: "Yayınlar", onClick: () => setTab("streams") },
+                  { id: "schedule", label: "Takvim", onClick: () => setTab("schedule") },
+                  ...(isSeniorOfficer ? [{ id: "officer", label: "Officer", onClick: () => setTab("officer") }] as const : []),
+                ]}
+                className="mx-auto"
+              />
             </div>
 
             <motion.div
@@ -834,78 +851,103 @@ export default function Home() {
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
               {tab === "home" && (
-                <section id="panel-home" role="tabpanel" aria-labelledby="tab-home" className="mt-8">
-                  <div className="relative overflow-hidden">
-                    <div className="max-w-5xl mx-auto text-center px-4">
-                      <MagicCardSkyrimMinimal className="max-w-5xl mx-auto p-6 sm:p-7 border-purple-500/30 shadow-[0_0_40px_rgba(147,112,219,0.15)]">
-                        <SkyrimTitle className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                          BİR LONCANIN NİYE WEB SİTESİ
-                          <span className="block text-purple-100">OLUR?</span>
-                        </SkyrimTitle>
-                      </MagicCardSkyrimMinimal>
-                      <SkyrimSubtitle className="mt-4 text-lg sm:text-xl text-purple-50/90 max-w-3xl mx-auto">
-                        Çünkü burası sadece bir oyun listesi değil; iradenin, disiplinin ve kader ortaklığının duvara kazındığı yer.
-                        Burası, dağınık sesleri tek bir savaş çığlığına dönüştüren merkez. Ve evet—burası, senin hikâyenin başladığı yer.
-                      </SkyrimSubtitle>
-                      <div className="mt-6 flex items-center justify-center gap-4">
-                        <MagicButtonSkyrim className="h-12 px-8 text-[15px] font-semibold tracking-[0.01em] bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300">
-                          Discord'a Katıl
-                        </MagicButtonSkyrim>
-                        <button
+                <section id="panel-home" role="tabpanel" aria-labelledby="tab-home" className="mt-4">
+                  <div className="text-center">
+                    <SkyrimTitle className="text-2xl md:text-4xl xl:text-5xl font-extrabold tracking-tighter leading-[1.06] mx-auto text-center">
+                      <span className="block whitespace-nowrap">
+                        <RotatingText 
+                          texts={["BİR LONCANIN NİYE", "BİR LONCANIN NİYE"]} 
+                          className="text-white"
+                        />
+                        <span className="mx-2 inline-block">
+                          <GradientText 
+                            colors={["#8b5cf6", "#a855f7", "#c084fc", "#8b5cf6"]}
+                            className="bg-clip-text text-transparent"
+                          >
+                            WEB SİTESİ
+                          </GradientText>
+                        </span>
+                      </span>
+                      <span className="block whitespace-nowrap">OLUR?</span>
+                    </SkyrimTitle>
+                    <SkyrimSubtitle className="mt-4 text-lg md:text-xl text-zinc-300 max-w-3xl mx-auto">
+                      <TypeWriter 
+                        text="Çünkü burası sadece bir oyun listesi değil; iradenin, disiplinin ve kader ortaklığının duvara kazındığı yer. Burası, dağınık sesleri tek bir savaş çığlığına dönüştüren merkez. Ve evet—burası, senin hikâyenin başladığı yer."
+                        speed={50}
+                        className="text-zinc-300"
+                      />
+                    </SkyrimSubtitle>
+                    <div className="mt-6 flex items-center justify-center gap-4">
+                      <button className="h-12 px-8 text-[15px] font-semibold bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl">
+                        Discord'a Katıl
+                      </button>
+                                              <button
                           type="button"
                           onClick={() => {
-                            const el = document.getElementById("voitans-intro");
+                            const el = document.getElementById("intro-content-border");
                             if (!el) return;
+                            
+                            // Efekt zaten aktifse tekrar tetikleme
+                            if (el.classList.contains("ring-highlight")) return;
+                            
+                            // Logo ve intro metnini kapsayan container'ın border efektini tetikle
                             el.classList.remove("dimmed");
                             el.classList.add("ring-highlight");
-                            window.setTimeout(() => {
+                            
+                            // 1 saniye sonra normale dön
+                            setTimeout(() => {
                               el.classList.remove("ring-highlight");
                               el.classList.add("dimmed");
                             }, 1000);
                           }}
-                          className="skyrim-button px-6 py-3 text-purple-100 border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300"
+                          className="px-6 py-3 text-white border border-white/20 hover:border-purple-400/50 hover:text-purple-300 transition-all duration-300 relative overflow-hidden group rounded-full shadow-lg hover:shadow-xl"
                         >
-                          Neden VOITANS?
-                        </button>
-                      </div>
+                        <span className="relative z-10">Neden VOITANS?</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                      </button>
                     </div>
                   </div>
 
-                  <section id="voitans-intro" className="mt-6">
-                    <MagicCardSkyrimMinimal className="max-w-3xl mx-auto p-6 sm:p-7">
-                      <div className="grid grid-cols-[auto_1fr] gap-4 sm:gap-5 items-start">
-                        <div className="size-12 sm:size-14 rounded-xl bg-white/5 border border-white/10 grid place-items-center overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,.04)]">
-                          <img
-                            src="/pictures/thevoitanspurple-saturation100.gif"
-                            alt="VOITANS Crest"
-                            className="w-full h-full object-contain opacity-90"
-                            loading="lazy"
-                            decoding="async"
-                          />
+                  <section id="voitans-intro" className="mt-8">
+                    <div className="max-w-3xl mx-auto p-6 rounded-xl transition-all duration-500">
+                      <div id="intro-content-border" className="flex items-start gap-6 p-4 border border-purple-500/30 rounded-lg dimmed">
+                        <div className="flex-shrink-0 mt-1.5">
+                          <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                            <video
+                              src="/voitans.mp4"
+                              className="w-full h-full object-cover"
+                              style={{ display: 'block', objectPosition: 'center 40%' }}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              preload="auto"
+                            />
+                          </div>
                         </div>
-                        <div className="flex-1 text-[15px] leading-[1.85] text-[#D6DBE1] selection:bg-white/10">
-                          <p className="mb-4">
+                        <div className="flex-1 space-y-3 text-[14px] leading-relaxed text-white">
+                          <p>
                             Burası THE VOITANS. Sadece bir lonca değil; oyuna girdiğinde sana "kimsin, neredesin, neye ihtiyacın var?" diye soran bir ekip.
                             Bazen günaydınla başlarız, bazen "akşam 19:30 Discord" diyerek plan kurarız; kimi gün drop kovalayıp build tartışır,
                             kimi gün birimizin sevincine ortak olur, kaybında omuz veririz. Bizim için lonca, listelerde bir isim değil;
-                            <span className="text-zinc-100">emek veren, birbirini kollayan, aynı çağrıda toplanan insanlar</span> demek.
+                            <span className="text-white font-medium">emek veren, birbirini kollayan, aynı çağrıda toplanan insanlar</span> demek.
                           </p>
-                          <p className="mb-4">
+                          <p>
                             Burada "hoş geldin" demek bir formalite değil. Yeni katılanın adını anmak, birinin saatler süren emeğini takdir etmek,
                             "geliyorum" deyip sözünde durmak, denk geldiğinde yayını açıp paylaşmak… hepsi aynı kültürün parçaları.
                             Kimi gün bir tartışma çıkar, kimi gün yalnızca "iyi geceler" yazılır; ama bir sonraki gün yine aynı çağrıda buluşuruz.
                           </p>
-                          <p className="mb-0">
+                          <p>
                             Eğer aradığın şey sadece bir etiket, bir rozet ya da rastgele bir kalabalık değilse; doğru yerdesin.
                             Burada başarı kibirle değil, yardımla büyür. Kural basittir:
-                            <strong className="text-zinc-100"> Saygı, disiplin, birlik.</strong>
+                            <strong className="text-white font-semibold"> Saygı, disiplin, birlik.</strong>
                             Bir şey eksik kaldıysa söyler, birlikte tamamlarız. Çünkü hikâye yazılırken herkesin bir satırı vardır ve belki de seninki,
-                            <span className="text-zinc-100"> bugün burada başlar.</span>
-                            <span className="inline-block align-middle ml-1 size-1.5 rounded-full bg-[#8bf0cb] shadow-[0_0_14px_#8bf0cb99] animate-[pulseSoft_2.6s_ease-in-out_infinite]" />
+                            <span className="text-white font-medium"> bugün burada başlar.</span>
+                            <span className="inline-block align-middle ml-2 size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(139,240,203,0.6)] animate-pulse" />
                           </p>
                         </div>
                       </div>
-                    </MagicCardSkyrimMinimal>
+                    </div>
                   </section>
                 </section>
               )}
@@ -948,7 +990,48 @@ export default function Home() {
                 </section>
               )}
 
-              {/* Diğer sekme içerikleri buraya gelecek */}
+              {tab === "adventures" && (
+                <section id="panel-adventures" role="tabpanel" aria-labelledby="tab-adventures" className="max-w-6xl mx-auto mt-8">
+                  <AdventuresTabs />
+                </section>
+              )}
+
+              {tab === "members" && (
+                <section id="panel-members" role="tabpanel" aria-labelledby="tab-members" className="max-w-6xl mx-auto mt-8">
+                  <MembersSection />
+                </section>
+              )}
+
+              {tab === "announcements" && (
+                <section id="panel-announcements" role="tabpanel" aria-labelledby="tab-announcements" className="max-w-6xl mx-auto mt-8">
+                  <Announcements />
+                </section>
+              )}
+
+              {tab === "streams" && (
+                <section id="panel-streams" role="tabpanel" aria-labelledby="tab-streams" className="max-w-6xl mx-auto mt-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+                    <div className="relative aspect-video rounded-xl overflow-hidden">
+                      <LazyTwitch className="relative h-full" type="player" title="Twitch Player" />
+                    </div>
+                    <div className="relative h-[480px] lg:h-auto rounded-xl overflow-hidden">
+                      <LazyTwitch className="relative h-full" type="chat" title="Twitch Chat" />
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {tab === "schedule" && (
+                <section id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" className="max-w-6xl mx-auto mt-8">
+                  <WeeklySchedule />
+                </section>
+              )}
+
+              {tab === "officer" && (
+                <section id="panel-officer" role="tabpanel" aria-labelledby="tab-officer" className="max-w-6xl mx-auto mt-8">
+                  <OfficerAnnounce />
+                </section>
+              )}
             </motion.div>
           </div>
         </div>
