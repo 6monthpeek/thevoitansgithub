@@ -36,24 +36,25 @@ export function MemberMiniCard({ username, avatarUrl, dominantRoleColor, dominan
       <style jsx>{`
         .mini-card {
           display: grid;
-          grid-template-columns: 40px 1fr;
+          grid-template-columns: 48px 1fr;
           align-items: center;
-          gap: 10px;
-          padding: 10px;
+          gap: 12px;
+          padding: 12px;
           border-radius: 12px;
-          border: 1px solid rgba(255,255,255,0.08);
-          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.10);
+          background: var(--bg-1); /* Opaque background to block splash cursor */
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
         }
         .mini-card:hover {
           border-color: rgba(255,255,255,0.16);
-          background: rgba(255,255,255,0.03);
+          background: #14171d; /* Slightly lighter but still opaque */
         }
         .avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
           overflow: hidden;
-          background: rgba(255,255,255,0.04);
+          background: #0e1116; /* Opaque */
         }
         .avatar img {
           width: 100%;
@@ -63,7 +64,7 @@ export function MemberMiniCard({ username, avatarUrl, dominantRoleColor, dominan
         }
         .info { min-width: 0; }
         .name {
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 700;
           color: #e5e7eb;
           white-space: nowrap;
@@ -72,15 +73,15 @@ export function MemberMiniCard({ username, avatarUrl, dominantRoleColor, dominan
           line-height: 1.1;
         }
         .role {
-          margin-top: 4px;
+          margin-top: 5px;
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 2px 8px;
+          padding: 3px 10px;
           border-radius: 999px;
-          border: 1px solid rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.10);
           color: #d1d5db;
-          font-size: 11px;
+          font-size: 12px;
           line-height: 1.2;
         }
         .dot {

@@ -15,14 +15,19 @@ function buildTwitchSrc(opts: { channel?: string; type?: "player" | "chat"; pare
     .split(",")
     .map((p) => p.trim())
     .filter(Boolean);
-  const baseParents = (opts.parents && opts.parents.length ? opts.parents : envParents);
-  const parents = (baseParents && baseParents.length ? baseParents : ["localhost"]);
+  const runtimeParent = typeof window !== "undefined" ? window.location.hostname : undefined;
+  const merged = [
+    ...(opts.parents || []),
+    ...envParents,
+    ...(runtimeParent ? [runtimeParent] : []),
+  ].filter(Boolean) as string[];
+  const parents = merged.length ? Array.from(new Set(merged)) : ["localhost"];
   const parentParams = parents.map((p) => `parent=${encodeURIComponent(p)}`).join("&");
 
   const type = opts.type || "player";
   if (type === "chat") {
     return `https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?${parentParams}`;
-  }
+    }
   return `https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&${parentParams}`;
 }
 
@@ -64,6 +69,7 @@ function LazyTwitch({ channel, type = "player", className, title, parents }: Laz
           title={title || (type === "chat" ? "Twitch Chat" : "Twitch Player")}
           className="absolute inset-0 w-full h-full rounded-xl border border-white/10 bg-black"
           src={src}
+          allow="autoplay; fullscreen"
           allowFullScreen
           loading="lazy"
         />
