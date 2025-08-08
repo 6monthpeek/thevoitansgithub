@@ -1,139 +1,99 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import clientPromise from '@/lib/mongo';
 
-type LogEntry = {
-  timestamp: string; // ISO
-  event: string;
-  guildId?: string;
-  userId?: string;
-  channelId?: string;
-  data?: any;
-};
+// HMAC doğrulama fonksiyonu
+function verifySignature(body: string, signature: string, secret: string): boolean {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(body)
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature, 'hex'),
+    Buffer.from(expectedSignature, 'hex')
+  );
+}
 
-const isProd = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
-
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const start = Date.now();
+    const body = await request.text();
+    const signature = request.headers.get('x-signature');
+    const secret = process.env.LOG_INGEST_SECRET;
 
-    // 1) Shared-secret doğrulaması (opsiyonel ama önerilir)
-    // Header adı öncelik sırası:
-    //   1) X-Ingest-Token
-    //   2) Authorization: Bearer <token>
-    const xIngestHeader = req.headers.get("x-ingest-token") || req.headers.get("X-Ingest-Token");
-    const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-    const bearer = authHeader?.startsWith("Bearer ") ? authHeader.slice("Bearer ".length) : undefined;
-
-    const provided = (xIngestHeader || bearer || "").trim();
-    const expected = (process.env.SITE_LOG_INGEST_TOKEN || "").trim();
-
-    if (expected && provided !== expected) {
-      const mode = xIngestHeader ? "x-ingest-token" : (bearer ? "bearer" : "none");
+    if (!secret) {
       return NextResponse.json(
-        { error: "forbidden", code: "BAD_TOKEN", mode },
-        { status: 403 }
+        { error: 'LOG_INGEST_SECRET not configured' },
+        { status: 500 }
       );
     }
 
-    // 2) Body parse
-    let body: any = {};
-    try {
-      body = await req.json();
-    } catch {
+    if (!signature) {
       return NextResponse.json(
-        { error: "invalid json", code: "BAD_JSON" },
+        { error: 'X-Signature header required' },
+        { status: 401 }
+      );
+    }
+
+    // HMAC doğrulama
+    if (!verifySignature(body, signature, secret)) {
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 401 }
+      );
+    }
+
+    // JSON parse
+    let logData;
+    try {
+      logData = JSON.parse(body);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON' },
         { status: 400 }
       );
     }
 
-    const now = new Date().toISOString();
+    // Gerekli alanları kontrol et
+    if (!logData.event) {
+      return NextResponse.json(
+        { error: 'event field is required' },
+        { status: 400 }
+      );
+    }
 
-    // 3) Normalize
-    const normGuildId =
-      body?.guildId ||
-      body?.data?.guildId ||
-      body?.data?.guild?.id ||
-      undefined;
+    // MongoDB'ye bağlan
+    const client = await clientPromise;
+    const db = client.db('voitans');
+    const collection = db.collection('logs');
 
-    const normUserId =
-      body?.userId ||
-      body?.data?.userId ||
-      body?.data?.author?.id ||
-      undefined;
-
-    const normChannelId =
-      body?.channelId ||
-      body?.data?.channelId ||
-      body?.data?.channel?.id ||
-      undefined;
-
-    const entry: LogEntry = {
-      timestamp: body?.timestamp || now,
-      event: String(body?.event || "unknown"),
-      guildId: normGuildId ? String(normGuildId) : undefined,
-      userId: normUserId ? String(normUserId) : undefined,
-      channelId: normChannelId ? String(normChannelId) : undefined,
-      data: body?.data ?? undefined,
+    // Log document'ini hazırla
+    const logDocument = {
+      ts: logData.ts ? new Date(logData.ts) : new Date(),
+      event: logData.event,
+      guildId: logData.guildId || null,
+      userId: logData.userId || null,
+      channelId: logData.channelId || null,
+      severity: logData.severity || 0,
+      source: logData.source || 'bot',
+      payload: logData.payload || {},
+      createdAt: new Date()
     };
 
-    if (!entry.event) {
-      return NextResponse.json(
-        { error: "event field required", code: "MISSING_EVENT" },
-        { status: 400 }
-      );
-    }
+    // MongoDB'ye ekle
+    const result = await collection.insertOne(logDocument);
 
-    // 4) Yazma hedefi:
-    // - Prod (Vercel): /tmp/site-logs.json (runtime yazılabilir)
-    // - Local/dev: web/output/site-logs.json (repo içi)
-    // Ek olarak NDJSON paralel yazım: /tmp/site-logs.ndjson veya web/output/site-logs.ndjson
-    try {
-      const targetPath = isProd ? "/tmp/site-logs.json" : "web/output/site-logs.json";
-      const targetNdjson = isProd ? "/tmp/site-logs.ndjson" : "web/output/site-logs.ndjson";
+    return NextResponse.json({
+      ok: true,
+      id: result.insertedId,
+      ts: logDocument.ts
+    });
 
-      // Mevcut içeriği oku (yoksa boş dizi)
-      let arr: any[] = [];
-      try {
-        const buf = await (await import("fs/promises")).readFile(targetPath, "utf8");
-        const json = JSON.parse(buf);
-        if (Array.isArray(json)) arr = json;
-      } catch {
-        arr = [];
-      }
-
-      // Append (boyut büyürse ileride rotasyon/KV eklenir)
-      arr.push(entry);
-
-      // Klasör oluşturmayı dener (local path için)
-      try {
-        const { dirname } = await import("path");
-        const dir = dirname(targetPath);
-        await (await import("fs/promises")).mkdir(dir, { recursive: true });
-      } catch {}
-      // NDJSON için de klasör hazır olsun
-      try {
-        const { dirname } = await import("path");
-        const dir = dirname(targetNdjson);
-        await (await import("fs/promises")).mkdir(dir, { recursive: true });
-      } catch {}
-
-      // JSON array dosyasını güncelle
-      await (await import("fs/promises")).writeFile(targetPath, JSON.stringify(arr, null, 2), "utf8");
-      // NDJSON dosyasına satır ekle (append)
-      try {
-        await (await import("fs/promises")).appendFile(targetNdjson, JSON.stringify(entry) + "\n", "utf8");
-      } catch (e) {
-        console.error("[log-ingest][ndjson-append-error]", (e as any)?.message || e);
-      }
-
-      const took = Date.now() - start;
-      return NextResponse.json(
-        { ok: true, tookMs: took, mode: isProd ? "prod-tmp" : "local-file", paths: { json: targetPath, ndjson: targetNdjson } },
-        { status: 200 }
-      );
-    } catch (e: any) {
-      return NextResponse.json({ error: "storage error", code: "IO_ERROR", message: e?.message || "io-failed" }, { status: 500 });
-    }
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "failed", code: "UNHANDLED" }, { status: 500 });
+  } catch (error) {
+    console.error('Log ingest error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

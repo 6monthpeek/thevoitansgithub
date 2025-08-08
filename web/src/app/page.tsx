@@ -656,6 +656,29 @@ function OfficerAnnounce(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
 
+  // Logs state
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(true);
+  const [logsError, setLogsError] = useState<string | null>(null);
+  const [logsFilters, setLogsFilters] = useState({
+    page: 1,
+    limit: 20,
+    type: [] as string[],
+    user: "",
+    channel: "",
+    q: ""
+  });
+
+  // Event types for filtering
+  const eventTypes = [
+    'messageCreate',
+    'messageUpdate', 
+    'messageDelete',
+    'interactionCreate',
+    'guildMemberAdd',
+    'guildMemberRemove'
+  ];
+
   useEffect(() => {
     let alive = true;
     async function loadChannels() {
@@ -677,6 +700,59 @@ function OfficerAnnounce(): React.JSX.Element {
       alive = false;
     };
   }, [canView]);
+
+  // Load logs
+  useEffect(() => {
+    let alive = true;
+    async function loadLogs() {
+      if (!canView) return;
+      
+      setLoadingLogs(true);
+      setLogsError(null);
+      
+      try {
+        const params = new URLSearchParams({
+          page: logsFilters.page.toString(),
+          limit: logsFilters.limit.toString(),
+          ...(logsFilters.type.length > 0 && { type: logsFilters.type.join(',') }),
+          ...(logsFilters.user && { user: logsFilters.user }),
+          ...(logsFilters.channel && { channel: logsFilters.channel }),
+          ...(logsFilters.q && { q: logsFilters.q })
+        });
+
+        const r = await fetch(`/api/officer/logs?${params}`, { cache: "no-store" });
+        const j = await r.json().catch(() => ({}));
+        
+        if (!alive) return;
+        
+        if (!r.ok) {
+          throw new Error(j.error || 'Loglar yüklenemedi');
+        }
+        
+        setLogs(j.items || []);
+      } catch (e: any) {
+        if (!alive) return;
+        setLogsError(e?.message || 'Loglar yüklenirken hata oluştu');
+        setLogs([]);
+      } finally {
+        if (alive) setLoadingLogs(false);
+      }
+    }
+    
+    loadLogs();
+    
+    // Real-time güncelleme için interval
+    const interval = setInterval(() => {
+      if (alive && canView) {
+        loadLogs();
+      }
+    }, 30000); // 30 saniyede bir güncelle
+    
+    return () => {
+      alive = false;
+      clearInterval(interval);
+    };
+  }, [canView, logsFilters]);
 
   const disabled = submitting || !form.content.trim() || !form.channelId.trim();
   const postAnnouncement = async () => {
@@ -703,82 +779,246 @@ function OfficerAnnounce(): React.JSX.Element {
   if (!canView) return <div className="text-sm text-zinc-400">Bu alan yalnızca Senior Officer içindir.</div>;
 
   return (
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-zinc-100">Kanallar</h3>
-          {loadingChannels && <span className="text-xs text-zinc-400">Yükleniyor…</span>}
+    <div className="space-y-6">
+      {/* Logs Section */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-zinc-100">Sistem Logları</h3>
+          <div className="flex items-center gap-2">
+            {loadingLogs && <span className="text-xs text-zinc-400">Yükleniyor…</span>}
+            <button
+              onClick={() => setLogsFilters(f => ({ ...f, page: 1 }))}
+              disabled={loadingLogs}
+              className="px-3 py-1 text-xs text-zinc-300 hover:text-white disabled:opacity-50 rounded-lg border border-white/10 hover:border-white/20"
+            >
+              ↻ Yenile
+            </button>
+          </div>
         </div>
-        <div className="max-h-72 overflow-auto pr-1">
-          {!channels.length && !loadingChannels ? (
-            <div className="text-xs text-zinc-500">Kanal bulunamadı.</div>
-          ) : (
-            <ul className="space-y-1">
-              {channels.map((c) => (
-                <li key={c.id}>
-                  <button
-                    className={`w-full text-left rounded-md border border-white/10 px-2 py-1.5 text-xs hover:border-white/20 ${
-                      form.channelId === c.id ? "bg-white/10" : "bg-transparent"
-                    }`}
-                    onClick={() => setForm((f) => ({ ...f, channelId: c.id }))}
-                    title={c.id}
-                  >
-                    #{c.name} {c.type === 5 ? "(announcement)" : ""}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
 
-      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-        <h3 className="text-sm font-semibold text-zinc-100 mb-2">Duyuru Gönder</h3>
-        <div className="grid gap-1.5">
-          <label className="text-sm text-zinc-300">Hedef Kanal</label>
-          <select
-            value={form.channelId}
-            onChange={(e) => setForm((f) => ({ ...f, channelId: e.target.value }))}
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+          <input
+            type="text"
+            placeholder="Kullanıcı ara..."
+            value={logsFilters.user}
+            onChange={(e) => setLogsFilters(f => ({ ...f, user: e.target.value, page: 1 }))}
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
-            disabled={loadingChannels}
+          />
+          <input
+            type="text"
+            placeholder="Kanal ara..."
+            value={logsFilters.channel}
+            onChange={(e) => setLogsFilters(f => ({ ...f, channel: e.target.value, page: 1 }))}
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+          />
+          <input
+            type="text"
+            placeholder="İçerik ara..."
+            value={logsFilters.q}
+            onChange={(e) => setLogsFilters(f => ({ ...f, q: e.target.value, page: 1 }))}
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+          />
+          <select
+            value={logsFilters.type[0] || ""}
+            onChange={(e) => setLogsFilters(f => ({ 
+              ...f, 
+              type: e.target.value ? [e.target.value] : [], 
+              page: 1 
+            }))}
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
           >
-            <option value="">{loadingChannels ? "Kanallar yükleniyor…" : "Kanal seçin"}</option>
-            {channels.map((c) => (
-              <option key={c.id} value={c.id}>
-                #{c.name} {c.type === 5 ? "(announcement)" : ""}
+            <option value="">Tüm Eventler</option>
+            {eventTypes.map(type => (
+              <option key={type} value={type}>
+                {type}
               </option>
             ))}
           </select>
-
-          <label className="text-sm text-zinc-300 mt-2">İçerik</label>
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-            rows={6}
-            placeholder="Duyuru içeriğini yazın…"
+          <select
+            value={logsFilters.limit}
+            onChange={(e) => setLogsFilters(f => ({ ...f, limit: Number(e.target.value), page: 1 }))}
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
-          />
+          >
+            <option value={10}>10 log</option>
+            <option value={20}>20 log</option>
+            <option value={50}>50 log</option>
+          </select>
         </div>
 
-        {error && (
-          <div className="mt-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
-            {error}
-          </div>
-        )}
-        {ok && (
-          <div className="mt-2 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
-            Duyuru gönderildi.
-          </div>
-        )}
+        {/* Logs List */}
+        <div className="max-h-96 overflow-auto">
+          {logsError ? (
+            <div className="text-sm text-rose-400">{logsError}</div>
+          ) : loadingLogs ? (
+            <div className="text-sm text-zinc-400">Loglar yükleniyor...</div>
+          ) : logs.length === 0 ? (
+            <div className="text-sm text-zinc-500">Log bulunamadı.</div>
+          ) : (
+            <div className="space-y-2">
+              {logs.map((log) => {
+                // Event türüne göre renk belirleme
+                const getEventColor = (event: string) => {
+                  switch (event) {
+                    case 'messageCreate': return 'bg-blue-500';
+                    case 'messageUpdate': return 'bg-yellow-500';
+                    case 'messageDelete': return 'bg-red-500';
+                    case 'interactionCreate': return 'bg-purple-500';
+                    case 'guildMemberAdd': return 'bg-green-500';
+                    case 'guildMemberRemove': return 'bg-orange-500';
+                    default: return 'bg-gray-500';
+                  }
+                };
 
-        <div className="mt-3">
-          <button
-            disabled={disabled}
-            onClick={postAnnouncement}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 disabled:opacity-50 hover:border-white/20"
-          >
-            {submitting ? "Gönderiliyor…" : "Duyuruyu Gönder"}
-          </button>
+                return (
+                  <div key={log._id || log.timestamp} className="flex items-start gap-3 p-3 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-colors">
+                    <div className="flex-shrink-0">
+                      <div className={`w-2 h-2 rounded-full ${getEventColor(log.event)}`}></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium text-zinc-300 bg-zinc-700 px-2 py-1 rounded">
+                          {log.event}
+                        </span>
+                        <span className="text-xs text-zinc-500">
+                          {new Date(log.timestamp).toLocaleString('tr-TR')}
+                        </span>
+                      </div>
+                      {log.enrichedUser && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <img
+                            src={log.enrichedUser.avatarUrl || "https://cdn.discordapp.com/embed/avatars/0.png"}
+                            alt={log.enrichedUser.username || "User"}
+                            className="w-4 h-4 rounded-full"
+                          />
+                          <span className="text-xs text-zinc-300">
+                            {log.enrichedUser.nickname || log.enrichedUser.globalName || log.enrichedUser.username || "Unknown User"}
+                          </span>
+                        </div>
+                      )}
+                      {log.data?.content && (
+                        <div className="text-sm text-zinc-400 mt-1">
+                          {log.data.content.length > 200 
+                            ? `${log.data.content.substring(0, 200)}...` 
+                            : log.data.content
+                          }
+                        </div>
+                      )}
+                      {log.data?.commandName && (
+                        <div className="text-xs text-zinc-500 mt-1">
+                          Komut: /{log.data.commandName}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {logs.length > 0 && (
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+            <button
+              onClick={() => setLogsFilters(f => ({ ...f, page: Math.max(1, f.page - 1) }))}
+              disabled={logsFilters.page === 1}
+              className="px-3 py-1 text-sm text-zinc-300 disabled:opacity-50 hover:text-white"
+            >
+              ← Önceki
+            </button>
+            <span className="text-sm text-zinc-400">
+              Sayfa {logsFilters.page}
+            </span>
+            <button
+              onClick={() => setLogsFilters(f => ({ ...f, page: f.page + 1 }))}
+              disabled={logs.length < logsFilters.limit}
+              className="px-3 py-1 text-sm text-zinc-300 disabled:opacity-50 hover:text-white"
+            >
+              Sonraki →
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Announcement Section */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-zinc-100">Kanallar</h3>
+            {loadingChannels && <span className="text-xs text-zinc-400">Yükleniyor…</span>}
+          </div>
+          <div className="max-h-72 overflow-auto pr-1">
+            {!channels.length && !loadingChannels ? (
+              <div className="text-xs text-zinc-500">Kanal bulunamadı.</div>
+            ) : (
+              <ul className="space-y-1">
+                {channels.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      className={`w-full text-left rounded-md border border-white/10 px-2 py-1.5 text-xs hover:border-white/20 ${
+                        form.channelId === c.id ? "bg-white/10" : "bg-transparent"
+                      }`}
+                      onClick={() => setForm((f) => ({ ...f, channelId: c.id }))}
+                      title={c.id}
+                    >
+                      #{c.name} {c.type === 5 ? "(announcement)" : ""}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <h3 className="text-sm font-semibold text-zinc-100 mb-2">Duyuru Gönder</h3>
+          <div className="grid gap-1.5">
+            <label className="text-sm text-zinc-300">Hedef Kanal</label>
+            <select
+              value={form.channelId}
+              onChange={(e) => setForm((f) => ({ ...f, channelId: e.target.value }))}
+              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+              disabled={loadingChannels}
+            >
+              <option value="">{loadingChannels ? "Kanallar yükleniyor…" : "Kanal seçin"}</option>
+              {channels.map((c) => (
+                <option key={c.id} value={c.id}>
+                  #{c.name} {c.type === 5 ? "(announcement)" : ""}
+                </option>
+              ))}
+            </select>
+
+            <label className="text-sm text-zinc-300 mt-2">İçerik</label>
+            <textarea
+              value={form.content}
+              onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+              rows={6}
+              placeholder="Duyuru içeriğini yazın…"
+              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-white/20"
+            />
+          </div>
+
+          {error && (
+            <div className="mt-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+              {error}
+            </div>
+          )}
+          {ok && (
+            <div className="mt-2 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+              Duyuru gönderildi.
+            </div>
+          )}
+
+          <div className="mt-3">
+            <button
+              disabled={disabled}
+              onClick={postAnnouncement}
+              className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 disabled:opacity-50 hover:border-white/20"
+            >
+              {submitting ? "Gönderiliyor…" : "Duyuruyu Gönder"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -896,17 +1136,19 @@ export default function Home() {
                           }}
                           className="px-6 py-3 text-white border border-white/20 hover:border-purple-400/50 hover:text-purple-300 transition-all duration-300 relative overflow-hidden group rounded-full shadow-lg hover:shadow-xl"
                         >
-                        <span className="relative z-10">Neden VOITANS?</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                      </button>
+                         {/* Opaque background to block splash cursor */}
+                         <span className="absolute inset-0 -z-10 rounded-full bg-[#0E1116]" aria-hidden />
+                         <span className="relative z-10">Neden VOITANS?</span>
+                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                       </button>
                     </div>
                   </div>
 
                   <section id="voitans-intro" className="mt-8">
                     <div className="max-w-3xl mx-auto p-6 rounded-xl transition-all duration-500">
                       <div id="intro-content-border" className="relative overflow-hidden flex items-start gap-6 p-4 border border-purple-500/30 rounded-lg dimmed">
-                        {/* Background layer to match site background for better text contrast */}
-                        <div className="site-bg -z-10" />
+                        {/* Opaque background layer to fully block splash cursor behind */}
+                        <div className="absolute inset-0 -z-10 bg-[#0E1116]" />
                         <div className="flex-shrink-0 mt-1.5">
                           <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                             <img
@@ -997,7 +1239,8 @@ export default function Home() {
               )}
 
               {tab === "announcements" && (
-                <section id="panel-announcements" role="tabpanel" aria-labelledby="tab-announcements" className="max-w-6xl mx-auto mt-8">
+                <section id="panel-announcements" role="tabpanel" aria-labelledby="tab-announcements" className="relative overflow-hidden max-w-6xl mx-auto mt-8">
+                  <div className="absolute inset-0 -z-10 bg-[#0E1116]" />
                   <Announcements />
                 </section>
               )}
@@ -1016,13 +1259,15 @@ export default function Home() {
               )}
 
               {tab === "schedule" && (
-                <section id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" className="max-w-6xl mx-auto mt-8">
+                <section id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" className="relative overflow-hidden max-w-6xl mx-auto mt-8">
+                  <div className="absolute inset-0 -z-10 bg-[#0E1116]" />
                   <WeeklySchedule />
                 </section>
               )}
 
               {tab === "officer" && (
-                <section id="panel-officer" role="tabpanel" aria-labelledby="tab-officer" className="max-w-6xl mx-auto mt-8">
+                <section id="panel-officer" role="tabpanel" aria-labelledby="tab-officer" className="relative overflow-hidden max-w-6xl mx-auto mt-8">
+                  <div className="absolute inset-0 -z-10 bg-[#0E1116]" />
                   <OfficerAnnounce />
                 </section>
               )}

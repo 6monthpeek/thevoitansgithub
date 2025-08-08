@@ -6,6 +6,9 @@ const { Routes } = require("discord-api-types/v10");
 const fs = require("fs");
 const path = require("path");
 
+// MongoDB Logger'ı import et
+const logger = require("./logger");
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -82,6 +85,31 @@ try {
 } catch (e) {
   console.warn("⚠️ _wireAll yüklenemedi:", e?.message || e);
 }
+
+// MongoDB Logger event handlers
+client.on('messageCreate', (message) => {
+  logger.messageCreate(message);
+});
+
+client.on('messageUpdate', (oldMessage, newMessage) => {
+  logger.messageUpdate(oldMessage, newMessage);
+});
+
+client.on('messageDelete', (message) => {
+  logger.messageDelete(message);
+});
+
+client.on('interactionCreate', (interaction) => {
+  logger.interactionCreate(interaction);
+});
+
+client.on('guildMemberAdd', (member) => {
+  logger.guildMemberAdd(member);
+});
+
+client.on('guildMemberRemove', (member) => {
+  logger.guildMemberRemove(member);
+});
 
 // Basit HTTP keep-alive sunucusu (Replit/Uptime ping için)
 try {
