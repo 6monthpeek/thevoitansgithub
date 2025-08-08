@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { 
@@ -792,7 +792,6 @@ function OfficerAnnounce(): React.JSX.Element {
 }
 
 export default function Home() {
-  const introVideoRef = useRef<HTMLVideoElement | null>(null);
   const { data: session } = useSession();
   const roles: Array<{ id: string; name: string }> =
     ((session?.user as any)?.guildMember?.roles as any[])?.map((r: any) => ({ id: String(r.id), name: r.name })) ?? [];
@@ -811,18 +810,6 @@ export default function Home() {
   useEffect(() => {
     const t = setTimeout(() => setBooting(false), 600);
     return () => clearTimeout(t);
-  }, []);
-
-  // Force autoplay for muted inline video after mount (Safari/iOS quirks)
-  useEffect(() => {
-    const v = introVideoRef.current;
-    if (!v) return;
-    // Ensure muted and inline before play
-    v.muted = true;
-    // Some browsers require a user-gesture-like microtask; retry if rejected
-    const tryPlay = () => v.play().catch(() => setTimeout(() => v.play().catch(() => {}), 200));
-    if (v.readyState >= 2) tryPlay();
-    else v.addEventListener("loadeddata", tryPlay, { once: true });
   }, []);
 
   const pathname = usePathname();
@@ -928,23 +915,14 @@ export default function Home() {
                         <div className="site-bg -z-10" />
                         <div className="flex-shrink-0 mt-1.5">
                           <div className="size-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                            <video
-                              ref={introVideoRef}
+                            <img
+                              src="/voitans.gif"
+                              alt="VOITANS Animated Logo"
                               className="w-full h-full object-cover"
                               style={{ display: 'block', objectPosition: 'center 45%' }}
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                              x5-playsinline
-                              webkit-playsinline="true"
-                              preload="auto"
-                              poster="/voitans-logo.svg"
-                              aria-label="VOITANS animated logo"
-                            >
-                              <source src="/voitans.mp4" type="video/mp4" />
-                              <img src="/voitans-logo.svg" alt="VOITANS Logo" />
-                            </video>
+                              loading="eager"
+                              decoding="async"
+                            />
                           </div>
                         </div>
                         <div className="flex-1 space-y-3 text-[14px] leading-relaxed text-white">
