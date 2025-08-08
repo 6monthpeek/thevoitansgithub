@@ -1,1 +1,1 @@
-openrouter/horizon-beta
+openai/gpt-oss-20b:free
